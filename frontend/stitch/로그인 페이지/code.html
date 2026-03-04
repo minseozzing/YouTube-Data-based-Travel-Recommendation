@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>VoyageWise | 다음 여행을 계획해 보세요</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;family=Noto+Sans+KR:wght@300;400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#2563eb",
+                        "background-light": "#f8fafc",
+                        "background-dark": "#0f172a",
+                    },
+                    fontFamily: {
+                        display: ["Plus Jakarta Sans", "Noto Sans KR", "sans-serif"],
+                        sans: ["Noto Sans KR", "Plus Jakarta Sans", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "12px",
+                    },
+                },
+            },
+        };
+    </script>
+<style type="text/tailwindcss">
+        @layer base {
+            body {
+                @apply font-sans;
+            }
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark min-h-screen transition-colors duration-300">
+<header class="fixed top-0 w-full z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+<div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-white">explore</span>
+</div>
+<span class="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white font-display">VoyageWise</span>
+</div>
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors" href="#">탐색하기</a>
+<a class="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors" href="#">여행지</a>
+<a class="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors" href="#">가격 안내</a>
+<a class="px-5 py-2.5 rounded-full border border-slate-200 dark:border-slate-700 text-sm font-semibold text-slate-900 dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800 transition-all" href="#">홈페이지로 돌아가기</a>
+</nav>
+</div>
+</header>
+<main class="pt-20 min-h-screen flex items-center justify-center p-4 md:p-8">
+<div class="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-2 bg-white dark:bg-slate-900 rounded-[32px] overflow-hidden shadow-2xl shadow-slate-200 dark:shadow-none border border-slate-100 dark:border-slate-800">
+<div class="p-8 md:p-16 xl:p-24 flex flex-col justify-center">
+<div class="max-w-md mx-auto w-full">
+<h1 class="text-4xl md:text-5xl font-black text-slate-900 dark:text-white mb-4 leading-tight">
+                    다음 <span class="text-primary italic">여행</span>을<br/>계획해 보세요.
+                </h1>
+<p class="text-slate-500 dark:text-slate-400 text-lg mb-10 leading-relaxed">
+                    데이터 기반의 프리미엄 여행 계획을 지금 바로 경험해 보세요.
+                </p>
+<button class="w-full flex items-center justify-center gap-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-primary dark:hover:border-primary px-6 py-4 rounded-2xl shadow-sm hover:shadow-md transition-all group">
+<svg class="w-6 h-6" viewBox="0 0 48 48">
+<path d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" fill="#EA4335"></path>
+<path d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" fill="#4285F4"></path>
+<path d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" fill="#FBBC05"></path>
+<path d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" fill="#34A853"></path>
+</svg>
+<span class="text-slate-700 dark:text-slate-200 font-bold">Google 계정으로 계속하기</span>
+</button>
+<div class="relative my-10 text-center">
+<div class="absolute inset-0 flex items-center">
+<div class="w-full border-t border-slate-100 dark:border-slate-800"></div>
+</div>
+<span class="relative px-4 text-[11px] font-bold tracking-widest text-slate-400 dark:text-slate-500 bg-white dark:bg-slate-900 uppercase">단 하나의 계정으로 안전하게</span>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="p-6 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 hover:border-primary/30 transition-colors">
+<div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-primary text-xl">fingerprint</span>
+</div>
+<h3 class="font-bold text-slate-900 dark:text-white text-sm mb-1">빠르고 안전함</h3>
+<p class="text-slate-500 dark:text-slate-400 text-xs leading-relaxed">복잡한 비밀번호 없이 데이터 유출 걱정 없는 안전한 로그인을 제공합니다.</p>
+</div>
+<div class="p-6 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 hover:border-primary/30 transition-colors">
+<div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-primary text-xl">sync</span>
+</div>
+<h3 class="font-bold text-slate-900 dark:text-white text-sm mb-1">실시간 동기화</h3>
+<p class="text-slate-500 dark:text-slate-400 text-xs leading-relaxed">웹, 태블릿, 모바일 기기를 넘나들며 끊김 없는 계획을 이어가세요.</p>
+</div>
+</div>
+<p class="mt-12 text-center text-[10px] font-bold tracking-widest text-slate-400 dark:text-slate-500 uppercase">
+                    계속 진행함으로써 <a class="text-primary hover:underline" href="#">서비스 약관</a> 및 <a class="text-primary hover:underline" href="#">개인정보 처리방침</a>에 동의하게 됩니다.
+                </p>
+</div>
+</div>
+<div class="relative min-h-[500px] lg:min-h-full">
+<img alt="캐나다 레이크 루이스의 풍경" class="absolute inset-0 w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCEpFmQubDJ9at1846cnrBlVexShFupcaaRFPReOqj4uTlfo4i-HfH-8V1VKpiqPuVaS3IsRt7iEgD4XUaM1MCJ_3a9ycmeG_qOpaB0JlakxqFAmv0uKsOqyRLZpbFHEu7kF8U9eh8Svn0jdln3Vf03N2n3x1rxYnjsurHuOI_Tz3PnCVWIdnlUXbEysQhahEq1oHdKtl6t-HQC7X_dEbQve_YLqllurcGBYrUTek-kzgWM-bC_aVFcJXSoqqXK307J4_oC_odraRo"/>
+<div class="absolute inset-0 bg-gradient-to-br from-primary/60 to-slate-900/80 backdrop-blur-[2px]"></div>
+<div class="absolute inset-0 p-12 lg:p-16 flex flex-col justify-between text-white">
+<div class="flex flex-col gap-6">
+<div class="w-12 h-12 glass-card rounded-xl flex items-center justify-center">
+<span class="material-symbols-outlined text-white">auto_awesome</span>
+</div>
+<div>
+<h2 class="text-5xl font-extrabold leading-tight mb-4">프리미엄<br/>여행의 시작</h2>
+<p class="text-white/80 text-lg max-w-sm font-medium">
+                            예산과 취향에 맞춘 완벽한 여정을 설계해 드립니다.
+                        </p>
+</div>
+</div>
+<div class="space-y-8">
+<div class="glass-card p-4 rounded-2xl inline-flex items-center gap-6 max-w-fit pr-8">
+<div class="flex -space-x-3">
+<img alt="사용자" class="w-10 h-10 rounded-full border-2 border-white/20 object-cover bg-slate-800" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAoIakJrfy7zJW2fz_75YzpEvr5hXFirTeANpTSFasHEcTKRJXtUffqBHlHxdPGMJt_H5aERSYz6ko2tbgdeOtLa9hoOHT1i2osTXx_vT573fmvf6TQIkzSJdVcFsaLLiiaAqXge021RCUFRxaADuhLR5IRcxDtdRybR4wea12XnYIDSz9r_mRmu4Tnx1Du1qsAHU2LHSjs205RzAy6-vV7BA0BfficZGnjDbaxtAupIH1zLyzPCLDpwrUGo2N5LK62C92tabchhyg"/>
+<img alt="사용자" class="w-10 h-10 rounded-full border-2 border-white/20 object-cover bg-slate-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCvxDLyDD7WYZeKRzFF9rjyWNXy4vLD65NqDxGEiX19CLKGrrEWOxSHoDMSvGPLqXuYNXSCAurdj7Q5XFE2qTKw_lL0AV0IiET_DRxlsGrFa_dkEGbLBpr_DWSb7rB-9iEzorpJLNKwdZG4l8olauev_GTxt6QctxTY9PchqHj42UOMtYlkzNvrLOUTt0T-SpjUtfpGmUf_P9XUfeALAlUxFmYo125L7rRGj3FoxPJtF7TfgEphcx6dEq2vp8o2ezkDxFexCTbTwNE"/>
+<img alt="사용자" class="w-10 h-10 rounded-full border-2 border-white/20 object-cover bg-slate-600" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCjQNl5IHaqBcl3YHjyMs2CW4GslXfyC6JYYbDkTPPsx_iiVGGOARBMWSJeJBie6awIJsMrHehErmfwCmDO_15T8n7ati6NqN_8kVaCwUz1224ibDqbJZFRlFpmQflkyoQizaAiIqhKDidk5VICWUvqbd_sTu8TlC5P5T0zTthT4mVAN8BSQrNEtsmWb1U_mfzP96NXfH0WXUxCybY5uEKeZNgnS89xDh_JZ0_9TfBN5U7rjPvTw5JgwGTJjgaPj6eYdthUJW8K62M"/>
+<div class="w-10 h-10 rounded-full border-2 border-white/20 bg-primary flex items-center justify-center text-xs font-bold">+</div>
+</div>
+<div class="text-sm font-bold tracking-widest uppercase">5만 명 이상의 여행자와 함께하세요</div>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2 opacity-80">
+<span class="material-symbols-outlined text-sm">location_on</span>
+<span class="text-xs font-bold tracking-widest uppercase">Lake Louise, Canada</span>
+</div>
+<div class="flex gap-2">
+<div class="h-1.5 w-12 bg-white rounded-full"></div>
+<div class="h-1.5 w-1.5 bg-white/40 rounded-full"></div>
+<div class="h-1.5 w-1.5 bg-white/40 rounded-full"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<footer class="py-12 px-6">
+<div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+<div class="flex items-center gap-2 text-slate-400 dark:text-slate-500 text-sm">
+<span class="material-symbols-outlined text-lg">explore</span>
+<span>VoyageWise Inc. © 2024</span>
+</div>
+<div class="flex items-center gap-8 text-[11px] font-bold tracking-widest uppercase text-slate-500 dark:text-slate-400">
+<a class="hover:text-primary transition-colors" href="#">고객센터</a>
+<a class="hover:text-primary transition-colors" href="#">안전 정보</a>
+<a class="hover:text-primary transition-colors" href="#">개인정보 처리방침</a>
+</div>
+</div>
+</footer>
+<button class="fixed bottom-8 right-8 w-12 h-12 bg-white dark:bg-slate-800 rounded-full shadow-lg border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-400 hover:scale-110 transition-all z-50" onclick="document.documentElement.classList.toggle('dark')">
+<span class="material-symbols-outlined">dark_mode</span>
+</button>
+
+</body></html>
