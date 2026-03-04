@@ -1,7 +1,9 @@
 import { motion, type Variants } from 'framer-motion';
-import { type LucideIcon, Loader2, Zap, Bot } from 'lucide-react';
+import { type LucideIcon, Loader2, Zap, Bot, FlaskConical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useGoogleLogin } from '@/hooks/auth/useGoogleLogin';
+import { useAuthStore } from '@/stores/authStore';
+import { useNavigate } from '@tanstack/react-router';
 import maldiveImg from '@/assets/Maldive_beach_1.jpg';
 
 // ─── 애니메이션 variants ──────────────────────────────────────────
@@ -166,6 +168,15 @@ const RightImagePanel = () => (
 // ─── LoginPage ────────────────────────────────────────────────────
 const LoginPage = () => {
   const { mutate: loginWithGoogle, isPending } = useGoogleLogin();
+  const { setAccessToken, setUser, setHasCompletedPreference } = useAuthStore();
+  const navigate = useNavigate();
+
+  const handleDevLogin = () => {
+    setAccessToken('dev-mock-token');
+    setUser({ id: 1, email: 'dev@dahaeng.com', name: '개발자', profileImageUrl: '' });
+    setHasCompletedPreference(true);
+    navigate({ to: '/main' });
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
@@ -204,12 +215,27 @@ const LoginPage = () => {
             </motion.div>
 
             {/* Google 로그인 버튼 */}
-            <motion.div variants={fadeInUp} className="mb-6">
+            <motion.div variants={fadeInUp} className="mb-3">
               <GoogleLoginButton
                 onClick={() => loginWithGoogle()}
                 isPending={isPending}
               />
             </motion.div>
+
+            {/* 개발 모드 버튼 (백엔드 없이 UI 확인용) */}
+            {import.meta.env.DEV && (
+              <motion.div variants={fadeInUp} className="mb-6">
+                <Button
+                  onClick={handleDevLogin}
+                  variant="outline"
+                  size="lg"
+                  className="w-full h-10 gap-2 border-dashed border-amber-400 bg-amber-50 text-amber-700 hover:bg-amber-100 text-sm font-medium"
+                >
+                  <FlaskConical className="size-4" aria-hidden="true" />
+                  개발 모드로 입장 (백엔드 없이)
+                </Button>
+              </motion.div>
+            )}
 
             {/* 구분선 */}
             <motion.div

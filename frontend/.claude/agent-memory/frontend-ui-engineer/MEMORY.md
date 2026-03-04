@@ -59,7 +59,7 @@ import { Dialog as DialogPrimitive } from 'radix-ui';
 - `src/pages/BookmarkDetailPage.tsx` — hero + 2-col dashboard (55/45)
 - `src/pages/CostPage.tsx` — hero search + 3-col TOP cards + 4-col cheap/expensive + promo banner
 - `src/pages/CountryCostDetailPage.tsx` — breadcrumb + hero + 2-col KPI + recharts line + city grid
-- `src/pages/MainPage.tsx` — includes `<CityDetailModal />` at top level
+- `src/pages/MainPage.tsx` — full-screen Globe page (fixed inset-0 z-0), custom MainNavBar, no standard chrome
 
 ## City Detail Modal Architecture
 - `src/components/city/CityDetailModal.tsx` — Dialog wrapper (max-w-4xl h-[85vh], flex-row layout)
@@ -98,8 +98,27 @@ import { Dialog as DialogPrimitive } from 'radix-ui';
 
 ## Layout Components
 - `AuthenticatedLayout` wraps `TopNavBar` + `<main>` + `Footer`
+  - Bypasses chrome for routes in `CHROMELESS_ROUTES = new Set(['/main'])`
+  - Uses `useLocation({ select: (l) => l.pathname })` from `@tanstack/react-router`
 - `TopNavBar` — sticky top-0 z-50
 - `Footer` — Privacy · Safety links, copyright 2026
+
+## MainPage Architecture (Globe Full-Screen)
+- `src/pages/MainPage.tsx` — `fixed inset-0 z-0` covers viewport; background: `Maldive_beach_1.jpg` + bg-black/20 overlay
+- `src/components/globe/GlobeContainer.tsx` — ResizeObserver pattern, lazy-loads GlobeViewer
+- `src/components/globe/GlobeViewer.tsx` — `react-globe.gl` Globe component, sets POV via `onGlobeReady`
+- `src/components/main/MainNavBar.tsx` — absolute top-3 left-3 right-3 z-30, glassmorphism bg-white/85
+- `src/components/main/LeftSidebar.tsx` — absolute top-[72px] left-3 bottom-3 w-64 z-20
+- `src/components/main/TripSettingsPanel.tsx` — budget/duration inputs + risk range slider + update button
+- `src/components/main/TopMatchingList.tsx` — sorted by matchingScore, top 5 cities
+- `src/components/main/TopMatchingCard.tsx` — image/avatar + city name + match badge
+- `src/components/main/HeroTextBlock.tsx` — pointer-events-none text overlay, framer-motion fade-in
+- `src/components/main/StatBar.tsx` — absolute bottom-4 center, 4 hardcoded stats
+- GlobeContainer layout: `absolute top-[72px] left-[280px] right-3 bottom-3` + `rounded-full overflow-hidden`
+- Globe marker colors: score>=80: #10b981 (emerald), >=50: #3b82f6 (blue), else: #f59e0b (amber)
+- react-globe.gl ref type: `useRef<GlobeMethods | undefined>(undefined)` from `import Globe, { type GlobeMethods } from 'react-globe.gl'`
+- Globe initial POV set via `onGlobeReady` callback: `globeRef.current?.pointOfView({ lat:35, lng:127, altitude:2.0 }, 0)`
+- z-index strategy: MainPage z-0 → Dialog (Portal) z-50 appears above; MainNavBar z-30 in MainPage context
 
 ## Bookmark Feature Architecture
 - Schema: `src/schemas/bookmark.schema.ts` — `BookmarkListItem`, `BookmarkDetail`

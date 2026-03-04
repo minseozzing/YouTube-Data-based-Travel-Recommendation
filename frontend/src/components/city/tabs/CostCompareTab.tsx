@@ -14,6 +14,18 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useCountryCost } from '@/hooks/cost/useCountryCost';
 import { cn } from '@/lib/utils';
 import type { CityDetail } from '@/schemas/city.schema';
+import type { CountryCost } from '@/schemas/cost.schema';
+
+// 백엔드 없을 때 기본 더미 물가 데이터
+const DUMMY_COST: CountryCost = {
+  countryId: 0,
+  currency: 'JPY',
+  onePerson: { totalWithRent: 180000, withoutRent: 120000, rentAndUtilities: 60000, food: 80000, transport: 25000 },
+  familyOf4: { totalWithRent: 420000 },
+  salaryAfterTaxMedian: 250000,
+  population: 10000000,
+  meta: { lastUpdatedAt: '2025-01-01T00:00:00Z', source: 'Demo Data' },
+};
 
 interface CostCompareTabProps {
   city: CityDetail;
@@ -45,7 +57,10 @@ const DUMMY_EXCHANGE_DATA = [
 ];
 
 export function CostCompareTab({ city }: CostCompareTabProps) {
-  const { data: costData, isLoading } = useCountryCost(city.countryId);
+  const { data: costFromApi, isLoading } = useCountryCost(city.countryId);
+
+  // API 실패 시 더미 데이터 fallback
+  const costData = costFromApi ?? (!isLoading ? DUMMY_COST : null);
 
   const currency = costData?.currency ?? 'KRW';
 
