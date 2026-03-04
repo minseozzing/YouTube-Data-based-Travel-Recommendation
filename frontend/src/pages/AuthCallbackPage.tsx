@@ -3,6 +3,8 @@ import { useNavigate, useSearch } from '@tanstack/react-router';
 import { useMutation } from '@tanstack/react-query';
 import { authApi } from '@/api/auth.api';
 import { useAuthStore } from '@/stores/authStore';
+import { Loader2, AlertCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 const AuthCallbackPage = () => {
   const navigate = useNavigate();
@@ -45,10 +47,42 @@ const AuthCallbackPage = () => {
   }, []);
 
   if (isError) {
-    return <p>로그인 처리 중 오류가 발생했습니다: {(error as Error)?.message}</p>;
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-background px-4">
+        <div className="flex flex-col items-center gap-3 text-center">
+          <AlertCircle
+            className="size-10 text-destructive"
+            aria-hidden="true"
+          />
+          <p className="text-base font-medium text-foreground">
+            로그인 처리 중 오류가 발생했습니다
+          </p>
+          {(error as Error)?.message && (
+            <p className="text-sm text-muted-foreground max-w-xs">
+              {(error as Error).message}
+            </p>
+          )}
+        </div>
+        <Button
+          variant="outline"
+          onClick={() => navigate({ to: '/login' })}
+          aria-label="로그인 페이지로 돌아가기"
+        >
+          로그인 페이지로 돌아가기
+        </Button>
+      </div>
+    );
   }
 
-  return <p>로그인 처리 중...</p>;
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-background">
+      <Loader2
+        className="size-10 animate-spin text-primary"
+        aria-label="로그인 처리 중"
+      />
+      <p className="text-sm text-muted-foreground">로그인 처리 중...</p>
+    </div>
+  );
 };
 
 export default AuthCallbackPage;

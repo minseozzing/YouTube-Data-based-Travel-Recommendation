@@ -3,6 +3,7 @@ import { useUiStore } from '@/stores/uiStore';
 import { useCityList } from '@/hooks/city/useCityList';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import QueryErrorFallback from '@/components/common/QueryErrorFallback';
+import { CityDetailModal } from '@/components/city/CityDetailModal';
 
 type MainTab = 'recommend' | 'cost' | 'flight' | 'news';
 
@@ -19,6 +20,7 @@ const MainPage = () => {
 
   return (
     <div>
+      <CityDetailModal />
       <h1>MainPage</h1>
       <div>
         {(['recommend', 'cost', 'flight', 'news'] as MainTab[]).map((t) => (
