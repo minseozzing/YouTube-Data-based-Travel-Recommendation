@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>VoyageWise | 항공권 및 숙박 비용 분석</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;family=Noto+Sans+KR:wght@300;400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#2563eb",
+                        accent: "#bae6fd",
+                        "background-light": "#f8fafc",
+                        "background-dark": "#0f172a",
+                    },
+                    fontFamily: {
+                        display: ["Plus Jakarta Sans", "Noto Sans KR", "sans-serif"],
+                        sans: ["Noto Sans KR", "Plus Jakarta Sans", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "12px",
+                    },
+                },
+            },
+        };
+    </script>
+<style type="text/tailwindcss">
+        @layer base {
+            body {
+                @apply font-sans antialiased;
+            }
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .dark .glass-card {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .frosted-glass-popup {
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+        }
+        .dark .frosted-glass-popup {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #e2e8f0;
+            border-radius: 10px;
+        }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #334155;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .chart-line {
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 0;
+        }
+        .active-glow {
+            box-shadow: 0 0 20px rgba(37, 99, 235, 0.4);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark min-h-screen transition-colors duration-300">
+<header class="fixed top-0 w-full z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+<div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-white">explore</span>
+</div>
+<span class="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">VoyageWise</span>
+</div>
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors" href="#">탐색</a>
+<a class="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors" href="#">여행지</a>
+<a class="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors" href="#">요금제</a>
+<button class="px-5 py-2.5 rounded-full border border-slate-200 dark:border-slate-700 text-sm font-semibold text-slate-900 dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">로그아웃</button>
+</nav>
+</div>
+</header>
+<main class="pt-28 pb-12 min-h-screen flex items-center justify-center p-4">
+<div class="max-w-6xl w-full bg-white dark:bg-slate-900 rounded-[32px] overflow-hidden shadow-2xl border border-slate-100 dark:border-slate-800 flex flex-col md:flex-row h-full max-h-[850px] relative">
+<div class="md:w-5/12 relative min-h-[300px] md:min-h-full">
+<img alt="시드니 오페라 하우스" class="absolute inset-0 w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCEpFmQubDJ9at1846cnrBlVexShFupcaaRFPReOqj4uTlfo4i-HfH-8V1VKpiqPuVaS3IsRt7iEgD4XUaM1MCJ_3a9ycmeG_qOpaB0JlakxqFAmv0uKsOqyRLZpbFHEu7kF8U9eh8Svn0jdln3Vf03N2n3x1rxYnjsurHuOI_Tz3PnCVWIdnlUXbEysQhahEq1oHdKtl6t-HQC7X_dEbQve_YLqllurcGBYrUTek-kzgWM-bC_aVFcJXSoqqXK307J4_oC_odraRo"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-8 w-full text-white">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-blue-400">location_on</span>
+<span class="text-xs font-bold tracking-widest uppercase opacity-90">호주, 뉴사우스웨일스</span>
+</div>
+<h2 class="text-4xl font-extrabold mb-2">시드니</h2>
+<p class="text-white/80 text-sm leading-relaxed mb-6">현대적인 도시미와 아름다운 해안선이 공존하는 남반구 최고의 도시</p>
+<button class="w-full bg-primary hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-2xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined">bookmark</span>
+                    저장하기
+                </button>
+</div>
+</div>
+<div class="md:w-7/12 bg-white dark:bg-slate-900 flex flex-col overflow-hidden relative">
+<div class="px-8 pt-8">
+<div class="flex flex-wrap gap-2 mb-6 p-1 bg-slate-100 dark:bg-slate-800 rounded-2xl">
+<button class="flex-1 py-3 px-4 rounded-xl text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-slate-700">추천 이유</button>
+<button class="flex-1 py-3 px-4 rounded-xl text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-slate-700">생활물가 비교</button>
+<button class="flex-1 py-3 px-4 rounded-xl text-sm font-bold bg-white dark:bg-slate-700 text-primary shadow-sm">항공권 정보</button>
+<button class="flex-1 py-3 px-4 rounded-xl text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-slate-700">현지 뉴스</button>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto px-8 pb-8 custom-scrollbar relative">
+<div class="space-y-8">
+<div class="bg-blue-50/50 dark:bg-blue-900/10 rounded-2xl p-6 border border-blue-100 dark:border-blue-900/30">
+<div class="flex justify-between items-start mb-6">
+<div>
+<h3 class="text-xl font-bold text-slate-900 dark:text-white mb-1">Price Trends</h3>
+<p class="text-xs font-medium text-slate-500 dark:text-slate-400">Estimated round-trip prices from Seoul</p>
+</div>
+<div class="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
+<button class="px-3 py-1 text-[10px] font-bold text-slate-500 hover:text-slate-700">3 Months</button>
+<button class="px-3 py-1 text-[10px] font-bold bg-white dark:bg-slate-700 text-primary rounded shadow-sm">6 Months</button>
+</div>
+</div>
+<div class="mt-12 h-40 flex items-end justify-between gap-2 relative">
+<div class="flex-1 flex flex-col items-center gap-2 group cursor-pointer">
+<div class="w-full bg-slate-200 dark:bg-slate-800 rounded-t-sm transition-all hover:bg-slate-300 dark:hover:bg-slate-700" style="height: 60%"></div>
+<span class="text-[10px] font-bold text-slate-400 group-hover:text-slate-600 transition-colors">Oct</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2 group cursor-pointer">
+<div class="w-full bg-slate-200 dark:bg-slate-800 rounded-t-sm transition-all hover:bg-slate-300 dark:hover:bg-slate-700" style="height: 80%"></div>
+<span class="text-[10px] font-bold text-slate-400 group-hover:text-slate-600 transition-colors">Nov</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2 relative cursor-pointer">
+<div class="absolute -top-10 left-1/2 -translate-x-1/2 bg-primary text-white text-[10px] py-1 px-3 rounded-full whitespace-nowrap font-bold shadow-lg shadow-primary/20 z-20">
+                                    Cheapest: ₩820k
+                                    <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-primary rotate-45"></div>
+</div>
+<div class="w-full bg-primary active-glow rounded-t-sm transition-all relative" style="height: 45%">
+<div class="absolute -bottom-4 left-1/2 -translate-x-1/2 w-[2px] h-4 bg-primary/30"></div>
+</div>
+<span class="text-[10px] font-bold text-primary">Dec</span>
+<div class="absolute -bottom-10 flex flex-col items-center">
+<div class="px-2 py-0.5 bg-primary text-white text-[8px] font-bold rounded-md uppercase tracking-wider animate-pulse">Viewing</div>
+</div>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2 group cursor-pointer">
+<div class="w-full bg-slate-200 dark:bg-slate-800 rounded-t-sm transition-all hover:bg-slate-300 dark:hover:bg-slate-700" style="height: 90%"></div>
+<span class="text-[10px] font-bold text-slate-400 group-hover:text-slate-600 transition-colors">Jan</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2 group cursor-pointer">
+<div class="w-full bg-slate-200 dark:bg-slate-800 rounded-t-sm transition-all hover:bg-slate-300 dark:hover:bg-slate-700" style="height: 70%"></div>
+<span class="text-[10px] font-bold text-slate-400 group-hover:text-slate-600 transition-colors">Feb</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2 group cursor-pointer">
+<div class="w-full bg-slate-200 dark:bg-slate-800 rounded-t-sm transition-all hover:bg-slate-300 dark:hover:bg-slate-700" style="height: 100%"></div>
+<span class="text-[10px] font-bold text-slate-400 group-hover:text-slate-600 transition-colors">Mar</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2 group cursor-pointer">
+<div class="w-full bg-slate-200 dark:bg-slate-800 rounded-t-sm transition-all hover:bg-slate-300 dark:hover:bg-slate-700" style="height: 75%"></div>
+<span class="text-[10px] font-bold text-slate-400 group-hover:text-slate-600 transition-colors">Apr</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+<div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-100 dark:border-slate-800">
+<p class="text-[10px] font-bold text-slate-400 mb-1">선택된 달 최저가</p>
+<p class="text-sm font-black text-slate-900 dark:text-white">12월 18일</p>
+</div>
+<div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-100 dark:border-slate-800">
+<p class="text-[10px] font-bold text-slate-400 mb-1">비행 시간</p>
+<p class="text-sm font-black text-slate-900 dark:text-white">10시간 30분</p>
+</div>
+<div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-100 dark:border-slate-800">
+<p class="text-[10px] font-bold text-slate-400 mb-1">경유 횟수</p>
+<p class="text-sm font-black text-slate-900 dark:text-white">직항</p>
+</div>
+<div class="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-xl border border-blue-100 dark:border-blue-800">
+<p class="text-[10px] font-bold text-blue-500 mb-1">평균 1인 숙박비</p>
+<p class="text-sm font-black text-blue-700 dark:text-blue-300">125,000 KRW</p>
+</div>
+</div>
+<div class="relative">
+<div class="absolute -top-10 left-[35%] w-[1px] h-10 border-l border-dashed border-primary/20"></div>
+<div class="flex justify-between items-center mb-4">
+<div class="flex items-center gap-3">
+<h4 class="text-sm font-bold text-slate-900 dark:text-white">날짜별 최저가 캘린더</h4>
+<span class="bg-primary/10 text-primary text-[10px] font-bold px-2 py-0.5 rounded-full border border-primary/20 flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">calendar_today</span>
+                                    2024.12
+                                </span>
+</div>
+<div class="flex items-center gap-3">
+<span class="flex items-center gap-1 text-[10px] font-bold text-slate-400">
+<span class="w-2 h-2 rounded-full bg-slate-200 dark:bg-slate-700"></span> 데이터 없음
+                                </span>
+<span class="flex items-center gap-1 text-[10px] font-bold text-primary">
+<span class="w-2 h-2 rounded-full bg-primary"></span> 최저가 확정
+                                </span>
+</div>
+</div>
+<div class="grid grid-cols-7 gap-2">
+<div class="text-center text-[10px] font-black text-slate-400 py-1">일</div>
+<div class="text-center text-[10px] font-black text-slate-400 py-1">월</div>
+<div class="text-center text-[10px] font-black text-slate-400 py-1">화</div>
+<div class="text-center text-[10px] font-black text-slate-400 py-1">수</div>
+<div class="text-center text-[10px] font-black text-slate-400 py-1">목</div>
+<div class="text-center text-[10px] font-black text-slate-400 py-1">금</div>
+<div class="text-center text-[10px] font-black text-slate-400 py-1">토</div>
+<div class="aspect-square bg-slate-50 dark:bg-slate-800/30 rounded-lg p-1 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+<span class="text-[10px] font-bold mb-0.5 text-slate-400">1</span>
+<span class="text-[8px] font-black text-slate-500">92만</span>
+</div>
+<div class="aspect-square bg-slate-50 dark:bg-slate-800/30 rounded-lg p-1 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+<span class="text-[10px] font-bold mb-0.5 text-slate-400">2</span>
+<span class="text-[8px] font-black text-slate-500">89만</span>
+</div>
+<div class="aspect-square bg-slate-50 dark:bg-slate-800/30 rounded-lg p-1 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+<span class="text-[10px] font-bold mb-0.5 text-slate-400">3</span>
+<span class="text-[8px] font-black text-slate-500">95만</span>
+</div>
+<div class="aspect-square bg-slate-50 dark:bg-slate-800/30 rounded-lg p-1 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+<span class="text-[10px] font-bold mb-0.5 text-slate-400">4</span>
+<span class="text-[8px] font-black text-slate-500">88만</span>
+</div>
+<div class="aspect-square bg-slate-50 dark:bg-slate-800/30 rounded-lg p-1 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+<span class="text-[10px] font-bold mb-0.5 text-slate-400">5</span>
+<span class="text-[8px] font-black text-slate-500">90만</span>
+</div>
+<div class="aspect-square bg-slate-50 dark:bg-slate-800/30 rounded-lg p-1 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+<span class="text-[10px] font-bold mb-0.5 text-slate-400">6</span>
+<span class="text-[8px] font-black text-slate-500">110만</span>
+</div>
+<div class="aspect-square bg-slate-50 dark:bg-slate-800/30 rounded-lg p-1 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+<span class="text-[10px] font-bold mb-0.5 text-slate-400">7</span>
+<span class="text-[8px] font-black text-slate-500">105만</span>
+</div>
+<div class="aspect-square bg-slate-50 dark:bg-slate-800/30 rounded-lg p-1 flex flex-col items-center justify-center opacity-40"><span class="text-[10px] font-bold">...</span></div>
+<div class="aspect-square bg-slate-50 dark:bg-slate-800/30 rounded-lg p-1 flex flex-col items-center justify-center opacity-40"><span class="text-[10px] font-bold">...</span></div>
+<div class="aspect-square bg-slate-50 dark:bg-slate-800/30 rounded-lg p-1 flex flex-col items-center justify-center opacity-40"><span class="text-[10px] font-bold">...</span></div>
+<div class="aspect-square bg-slate-50 dark:bg-slate-800/30 rounded-lg p-1 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"><span class="text-[10px] font-bold text-slate-400">15</span><span class="text-[8px] font-black text-slate-500">87만</span></div>
+<div class="aspect-square bg-slate-50 dark:bg-slate-800/30 rounded-lg p-1 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"><span class="text-[10px] font-bold text-slate-400">16</span><span class="text-[8px] font-black text-slate-500">86만</span></div>
+<div class="aspect-square bg-slate-50 dark:bg-slate-800/30 rounded-lg p-1 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"><span class="text-[10px] font-bold text-slate-400">17</span><span class="text-[8px] font-black text-slate-500">85만</span></div>
+<div class="aspect-square bg-primary rounded-lg p-1 flex flex-col items-center justify-center shadow-lg shadow-primary/20 scale-110 border-2 border-white dark:border-slate-900 z-10 cursor-pointer">
+<span class="text-[10px] font-black text-white mb-0.5">18</span>
+<span class="text-[8px] font-black text-white">82만</span>
+</div>
+<div class="aspect-square bg-slate-50 dark:bg-slate-800/30 rounded-lg p-1 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"><span class="text-[10px] font-bold text-slate-400">19</span><span class="text-[8px] font-black text-slate-500">88만</span></div>
+<div class="aspect-square bg-slate-50 dark:bg-slate-800/30 rounded-lg p-1 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"><span class="text-[10px] font-bold text-slate-400">20</span><span class="text-[8px] font-black text-slate-500">92만</span></div>
+<div class="aspect-square bg-slate-50 dark:bg-slate-800/30 rounded-lg p-1 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"><span class="text-[10px] font-bold text-slate-400">21</span><span class="text-[8px] font-black text-slate-500">95만</span></div>
+</div>
+<div class="absolute inset-x-0 -inset-y-4 z-40 flex items-center justify-center p-4">
+<div class="frosted-glass-popup w-full max-w-lg rounded-3xl overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-300">
+<div class="px-6 py-4 flex items-center justify-between border-b border-white/20">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">flight_takeoff</span>
+<h5 class="text-sm font-bold text-slate-900 dark:text-white">12월 18일 상세 항공편</h5>
+</div>
+<button class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors">
+<span class="material-symbols-outlined text-slate-500 dark:text-slate-400">close</span>
+</button>
+</div>
+<div class="p-6 space-y-4 max-h-[400px] overflow-y-auto custom-scrollbar">
+<div class="bg-white/60 dark:bg-slate-800/60 p-4 rounded-2xl border border-white/40 dark:border-slate-700/50 flex items-center justify-between gap-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center p-1.5 overflow-hidden">
+<img alt="Airline" class="w-full h-full object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAXBqDVWA3vGiP0ilst33ykSmSIB_qESvPFAxAQP-EuiqSbwDsQKksEWuIvvwp7VPh-5PPqdD-di6vdRAexFAznKIzlZ4OX2XXFEWGaIqRB-04l5ub3mIyLoUsHaosDQGxYFgqwzpFSZ8HVeWIAq9G3wnJ6kxB8En4bUYosxcIoRqV79Qoygpf8AFqoZ2Ouf1mgad-l8aggkpSC-C9fl3pl_2z9-qIt4OiX0nZGm-4uuHp9R_EhxA2GoFhQfD8vpa68GuOj9bDELiM"/>
+</div>
+<div>
+<p class="text-xs font-bold text-slate-900 dark:text-white">대한항공</p>
+<p class="text-[10px] text-slate-500 dark:text-slate-400">KE121</p>
+</div>
+</div>
+<div class="flex-1 text-center">
+<div class="flex items-center justify-center gap-4 mb-1">
+<span class="text-sm font-bold text-slate-900 dark:text-white">18:40</span>
+<div class="flex flex-col items-center gap-0.5 px-4 relative">
+<span class="text-[8px] font-bold text-slate-400">10h 30m</span>
+<div class="w-16 h-[1px] bg-slate-300 dark:bg-slate-600 relative">
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1 h-1 bg-slate-300 dark:bg-slate-600 rounded-full"></div>
+</div>
+<span class="text-[8px] font-bold text-blue-500">직항</span>
+</div>
+<span class="text-sm font-bold text-slate-900 dark:text-white">07:10</span>
+</div>
+</div>
+<div class="text-right flex flex-col items-end gap-2">
+<p class="text-sm font-black text-primary">₩825,000</p>
+<button class="px-4 py-1.5 bg-primary text-white text-[10px] font-bold rounded-lg hover:bg-blue-700 transition-colors">선택</button>
+</div>
+</div>
+<div class="bg-white/60 dark:bg-slate-800/60 p-4 rounded-2xl border border-white/40 dark:border-slate-700/50 flex items-center justify-between gap-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center p-1.5 overflow-hidden">
+<img alt="Airline" class="w-full h-full object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAcBOecHlFooKmd5FKA-vdXvN2PWLiLqmrfGILRZG5SjN32I65onsj188hPhOw_dXEu1ngsrM7o9zm-EqmphnvBqcziHpCVCEzNx1kzTcZxv5dTyul6BtoRtmRrToqpfPWMqHc06JeH36jnv1zZQpgcMT7Seht-Uwi5sYkkZ9Snt1UftTfUOKDBiWqebqL1sLhzidxl10OtoSl9BkGgcqbttKeqtQPjKH3aBpFk7h96GYrd320PbQacAqy-GI68fcOokOA08VPNulI"/>
+</div>
+<div>
+<p class="text-xs font-bold text-slate-900 dark:text-white">콴타스 항공</p>
+<p class="text-[10px] text-slate-500 dark:text-slate-400">QF88</p>
+</div>
+</div>
+<div class="flex-1 text-center">
+<div class="flex items-center justify-center gap-4 mb-1">
+<span class="text-sm font-bold text-slate-900 dark:text-white">20:15</span>
+<div class="flex flex-col items-center gap-0.5 px-4 relative">
+<span class="text-[8px] font-bold text-slate-400">10h 25m</span>
+<div class="w-16 h-[1px] bg-slate-300 dark:bg-slate-600 relative">
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1 h-1 bg-slate-300 dark:bg-slate-600 rounded-full"></div>
+</div>
+<span class="text-[8px] font-bold text-blue-500">직항</span>
+</div>
+<span class="text-sm font-bold text-slate-900 dark:text-white">08:40</span>
+</div>
+</div>
+<div class="text-right flex flex-col items-end gap-2">
+<p class="text-sm font-black text-primary">₩842,000</p>
+<button class="px-4 py-1.5 bg-primary text-white text-[10px] font-bold rounded-lg hover:bg-blue-700 transition-colors">선택</button>
+</div>
+</div>
+<div class="bg-white/60 dark:bg-slate-800/60 p-4 rounded-2xl border border-white/40 dark:border-slate-700/50 flex items-center justify-between gap-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center p-1.5 overflow-hidden">
+<img alt="Airline" class="w-full h-full object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDceXGGS3MLFCLG_L4oYPpBM0v3cnzX6f2eO1Gnt2Y0BECPeQTnRjOEDAYME4qQGCQUznrwhPTL8thxRiF1wpuMgrIcVxOgPvkoX1hkJFOolDJR_Rli-FVF5OKowPCMqqzSMIlfRjq1PB_0FdTAFw9vOo0tGDyiR8ihGptAvLKE9bh-gozUMyZaB7VtgLtXPwB_Cbg3wYFsE9FDh11yhP3vsu6JyIkIzzUaK6hwnhatfi1UOuMLYW6IzJAo4w9M6cGR1aM0-U4luds"/>
+</div>
+<div>
+<p class="text-xs font-bold text-slate-900 dark:text-white">싱가포르 항공</p>
+<p class="text-[10px] text-slate-500 dark:text-slate-400">SQ607</p>
+</div>
+</div>
+<div class="flex-1 text-center">
+<div class="flex items-center justify-center gap-4 mb-1">
+<span class="text-sm font-bold text-slate-900 dark:text-white">09:10</span>
+<div class="flex flex-col items-center gap-0.5 px-4 relative">
+<span class="text-[8px] font-bold text-slate-400">14h 50m</span>
+<div class="w-16 h-[1px] bg-slate-300 dark:bg-slate-600 relative">
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-orange-400 rounded-full"></div>
+</div>
+<span class="text-[8px] font-bold text-orange-500">1회 경유</span>
+</div>
+<span class="text-sm font-bold text-slate-900 dark:text-white">00:00</span>
+</div>
+</div>
+<div class="text-right flex flex-col items-end gap-2">
+<p class="text-sm font-black text-primary">₩798,000</p>
+<button class="px-4 py-1.5 bg-primary text-white text-[10px] font-bold rounded-lg hover:bg-blue-700 transition-colors">선택</button>
+</div>
+</div>
+</div>
+<div class="px-6 py-4 bg-white/10 text-center">
+<p class="text-[10px] text-slate-500 dark:text-slate-400">최저가 보장제 적용 상품입니다.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-slate-50/50 dark:bg-slate-800/10 rounded-2xl p-6 border border-slate-100 dark:border-slate-800">
+<div class="flex justify-between items-center mb-6">
+<h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-lg">monitoring</span>
+                                최저가 추적 그래프 (지난 30일)
+                            </h3>
+<span class="text-[10px] font-bold text-primary bg-white dark:bg-slate-800 px-2 py-1 rounded shadow-sm">KRW / 왕복 기준</span>
+</div>
+<div class="relative h-48 w-full">
+<svg class="w-full h-full overflow-visible" preserveAspectRatio="none" viewBox="0 0 400 100">
+<path class="chart-line" d="M0,80 Q50,75 80,60 T140,70 T200,40 T260,50 T320,20 T400,30" fill="none" stroke="#2563eb" stroke-width="2"></path>
+<path d="M0,80 Q50,75 80,60 T140,70 T200,40 T260,50 T320,20 T400,30 V100 H0 Z" fill="url(#gradient)" opacity="0.1"></path>
+<defs>
+<linearGradient id="gradient" x1="0%" x2="0%" y1="0%" y2="100%">
+<stop offset="0%" style="stop-color:#2563eb;stop-opacity:1"></stop>
+<stop offset="100%" style="stop-color:#2563eb;stop-opacity:0"></stop>
+</linearGradient>
+</defs>
+<circle cx="320" cy="20" fill="#2563eb" r="4"></circle>
+</svg>
+<div class="absolute top-2 left-[80%] -translate-x-1/2 bg-slate-900 text-white text-[10px] py-1 px-2 rounded">
+                                845,000 KRW
+                            </div>
+</div>
+<div class="flex justify-between mt-4 text-[10px] font-bold text-slate-400">
+<span>30일 전</span>
+<span>오늘</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<footer class="py-12 px-6">
+<div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+<div class="flex items-center gap-2 text-slate-400 dark:text-slate-500 text-sm">
+<span class="material-symbols-outlined text-lg">explore</span>
+<span>VoyageWise Inc. © 2024</span>
+</div>
+<div class="flex items-center gap-8 text-[11px] font-bold tracking-widest uppercase text-slate-500 dark:text-slate-400">
+<a class="hover:text-primary transition-colors" href="#">고객지원</a>
+<a class="hover:text-primary transition-colors" href="#">안전 정보</a>
+<a class="hover:text-primary transition-colors" href="#">개인정보 처리방침</a>
+</div>
+</div>
+</footer>
+<button class="fixed bottom-8 right-8 w-12 h-12 bg-white dark:bg-slate-800 rounded-full shadow-lg border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-400 hover:scale-110 transition-all z-50" onclick="document.documentElement.classList.toggle('dark')">
+<span class="material-symbols-outlined">dark_mode</span>
+</button>
+
+</body></html>

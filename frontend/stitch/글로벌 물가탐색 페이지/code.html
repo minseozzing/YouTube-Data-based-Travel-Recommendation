@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>VoyageWise - 글로벌 물가 탐색기</title>
+<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#7DD3FC","background-light": "#F8FAFC",
+              "background-dark": "#0F172A",
+            },
+            fontFamily: {
+              sans: ["Pretendard", "sans-serif"],
+              display: ["Pretendard", "sans-serif"],
+            },
+            borderRadius: {
+              DEFAULT: "1rem",
+            },
+          },
+        },
+      };
+    </script>
+<style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .dark .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-100 font-sans transition-colors duration-300">
+<nav class="sticky top-0 z-50 glass-card px-6 py-4 mb-8">
+<div class="max-w-7xl mx-auto flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-icons-outlined text-primary text-3xl">explore</span>
+<span class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">VoyageWise</span>
+</div>
+<div class="hidden md:flex items-center gap-8 font-medium">
+<a class="text-primary border-b-2 border-primary pb-1" href="#">물가 탐색기</a>
+<a class="hover:text-primary transition-colors" href="#">여행 계획</a>
+<a class="hover:text-primary transition-colors" href="#">커뮤니티</a>
+<button class="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors" onclick="document.documentElement.classList.toggle('dark')">
+<span class="material-icons-outlined">dark_mode</span>
+</button>
+</div>
+</div>
+</nav>
+<main class="max-w-7xl mx-auto px-6 pb-20">
+<section class="mb-12">
+<h1 class="text-4xl font-extrabold mb-8 text-center bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-500">
+                어디로 떠나볼까요?
+            </h1>
+<div class="max-w-3xl mx-auto space-y-4">
+<div class="relative">
+<span class="material-icons-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+<input class="w-full pl-12 pr-4 py-4 rounded-2xl border-none ring-1 ring-slate-200 dark:ring-slate-700 bg-white dark:bg-slate-800 shadow-xl focus:ring-2 focus:ring-primary outline-none text-lg transition-all" placeholder="국가명 또는 도시명을 입력하세요..." type="text"/>
+</div>
+<div class="flex flex-wrap gap-3 justify-center">
+<div class="group relative">
+<button class="px-5 py-2 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center gap-2 hover:border-primary transition-all">
+<span>대륙별</span>
+<span class="material-icons-outlined text-sm">expand_more</span>
+</button>
+</div>
+<div class="group relative">
+<button class="px-5 py-2 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center gap-2 hover:border-primary transition-all">
+<span>국가별</span>
+<span class="material-icons-outlined text-sm">expand_more</span>
+</button>
+</div>
+<div class="group relative">
+<button class="px-5 py-2 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center gap-2 hover:border-primary transition-all">
+<span>도시별</span>
+<span class="material-icons-outlined text-sm">expand_more</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<section class="mb-16">
+<div class="flex items-center justify-between mb-6">
+<div class="flex items-center gap-2">
+<span class="material-icons-outlined text-primary">trending_up</span>
+<h2 class="text-2xl font-bold">한국인이 자주 찾는 여행지 TOP</h2>
+</div>
+<button class="text-sm font-medium text-slate-500 hover:text-primary transition-colors">전체보기</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="group cursor-pointer relative overflow-hidden rounded-3xl h-80 shadow-lg hover:shadow-2xl transition-all hover:-translate-y-2">
+<img alt="Japan Tokyo cityscape" class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAVdR1R0NoKFg-4VkUAXs-cz6kAg3IxND2LdOnkgbXLwLNVbK3I09sEH0jfbo3RgYmx6FT-cEBTlHwJJ1KXtq_ihSTROcV78sncl13i8Mow3tN8cq_B4Y3GcGG-T8jsSzQX2H9AMT-sRo4vi7GL73Q87lq1zyEzx2NnYssdgt9sjDMELMPzGi1QPs7mGwHTR7YLrFvXeMwa4QGV5vJtskO6zF4db9p5P1xC9YsUm0Dww4uXsQS-cRQqLY4so06Roeg7sI1B7fqpSZY"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+<div class="absolute bottom-6 left-6 text-white">
+<span class="bg-primary/90 text-slate-900 px-3 py-1 rounded-full text-xs font-bold mb-3 inline-block">TOP 1</span>
+<h3 class="text-2xl font-bold mb-1">일본, 도쿄</h3>
+<p class="text-sm text-slate-200 flex items-center gap-1">
+<span class="material-icons-outlined text-sm">payments</span>
+                            하루 평균 생활비 ₩125,000
+                        </p>
+</div>
+</div>
+<div class="group cursor-pointer relative overflow-hidden rounded-3xl h-80 shadow-lg hover:shadow-2xl transition-all hover:-translate-y-2">
+<img alt="Vietnam Da Nang beach" class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBWy0bON0Jk-mtu2mQRifsH8bT-NqGth1aXfnmnJ9O6uEzVcYIOqtPLZQSs8i6VGP5gRaGcpOkU0CpcE9jN4dRoTAOCOgyGvDc9OCa0Rz0yE3q_JvVIGtwgox_1HV1KqkGN0t4ClyBeKgeepBnDxOU23NIeXGoZtPmHhTXFX8VHEoJo_MT-T9P1UyHf0jnsfWCtCtwfZj_I9v_AQ6x-z4WMQTyOf62-DIktnLYppL_UghvlfzkeIa-fABBNFHjA19ptpUDeVNR-hm8"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+<div class="absolute bottom-6 left-6 text-white">
+<span class="bg-primary/90 text-slate-900 px-3 py-1 rounded-full text-xs font-bold mb-3 inline-block">TOP 2</span>
+<h3 class="text-2xl font-bold mb-1">베트남, 다낭</h3>
+<p class="text-sm text-slate-200 flex items-center gap-1">
+<span class="material-icons-outlined text-sm">payments</span>
+                            하루 평균 생활비 ₩55,000
+                        </p>
+</div>
+</div>
+<div class="group cursor-pointer relative overflow-hidden rounded-3xl h-80 shadow-lg hover:shadow-2xl transition-all hover:-translate-y-2">
+<img alt="Australia Sydney Opera House" class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBUDpEFb2T5w0I_9qrLyjdPZ2olk1AxydvIxpYvBTlfs8HxP4MPQAliqertWP7CoRa_GmX0NZCTHpNAW7sO1BsRgBneGzNt4HF7wbxeZAg74W9xE2SP2yvxeFJFQviGNQTVu_lKenMui3HTbk_A5rSRmcJ1tNOsP7SlEzSI-9oFD8CQEJLZybukQB_WPPmx6tJGFU9-0QcXFXAekm5nkfviQgxE8BahjXGEA1evELUVbSM14_uZbzGuQeAdh-Re6IYrFy2mEEK5Ytw"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+<div class="absolute bottom-6 left-6 text-white">
+<span class="bg-primary/90 text-slate-900 px-3 py-1 rounded-full text-xs font-bold mb-3 inline-block">TOP 3</span>
+<h3 class="text-2xl font-bold mb-1">호주, 시드니</h3>
+<p class="text-sm text-slate-200 flex items-center gap-1">
+<span class="material-icons-outlined text-sm">payments</span>
+                            하루 평균 생활비 ₩185,000
+                        </p>
+</div>
+</div>
+</div>
+</section>
+<section class="mb-16">
+<div class="flex items-center justify-between mb-6">
+<div class="flex items-center gap-2">
+<span class="material-icons-outlined text-green-500">savings</span>
+<h2 class="text-2xl font-bold">물가가 가장 저렴한 국가</h2>
+</div>
+<button class="text-sm font-medium text-slate-500 hover:text-primary transition-colors">전체보기</button>
+</div>
+<div class="flex gap-6 overflow-x-auto pb-4 hide-scrollbar">
+<div class="flex-shrink-0 w-64 p-5 rounded-3xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow">
+<div class="w-full h-32 rounded-2xl overflow-hidden mb-4 bg-slate-100">
+<img alt="Thailand landscape" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBNR5DWhDu1mROipncdX1Uh3Rz12x0_GiAJPn05CE5HwgIhqg-bW3hhfFj2I3z53WIjJXBxXxkVzQDTAAV7wbs1W9rYk4NKuANk_K1kG7Ys8m_iJ1eZ1Zoz05DJWcYoFlcxoLVzNDbkUZ906-SkwX1MsNt8a-Wbk3gXWXdbVePwrOAbWvgLFtLdoSxQkZ0id05ASTVtMbGrxXShl9HLWFtLPibjq9VQ3caopRuiHbWlHScAZWlrUoTvbBnOfpslgcMzMrb51Kg5HEw"/>
+</div>
+<div class="flex items-center justify-between mb-2">
+<span class="text-xs font-bold text-primary uppercase">Ranking 01</span>
+<span class="text-xs text-slate-400">Low Cost</span>
+</div>
+<h4 class="font-bold text-lg">태국</h4>
+<p class="text-primary font-bold">₩48,500 <span class="text-xs text-slate-400 font-normal">/ day</span></p>
+</div>
+<div class="flex-shrink-0 w-64 p-5 rounded-3xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow">
+<div class="w-full h-32 rounded-2xl overflow-hidden mb-4 bg-slate-100">
+<img alt="India landscape" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_K49iHFPsZg0yDlN67BnZWDjdiNkc2omD5jfUE1yMyY3z_LvIKcVfYFneFtvv2ti_W5RlFWtxzwhlE45OqtxZsbEVoWWiIrDzYpxpxpiXN8A1FJXXDFz1xKQ5D__it7HblHnKIXqgYJ2BDPSGSqED6bKZ0K_n0KfQXfZpE4N46f9FbxWBIVAvdC0V3qAsi_yH48Qz8Ruo0jVRA4SfIx6koGhK3yW_iStUHhZpcZwWoGkV6bAj-yPWwvponvvrvz5to1V6IhOHEcc"/>
+</div>
+<div class="flex items-center justify-between mb-2">
+<span class="text-xs font-bold text-primary uppercase">Ranking 02</span>
+<span class="text-xs text-slate-400">Low Cost</span>
+</div>
+<h4 class="font-bold text-lg">인도</h4>
+<p class="text-primary font-bold">₩32,000 <span class="text-xs text-slate-400 font-normal">/ day</span></p>
+</div>
+<div class="flex-shrink-0 w-64 p-5 rounded-3xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow">
+<div class="w-full h-32 rounded-2xl overflow-hidden mb-4 bg-slate-100">
+<img alt="Indonesia landscape" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB8ul0p3ETR8mLmCFe9dDCwCRMmmuzIYWKmo4MTdix6PcAb6DH6rVUKfOoELlQe-Fsz__qupqGC7-mdpMak9ekgzh_1M2zt8xBq3iRS0zkXKPjDnvRFRC80nzv0POKVcyAG8ASdnfaIc7Yse9d7mB4OxLdud-LjhYLZ3nibZLhFT-EaYQqzk43pfXPpfULF_7YspJnd6Qos7JbmeHFHwIAduMSprqBrwffmTw3x4VdS4QcOYnRfk4zcjhUoq-8jco4fz9s-xqfVDEw"/>
+</div>
+<div class="flex items-center justify-between mb-2">
+<span class="text-xs font-bold text-primary uppercase">Ranking 03</span>
+<span class="text-xs text-slate-400">Low Cost</span>
+</div>
+<h4 class="font-bold text-lg">인도네시아</h4>
+<p class="text-primary font-bold">₩52,200 <span class="text-xs text-slate-400 font-normal">/ day</span></p>
+</div>
+<div class="flex-shrink-0 w-64 p-5 rounded-3xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow">
+<div class="w-full h-32 rounded-2xl overflow-hidden mb-4 bg-slate-100">
+<img alt="Bali" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDcVsRGJRTMNnKGJb06BGVaNSqj2r5su9gftxvLLt9-67k1KDm6KE4-3p_yaHX5N6S-v5MBOgLyQO9ylz29xLBHT1nEpku42P65e_hkDO5KtkyUwyGoQaJIPSpN1cAWaVjzK0i1uWjm-oyasasJl3CdjW3-Zvw1WNHegoHnhjUMarkv0XlvgK-i84TRba6nTcKD1HDo6dc4hOam8eCXotGpnRtcdgInfBz4ewCBuBX-k1Z9fTmX3D09kjuURMxQEDgADEVHqz05jwo"/>
+</div>
+<div class="flex items-center justify-between mb-2">
+<span class="text-xs font-bold text-primary uppercase">Ranking 04</span>
+<span class="text-xs text-slate-400">Low Cost</span>
+</div>
+<h4 class="font-bold text-lg">라오스</h4>
+<p class="text-primary font-bold">₩38,000 <span class="text-xs text-slate-400 font-normal">/ day</span></p>
+</div>
+</div>
+</section>
+<section class="mb-16">
+<div class="flex items-center justify-between mb-6">
+<div class="flex items-center gap-2">
+<span class="material-icons-outlined text-red-400">diamond</span>
+<h2 class="text-2xl font-bold">물가가 비싼 국가</h2>
+</div>
+<button class="text-sm font-medium text-slate-500 hover:text-primary transition-colors">전체보기</button>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+<div class="p-6 rounded-3xl bg-white dark:bg-slate-800 border-2 border-slate-50 dark:border-slate-700 hover:border-primary/30 transition-all cursor-pointer">
+<div class="text-4xl mb-4">🇨🇭</div>
+<h4 class="font-bold mb-1">스위스</h4>
+<p class="text-sm text-slate-500 dark:text-slate-400">평균 ₩295,000 / 일</p>
+<div class="mt-4 h-1.5 w-full bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+<div class="h-full bg-red-400 w-[95%]"></div>
+</div>
+</div>
+<div class="p-6 rounded-3xl bg-white dark:bg-slate-800 border-2 border-slate-50 dark:border-slate-700 hover:border-primary/30 transition-all cursor-pointer">
+<div class="text-4xl mb-4">🇮🇸</div>
+<h4 class="font-bold mb-1">아이슬란드</h4>
+<p class="text-sm text-slate-500 dark:text-slate-400">평균 ₩268,000 / 일</p>
+<div class="mt-4 h-1.5 w-full bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+<div class="h-full bg-red-400 w-[88%]"></div>
+</div>
+</div>
+<div class="p-6 rounded-3xl bg-white dark:bg-slate-800 border-2 border-slate-50 dark:border-slate-700 hover:border-primary/30 transition-all cursor-pointer">
+<div class="text-4xl mb-4">🇳🇴</div>
+<h4 class="font-bold mb-1">노르웨이</h4>
+<p class="text-sm text-slate-500 dark:text-slate-400">평균 ₩242,000 / 일</p>
+<div class="mt-4 h-1.5 w-full bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+<div class="h-full bg-red-400 w-[82%]"></div>
+</div>
+</div>
+<div class="p-6 rounded-3xl bg-white dark:bg-slate-800 border-2 border-slate-50 dark:border-slate-700 hover:border-primary/30 transition-all cursor-pointer">
+<div class="text-4xl mb-4">🇸🇬</div>
+<h4 class="font-bold mb-1">싱가포르</h4>
+<p class="text-sm text-slate-500 dark:text-slate-400">평균 ₩215,000 / 일</p>
+<div class="mt-4 h-1.5 w-full bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+<div class="h-full bg-red-400 w-[78%]"></div>
+</div>
+</div>
+</div>
+</section>
+<section class="rounded-3xl bg-gradient-to-br from-primary to-blue-600 p-10 text-white flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden">
+<div class="absolute -right-20 -top-20 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+<div class="absolute -left-20 -bottom-20 w-64 h-64 bg-black/10 rounded-full blur-3xl"></div>
+<div class="relative z-10 max-w-xl">
+<h2 class="text-3xl font-extrabold mb-4 leading-tight">생활 물가 지수(PPP)를 활용한<br/>똑똑한 여행 계획을 세워보세요</h2>
+<p class="text-blue-50 opacity-90 mb-6 text-lg">전 세계 1,500개 이상의 도시 데이터를 실시간으로 비교하고, 내 예산에 딱 맞는 목적지를 추천받으세요.</p>
+<div class="flex gap-4">
+<button class="bg-white text-primary px-8 py-3 rounded-full font-bold hover:bg-blue-50 transition-colors shadow-lg">무료 시작하기</button>
+<button class="bg-primary/20 backdrop-blur-md border border-white/30 text-white px-8 py-3 rounded-full font-bold hover:bg-white/20 transition-colors">자세히 보기</button>
+</div>
+</div>
+<div class="relative z-10 hidden lg:block">
+<span class="material-icons-outlined text-[160px] opacity-20">insights</span>
+</div>
+</section>
+</main>
+<footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-12">
+<div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12">
+<div class="col-span-1 md:col-span-2">
+<div class="flex items-center gap-2 mb-4">
+<span class="material-icons-outlined text-primary text-3xl">explore</span>
+<span class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">VoyageWise</span>
+</div>
+<p class="text-slate-500 dark:text-slate-400 max-w-sm">
+                    글로벌 물가 데이터를 분석하여 여행자들에게 최적의 목적지를 제안합니다. 복잡한 환율과 현지 물가를 한눈에 파악하세요.
+                </p>
+</div>
+<div>
+<h5 class="font-bold mb-4 uppercase text-xs tracking-widest text-slate-400">서비스</h5>
+<ul class="space-y-2 text-slate-600 dark:text-slate-300 font-medium">
+<li><a class="hover:text-primary transition-colors" href="#">물가 비교</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">여행 일정 만들기</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">프리미엄 리포트</a></li>
+</ul>
+</div>
+<div>
+<h5 class="font-bold mb-4 uppercase text-xs tracking-widest text-slate-400">고객 지원</h5>
+<ul class="space-y-2 text-slate-600 dark:text-slate-300 font-medium">
+<li><a class="hover:text-primary transition-colors" href="#">자주 묻는 질문</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">문의하기</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">개인정보 처리방침</a></li>
+</ul>
+</div>
+</div>
+<div class="max-w-7xl mx-auto px-6 mt-12 pt-8 border-t border-slate-100 dark:border-slate-800 text-center text-slate-400 text-sm">
+            © 2024 VoyageWise Inc. All rights reserved.
+        </div>
+</footer>
+
+</body></html>

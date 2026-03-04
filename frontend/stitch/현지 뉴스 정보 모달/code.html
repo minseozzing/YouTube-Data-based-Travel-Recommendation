@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>VoyageWise | 현지 뉴스 및 AI 요약</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;family=Noto+Sans+KR:wght@300;400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#2563eb",
+                        accent: "#bae6fd",
+                        "background-light": "#f8fafc",
+                        "background-dark": "#0f172a",
+                    },
+                    fontFamily: {
+                        display: ["Plus Jakarta Sans", "Noto Sans KR", "sans-serif"],
+                        sans: ["Noto Sans KR", "Plus Jakarta Sans", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "12px",
+                    },
+                },
+            },
+        };
+    </script>
+<style type="text/tailwindcss">
+        @layer base {
+            body {
+                @apply font-sans antialiased;
+            }
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #e2e8f0;
+            border-radius: 10px;
+        }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #334155;
+        }
+        .news-card-hover:hover {
+            transform: translateY(-2px);
+            transition: all 0.2s ease;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark min-h-screen transition-colors duration-300">
+<header class="fixed top-0 w-full z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+<div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-white">explore</span>
+</div>
+<span class="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">VoyageWise</span>
+</div>
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors" href="#">탐색</a>
+<a class="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors" href="#">여행지</a>
+<a class="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors" href="#">요금제</a>
+<button class="px-5 py-2.5 rounded-full border border-slate-200 dark:border-slate-700 text-sm font-semibold text-slate-900 dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">로그아웃</button>
+</nav>
+</div>
+</header>
+<main class="pt-28 pb-12 min-h-screen flex items-center justify-center p-4">
+<div class="max-w-6xl w-full bg-white dark:bg-slate-900 rounded-[32px] overflow-hidden shadow-2xl border border-slate-100 dark:border-slate-800 flex flex-col md:flex-row h-full max-h-[850px]">
+<div class="md:w-5/12 relative min-h-[300px] md:min-h-full">
+<img alt="시드니 오페라 하우스" class="absolute inset-0 w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCEpFmQubDJ9at1846cnrBlVexShFupcaaRFPReOqj4uTlfo4i-HfH-8V1VKpiqPuVaS3IsRt7iEgD4XUaM1MCJ_3a9ycmeG_qOpaB0JlakxqFAmv0uKsOqyRLZpbFHEu7kF8U9eh8Svn0jdln3Vf03N2n3x1rxYnjsurHuOI_Tz3PnCVWIdnlUXbEysQhahEq1oHdKtl6t-HQC7X_dEbQve_YLqllurcGBYrUTek-kzgWM-bC_aVFcJXSoqqXK307J4_oC_odraRo"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-8 w-full text-white">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-blue-400">location_on</span>
+<span class="text-xs font-bold tracking-widest uppercase opacity-90">호주, 뉴사우스웨일스</span>
+</div>
+<h2 class="text-4xl font-extrabold mb-2">시드니</h2>
+<p class="text-white/80 text-sm leading-relaxed mb-6">현대적인 도시미와 아름다운 해안선이 공존하는 남반구 최고의 도시</p>
+<button class="w-full bg-primary hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-2xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined">bookmark</span>
+                    저장하기
+                </button>
+</div>
+</div>
+<div class="md:w-7/12 bg-white dark:bg-slate-900 flex flex-col overflow-hidden">
+<div class="px-8 pt-8">
+<div class="flex flex-wrap gap-2 mb-6 p-1 bg-slate-100 dark:bg-slate-800 rounded-2xl">
+<button class="flex-1 py-3 px-4 rounded-xl text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-slate-700">추천 이유</button>
+<button class="flex-1 py-3 px-4 rounded-xl text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-slate-700">생활물가 비교</button>
+<button class="flex-1 py-3 px-4 rounded-xl text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-slate-700">항공권 정보</button>
+<button class="flex-1 py-3 px-4 rounded-xl text-sm font-bold bg-white dark:bg-slate-700 text-primary shadow-sm">현지 뉴스</button>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto px-8 pb-8 custom-scrollbar">
+<div class="space-y-6">
+<div class="bg-blue-50/50 dark:bg-blue-900/10 rounded-2xl p-6 border border-blue-100 dark:border-blue-900/30">
+<div class="flex justify-between items-start mb-4">
+<div>
+<h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-primary text-xl">auto_awesome</span>
+                                    실시간 뉴스 요약
+                                </h3>
+<p class="text-[11px] text-slate-500 font-medium">AI가 분석한 시드니의 현재 상황</p>
+</div>
+<div class="flex flex-col items-end gap-1">
+<span class="text-[10px] font-bold text-slate-400 uppercase tracking-tight">뉴스 성향 분석</span>
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-[10px] font-black">
+<span class="material-symbols-outlined text-[14px]">sentiment_very_satisfied</span>
+                                    GOOD NEWS
+                                </span>
+</div>
+</div>
+<div class="space-y-3">
+<div class="flex gap-3">
+<span class="material-symbols-outlined text-amber-500 text-sm mt-0.5">warning</span>
+<p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+<strong class="text-slate-800 dark:text-slate-100">안전:</strong> 시내 중심가 야간 축제로 인해 일부 구간 교통 통제가 있으나 전반적인 치안 상태는 매우 양호합니다.
+                                </p>
+</div>
+<div class="flex gap-3">
+<span class="material-symbols-outlined text-primary text-sm mt-0.5">event</span>
+<p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+<strong class="text-slate-800 dark:text-slate-100">이벤트:</strong> 이번 주말 '시드니 라이트 페스티벌'이 개막하여 다채로운 조명 쇼와 거리 공연이 예정되어 있습니다.
+                                </p>
+</div>
+<div class="flex gap-3">
+<span class="material-symbols-outlined text-sky-500 text-sm mt-0.5">wb_sunny</span>
+<p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+<strong class="text-slate-800 dark:text-slate-100">날씨:</strong> 맑고 쾌적한 가을 날씨가 지속될 전망이며, 야외 활동에 매우 적합한 기온을 유지하고 있습니다.
+                                </p>
+</div>
+</div>
+</div>
+<div>
+<div class="flex justify-between items-center mb-4">
+<h4 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+<span class="material-symbols-outlined text-slate-400 text-lg">list_alt</span>
+                                추천 기사 리스트
+                            </h4>
+<span class="text-[10px] font-bold text-primary bg-blue-50 dark:bg-blue-900/20 px-2 py-1 rounded">유저 선호 뉴스 필터링 적용</span>
+</div>
+<div class="space-y-4">
+<div class="news-card-hover group bg-white dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 flex gap-4 shadow-sm hover:shadow-md transition-all">
+<div class="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 bg-slate-200">
+<img alt="뉴스 썸네일" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB7E_eSNj99ENS4IPBdSsOP4BXFi1Be5-EV3RTpQuQRQGYeyVKzjWutqKNb2D65BUPemyFXIzSCUjHiXKnOwuYdePXdnGbKqtEwtVg-j1ks_v3x4Lah9jGgqNRAR4PPNzwg76vto_14TpuHEV_5gC6cIToN7nmHlaNOr8x_J7kjFrSsChwKveR-XuU023dXOmnLBvd8h53AlxI_EK7FpeG6RFeUFiZWy4I1Tiog7q_bpvtVSBHxsiY_OmxqPbv8ioM6Ce0XKmHh4Yg"/>
+</div>
+<div class="flex-1 flex flex-col justify-between py-0.5">
+<div>
+<h5 class="text-sm font-bold text-slate-900 dark:text-white mb-1 line-clamp-1 group-hover:text-primary transition-colors">올해 시드니 라이트 페스티벌, 역대 최대 규모 개최</h5>
+<p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">전 세계 아티스트들이 참여하는 이번 축제는 시드니 항구 전체를 빛으로 수놓을 예정입니다...</p>
+</div>
+<div class="flex justify-between items-center mt-2">
+<span class="text-[10px] text-slate-400 font-medium">The Sydney Morning Herald • 2시간 전</span>
+<a class="text-[10px] font-black text-primary flex items-center gap-0.5 hover:underline" href="#">
+                                            기사 보기
+                                            <span class="material-symbols-outlined text-[12px]">open_in_new</span>
+</a>
+</div>
+</div>
+</div>
+<div class="news-card-hover group bg-white dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 flex gap-4 shadow-sm hover:shadow-md transition-all">
+<div class="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 bg-slate-200">
+<img alt="뉴스 썸네일" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD_GTZjqxysr-A5awefQ9xJRvKZvSCWqGQDQq-4ykeWgHhblX6_LBmgJFZw0-MunX17PZPP9pzqtV5qr4vF7DYB8WmcLjS1PspFa7LLmi-ig0bUMOOWx2PBfq8kXcJsM9FJ74KJFHaUJ2DtcgWkSaDBW1kFbyQ3pH7KBr4S31IgfCp9R0AtaOIq1rDRi0h5D5Fv2fhN7y1PFGD1F83QHukDjpwJIyHnjzfl7_0JXud46VsnmeU4YS9gFiH6VyJZ20-kR3HImGaTVzw"/>
+</div>
+<div class="flex-1 flex flex-col justify-between py-0.5">
+<div>
+<h5 class="text-sm font-bold text-slate-900 dark:text-white mb-1 line-clamp-1 group-hover:text-primary transition-colors">호주 달러 환율 안정세, 여행객 환전 적기</h5>
+<p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">최근 경제 지표 발표 이후 호주 달러가 안정세를 보이며 해외 관광객들의 소비 심리가...</p>
+</div>
+<div class="flex justify-between items-center mt-2">
+<span class="text-[10px] text-slate-400 font-medium">Finance Daily • 5시간 전</span>
+<a class="text-[10px] font-black text-primary flex items-center gap-0.5 hover:underline" href="#">
+                                            기사 보기
+                                            <span class="material-symbols-outlined text-[12px]">open_in_new</span>
+</a>
+</div>
+</div>
+</div>
+<div class="news-card-hover group bg-white dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 flex gap-4 shadow-sm hover:shadow-md transition-all">
+<div class="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 bg-slate-200">
+<img alt="뉴스 썸네일" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCUPOL_Hv1LB2Yk4C63EsLcgRVX-s0Z1gYcj1hxXP2n7ThBYJ2_79ZhOxBDjNtaEBEIFjaeKTTYLSUPaxVh-8Oc-QKRP3gPndskKZg1T71-wG7j4gyeY9BVM7CyYqUd0CE3OGRshhwyIc6u1I1hHHj9s_E_0jEwxBZ3xkNqnlAXmM2kJ0xCZyQR1WrEXFZsKybTMl5fUA8fDMAM558_7myPxHDprmPsqc2EfvsHWqtNvn7qm8H1jbLrbw5VgJs_d-D3ThsrrYmfKxc"/>
+</div>
+<div class="flex-1 flex flex-col justify-between py-0.5">
+<div>
+<h5 class="text-sm font-bold text-slate-900 dark:text-white mb-1 line-clamp-1 group-hover:text-primary transition-colors">본다이 비치 인근 새로운 미식 거리 조성</h5>
+<p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">시드니 시의회는 본다이 비치 북쪽 구역을 로컬 셰프들을 위한 팝업 레스토랑 거리로...</p>
+</div>
+<div class="flex justify-between items-center mt-2">
+<span class="text-[10px] text-slate-400 font-medium">Local Travel News • 1일 전</span>
+<a class="text-[10px] font-black text-primary flex items-center gap-0.5 hover:underline" href="#">
+                                            기사 보기
+                                            <span class="material-symbols-outlined text-[12px]">open_in_new</span>
+</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<footer class="py-12 px-6">
+<div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+<div class="flex items-center gap-2 text-slate-400 dark:text-slate-500 text-sm">
+<span class="material-symbols-outlined text-lg">explore</span>
+<span>VoyageWise Inc. © 2024</span>
+</div>
+<div class="flex items-center gap-8 text-[11px] font-bold tracking-widest uppercase text-slate-500 dark:text-slate-400">
+<a class="hover:text-primary transition-colors" href="#">고객지원</a>
+<a class="hover:text-primary transition-colors" href="#">안전 정보</a>
+<a class="hover:text-primary transition-colors" href="#">개인정보 처리방침</a>
+</div>
+</div>
+</footer>
+<button class="fixed bottom-8 right-8 w-12 h-12 bg-white dark:bg-slate-800 rounded-full shadow-lg border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-400 hover:scale-110 transition-all z-50" onclick="document.documentElement.classList.toggle('dark')">
+<span class="material-symbols-outlined">dark_mode</span>
+</button>
+
+</body></html>

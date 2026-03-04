@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>VoyageWise | 도시 상세 정보 및 추천</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;family=Noto+Sans+KR:wght@300;400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#2563eb",
+                        "background-light": "#f8fafc",
+                        "background-dark": "#0f172a",
+                    },
+                    fontFamily: {
+                        display: ["Plus Jakarta Sans", "Noto Sans KR", "sans-serif"],
+                        sans: ["Noto Sans KR", "Plus Jakarta Sans", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "12px",
+                    },
+                },
+            },
+        };
+    </script>
+<style type="text/tailwindcss">
+        @layer base {
+            body {
+                @apply font-sans antialiased;
+            }
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .dark .glass-card {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .crystal-back-btn {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        .crystal-back-btn:hover {
+            background: rgba(255, 255, 255, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark min-h-screen transition-colors duration-300">
+<header class="fixed top-0 w-full z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+<div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-white">explore</span>
+</div>
+<span class="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">VoyageWise</span>
+</div>
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors" href="#">탐색</a>
+<a class="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors" href="#">여행지</a>
+<a class="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors" href="#">요금제</a>
+<button class="px-5 py-2.5 rounded-full border border-slate-200 dark:border-slate-700 text-sm font-semibold text-slate-900 dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">로그아웃</button>
+</nav>
+</div>
+</header>
+<main class="pt-28 pb-12 min-h-screen flex items-center justify-center p-4">
+<div class="max-w-5xl w-full bg-white dark:bg-slate-900 rounded-[32px] overflow-hidden shadow-2xl border border-slate-100 dark:border-slate-800 flex flex-col md:flex-row relative">
+<div class="md:w-5/12 relative min-h-[400px] md:min-h-full">
+<img alt="루이스 호수 풍경" class="absolute inset-0 w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCEpFmQubDJ9at1846cnrBlVexShFupcaaRFPReOqj4uTlfo4i-HfH-8V1VKpiqPuVaS3IsRt7iEgD4XUaM1MCJ_3a9ycmeG_qOpaB0JlakxqFAmv0uKsOqyRLZpbFHEu7kF8U9eh8Svn0jdln3Vf03N2n3x1rxYnjsurHuOI_Tz3PnCVWIdnlUXbEysQhahEq1oHdKtl6t-HQC7X_dEbQve_YLqllurcGBYrUTek-kzgWM-bC_aVFcJXSoqqXK307J4_oC_odraRo"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+<button class="crystal-back-btn absolute top-6 left-6 flex items-center gap-2 px-5 py-2.5 rounded-full text-white font-bold text-sm transition-all z-10">
+<span class="material-symbols-outlined text-xl">arrow_back</span>
+                    뒤로가기
+                </button>
+<div class="absolute bottom-0 left-0 p-8 w-full text-white">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-blue-400 text-lg">location_on</span>
+<span class="text-xs font-bold tracking-widest uppercase opacity-90">캐나다, 앨버타</span>
+</div>
+<h2 class="text-4xl font-extrabold mb-2">레이크 루이스</h2>
+<p class="text-white/80 text-sm leading-relaxed mb-6">에메랄드빛 호수와 장엄한 빙하가 어우러진 세계 최고의 휴양지</p>
+<button class="w-full bg-primary hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-2xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined">bookmark</span>
+                        저장하기
+                    </button>
+</div>
+</div>
+<div class="md:w-7/12 p-8 md:p-12 bg-white dark:bg-slate-900 overflow-y-auto max-h-[800px]">
+<div class="flex flex-wrap gap-2 mb-8 p-1 bg-slate-100 dark:bg-slate-800 rounded-2xl">
+<button class="flex-1 py-3 px-4 rounded-xl text-sm font-bold bg-white dark:bg-slate-700 text-primary shadow-sm">추천 이유</button>
+<button class="flex-1 py-3 px-4 rounded-xl text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200">생활물가 비교</button>
+<button class="flex-1 py-3 px-4 rounded-xl text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200">항공권 정보</button>
+<button class="flex-1 py-3 px-4 rounded-xl text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200">현지 뉴스</button>
+</div>
+<div class="space-y-8">
+<div>
+<div class="flex items-center gap-3 mb-4">
+<div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">auto_awesome</span>
+</div>
+<h3 class="text-xl font-bold text-slate-900 dark:text-white">AI 맞춤 추천 분석</h3>
+</div>
+<p class="text-slate-600 dark:text-slate-400 leading-relaxed mb-6">
+                            귀하의 최근 여행 선호도와 아웃도어 활동 데이터를 분석한 결과, 레이크 루이스는 <span class="text-primary font-bold">98%의 매칭률</span>을 보입니다. 대자연 속에서의 휴식과 프리미엄 숙박 시설을 선호하는 귀하의 스타일에 가장 부합하는 목적지입니다.
+                        </p>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<div class="p-5 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
+<h4 class="font-bold text-slate-900 dark:text-white text-sm mb-2 flex items-center gap-2">
+<span class="material-symbols-outlined text-xs text-blue-500">trending_up</span>
+                                    인기 키워드
+                                </h4>
+<div class="flex flex-wrap gap-2">
+<span class="px-3 py-1 bg-white dark:bg-slate-700 text-[11px] font-bold text-slate-600 dark:text-slate-300 rounded-full border border-slate-200 dark:border-slate-600">#하이킹</span>
+<span class="px-3 py-1 bg-white dark:bg-slate-700 text-[11px] font-bold text-slate-600 dark:text-slate-300 rounded-full border border-slate-200 dark:border-slate-600">#인생사진</span>
+<span class="px-3 py-1 bg-white dark:bg-slate-700 text-[11px] font-bold text-slate-600 dark:text-slate-300 rounded-full border border-slate-200 dark:border-slate-600">#럭셔리호텔</span>
+</div>
+</div>
+<div class="p-5 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
+<h4 class="font-bold text-slate-900 dark:text-white text-sm mb-2 flex items-center gap-2">
+<span class="material-symbols-outlined text-xs text-orange-500">calendar_month</span>
+                                    최적의 방문 시기
+                                </h4>
+<p class="text-xs text-slate-500 dark:text-slate-400 font-medium">6월~8월 (여름 시즌)</p>
+<p class="text-[10px] text-slate-400 mt-1 italic">맑은 호수를 보기에 가장 좋습니다.</p>
+</div>
+</div>
+</div>
+<div class="border-t border-slate-100 dark:border-slate-800 pt-8">
+<h4 class="text-sm font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-6">상세 요약</h4>
+<ul class="space-y-4">
+<li class="flex gap-4">
+<span class="material-symbols-outlined text-slate-400">payments</span>
+<div>
+<p class="text-sm font-bold text-slate-900 dark:text-white">생활물가 비교</p>
+<p class="text-xs text-slate-500 dark:text-slate-400">현재 거주지보다 약 15% 높음 (식비 위주)</p>
+</div>
+</li>
+<li class="flex gap-4">
+<span class="material-symbols-outlined text-slate-400">flight_takeoff</span>
+<div>
+<p class="text-sm font-bold text-slate-900 dark:text-white">최저가 항공권</p>
+<p class="text-xs text-slate-500 dark:text-slate-400">직항 기준 120만원부터 (캘거리 공항 이용)</p>
+</div>
+</li>
+<li class="flex gap-4">
+<span class="material-symbols-outlined text-slate-400">newspaper</span>
+<div>
+<p class="text-sm font-bold text-slate-900 dark:text-white">최신 현지 소식</p>
+<p class="text-xs text-slate-500 dark:text-slate-400">밴프 국립공원 내 셔틀 버스 예약제 시행 중</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</main>
+<footer class="py-12 px-6">
+<div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+<div class="flex items-center gap-2 text-slate-400 dark:text-slate-500 text-sm">
+<span class="material-symbols-outlined text-lg">explore</span>
+<span>VoyageWise Inc. © 2024</span>
+</div>
+<div class="flex items-center gap-8 text-[11px] font-bold tracking-widest uppercase text-slate-500 dark:text-slate-400">
+<a class="hover:text-primary transition-colors" href="#">고객지원</a>
+<a class="hover:text-primary transition-colors" href="#">안전 정보</a>
+<a class="hover:text-primary transition-colors" href="#">개인정보 처리방침</a>
+</div>
+</div>
+</footer>
+<button class="fixed bottom-8 right-8 w-12 h-12 bg-white dark:bg-slate-800 rounded-full shadow-lg border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-400 hover:scale-110 transition-all z-50" onclick="document.documentElement.classList.toggle('dark')">
+<span class="material-symbols-outlined">dark_mode</span>
+</button>
+
+</body></html>
