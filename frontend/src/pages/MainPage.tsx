@@ -5,6 +5,7 @@ import { LeftSidebar } from '@/components/main/LeftSidebar';
 import { HeroTextBlock } from '@/components/main/HeroTextBlock';
 import { StatBar } from '@/components/main/StatBar';
 import { GlobeContainer } from '@/components/globe/GlobeContainer';
+import { RightPanel } from '@/components/main/RightPanel';
 import maldivesBg from '@/assets/Maldive_beach_1.jpg';
 
 const MainPage = () => {
@@ -42,7 +43,10 @@ const MainPage = () => {
       {/* Stat Bar — bottom center */}
       <StatBar />
 
-      {/* City Detail Modal — global single instance, always mounted */}
+      {/* Right Summary Panel — 마커/카드 클릭 시 슬라이드 인 */}
+      <RightPanel />
+
+      {/* City Detail Modal — 전체 화면, 상세 보기 버튼으로 진입 */}
       <CityDetailModal />
     </div>
   );

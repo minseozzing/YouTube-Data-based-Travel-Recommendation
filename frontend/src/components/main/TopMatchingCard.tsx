@@ -18,21 +18,21 @@ function getMatchColor(score: number | undefined): string {
 }
 
 export function TopMatchingCard({ city, rank }: TopMatchingCardProps) {
-  const { openCityModal } = useUiStore();
+  const { openRightPanel } = useUiStore();
   const [imgError, setImgError] = useState(false);
 
   const handleClick = useCallback(() => {
-    openCityModal(city.cityId);
-  }, [city.cityId, openCityModal]);
+    openRightPanel(city.cityId);
+  }, [city.cityId, openRightPanel]);
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent<HTMLDivElement>) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
-        openCityModal(city.cityId);
+        openRightPanel(city.cityId);
       }
     },
-    [city.cityId, openCityModal],
+    [city.cityId, openRightPanel],
   );
 
   return (

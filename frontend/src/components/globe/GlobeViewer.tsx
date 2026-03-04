@@ -40,7 +40,7 @@ function getMarkerColor(score: number | undefined): string {
 
 export function GlobeViewer({ width, height }: GlobeViewerProps) {
   const globeRef = useRef<GlobeMethods | undefined>(undefined);
-  const { openCityModal, globeBudgetFilter, globeRiskFilter } = useUiStore();
+  const { openRightPanel, globeBudgetFilter, globeRiskFilter } = useUiStore();
   const { data: citiesFromApi } = useCityList();
   const cities = citiesFromApi ?? DUMMY_CITIES;
 
@@ -63,9 +63,9 @@ export function GlobeViewer({ width, height }: GlobeViewerProps) {
 
   const handlePointClick = useCallback(
     (point: object) => {
-      openCityModal((point as CityListItem).cityId);
+      openRightPanel((point as CityListItem).cityId);
     },
-    [openCityModal],
+    [openRightPanel],
   );
 
   const pointColorFn = useCallback(
