@@ -15,6 +15,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizationRequestResolver;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -32,6 +35,7 @@ public class SecurityConfig {
     private final CustomSuccessHandler customSuccessHandler;
     private final JwtUtil jwtUtil;
     private final MemberRepository memberRepository;
+    private final ClientRegistrationRepository clientRegistrationRepository;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
@@ -70,6 +74,8 @@ public class SecurityConfig {
         // 4. OAuth2 로그인 설정
         http
                 .oauth2Login((oauth2) -> oauth2
+                        .authorizationEndpoint(authorization -> authorization
+                                .authorizationRequestResolver(authorizationRequestResolver(clientRegistrationRepository)))
                         .userInfoEndpoint((userInfoEndpointConfig) -> userInfoEndpointConfig
                                 .userService(customOAuth2UserService))
                         .successHandler(customSuccessHandler)
@@ -100,5 +106,23 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         return http.build();
+    }
+
+    private OAuth2AuthorizationRequestResolver authorizationRequestResolver(
+            ClientRegistrationRepository clientRegistrationRepository) {
+
+        DefaultOAuth2AuthorizationRequestResolver authorizationRequestResolver =
+                new DefaultOAuth2AuthorizationRequestResolver(
+                        clientRegistrationRepository, "/oauth2/authorization");
+
+        authorizationRequestResolver.setAuthorizationRequestCustomizer(
+                customizer -> customizer
+                        .additionalParameters(params -> {
+                            params.put("access_type", "offline");
+                            params.put("prompt", "consent");
+                        })
+        );
+
+        return authorizationRequestResolver;
     }
 }
