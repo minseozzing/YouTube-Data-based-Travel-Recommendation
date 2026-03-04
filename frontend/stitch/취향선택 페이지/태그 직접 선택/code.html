@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html class="dark" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>여행 취향 선택 - 직접 선택</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#3B82F6",
+                        "background-light": "#F8FAFC",
+                        "background-dark": "#0F172A",
+                        "card-dark": "#1E293B",
+                        "chip-dark": "#334155",
+                    },
+                    fontFamily: {
+                        display: ["Pretendard", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "12px",
+                    },
+                },
+            },
+        };
+    </script>
+<style>
+        body {
+            font-family: 'Pretendard', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 10px;
+        }
+        .chip-selected {
+            background-color: #3B82F6 !important;
+            color: white !important;
+            border-color: #3B82F6 !important;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
+<header class="sticky top-0 z-10 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+<div class="max-w-2xl mx-auto px-6 py-4 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-icons-round text-primary">explore</span>
+<h1 class="text-lg font-bold">여행 취향 선택</h1>
+</div>
+<div class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-semibold">
+<span id="counter">0</span> / 10 선택됨
+            </div>
+</div>
+</header>
+<main class="flex-1 max-w-2xl mx-auto w-full px-6 py-8">
+<div class="mb-8">
+<h2 class="text-2xl font-bold mb-2">어떤 여행을 꿈꾸시나요?</h2>
+<p class="text-slate-500 dark:text-slate-400">최소 3개 이상의 태그를 선택해주세요. <br/>취향에 맞는 여행지를 추천해 드릴게요.</p>
+</div>
+<div class="space-y-10 mb-24">
+<section>
+<div class="flex items-center gap-2 mb-4">
+<span class="material-icons-round text-amber-500 text-sm">auto_awesome</span>
+<h3 class="font-bold text-slate-700 dark:text-slate-200">분위기</h3>
+</div>
+<div class="flex flex-wrap gap-2">
+<button class="tag-chip px-4 py-2 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-chip-dark hover:bg-slate-50 dark:hover:bg-slate-700 transition-all text-sm font-medium" onclick="toggleTag(this)">✨ 감성적인</button>
+<button class="tag-chip px-4 py-2 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-chip-dark hover:bg-slate-50 dark:hover:bg-slate-700 transition-all text-sm font-medium" onclick="toggleTag(this)">🌿 평화로운</button>
+<button class="tag-chip px-4 py-2 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-chip-dark hover:bg-slate-50 dark:hover:bg-slate-700 transition-all text-sm font-medium" onclick="toggleTag(this)">🏙️ 도시적인</button>
+<button class="tag-chip px-4 py-2 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-chip-dark hover:bg-slate-50 dark:hover:bg-slate-700 transition-all text-sm font-medium" onclick="toggleTag(this)">🏮 이색적인</button>
+<button class="tag-chip px-4 py-2 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-chip-dark hover:bg-slate-50 dark:hover:bg-slate-700 transition-all text-sm font-medium" onclick="toggleTag(this)">🔥 열정적인</button>
+</div>
+</section>
+<section>
+<div class="flex items-center gap-2 mb-4">
+<span class="material-icons-round text-emerald-500 text-sm">directions_run</span>
+<h3 class="font-bold text-slate-700 dark:text-slate-200">활동</h3>
+</div>
+<div class="flex flex-wrap gap-2">
+<button class="tag-chip px-4 py-2 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-chip-dark hover:bg-slate-50 dark:hover:bg-slate-700 transition-all text-sm font-medium" onclick="toggleTag(this)">🧗 액티비티</button>
+<button class="tag-chip px-4 py-2 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-chip-dark hover:bg-slate-50 dark:hover:bg-slate-700 transition-all text-sm font-medium" onclick="toggleTag(this)">🖼️ 전시/문화</button>
+<button class="tag-chip px-4 py-2 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-chip-dark hover:bg-slate-50 dark:hover:bg-slate-700 transition-all text-sm font-medium" onclick="toggleTag(this)">🛍️ 쇼핑</button>
+<button class="tag-chip px-4 py-2 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-chip-dark hover:bg-slate-50 dark:hover:bg-slate-700 transition-all text-sm font-medium" onclick="toggleTag(this)">🚶 트레킹</button>
+<button class="tag-chip px-4 py-2 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-chip-dark hover:bg-slate-50 dark:hover:bg-slate-700 transition-all text-sm font-medium" onclick="toggleTag(this)">☕ 카페투어</button>
+<button class="tag-chip px-4 py-2 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-chip-dark hover:bg-slate-50 dark:hover:bg-slate-700 transition-all text-sm font-medium" onclick="toggleTag(this)">📸 사진촬영</button>
+</div>
+</section>
+<section>
+<div class="flex items-center gap-2 mb-4">
+<span class="material-icons-round text-rose-500 text-sm">favorite</span>
+<h3 class="font-bold text-slate-700 dark:text-slate-200">목적</h3>
+</div>
+<div class="flex flex-wrap gap-2">
+<button class="tag-chip px-4 py-2 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-chip-dark hover:bg-slate-50 dark:hover:bg-slate-700 transition-all text-sm font-medium" onclick="toggleTag(this)">🧘 힐링/휴식</button>
+<button class="tag-chip px-4 py-2 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-chip-dark hover:bg-slate-50 dark:hover:bg-slate-700 transition-all text-sm font-medium" onclick="toggleTag(this)">🍱 맛집탐방</button>
+<button class="tag-chip px-4 py-2 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-chip-dark hover:bg-slate-50 dark:hover:bg-slate-700 transition-all text-sm font-medium" onclick="toggleTag(this)">🏛️ 역사 공부</button>
+<button class="tag-chip px-4 py-2 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-chip-dark hover:bg-slate-50 dark:hover:bg-slate-700 transition-all text-sm font-medium" onclick="toggleTag(this)">👫 가족 여행</button>
+<button class="tag-chip px-4 py-2 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-chip-dark hover:bg-slate-50 dark:hover:bg-slate-700 transition-all text-sm font-medium" onclick="toggleTag(this)">🥂 신혼 여행</button>
+</div>
+</section>
+<section>
+<div class="flex items-center gap-2 mb-4">
+<span class="material-icons-round text-yellow-500 text-sm">payments</span>
+<h3 class="font-bold text-slate-700 dark:text-slate-200">예산</h3>
+</div>
+<div class="flex flex-wrap gap-2">
+<button class="tag-chip px-4 py-2 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-chip-dark hover:bg-slate-50 dark:hover:bg-slate-700 transition-all text-sm font-medium" onclick="toggleTag(this)">🪙 가성비 위주</button>
+<button class="tag-chip px-4 py-2 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-chip-dark hover:bg-slate-50 dark:hover:bg-slate-700 transition-all text-sm font-medium" onclick="toggleTag(this)">💎 럭셔리 여행</button>
+<button class="tag-chip px-4 py-2 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-chip-dark hover:bg-slate-50 dark:hover:bg-slate-700 transition-all text-sm font-medium" onclick="toggleTag(this)">💸 적절한 소비</button>
+</div>
+</section>
+<section>
+<div class="flex items-center gap-2 mb-4">
+<span class="material-icons-round text-sky-500 text-sm">verified_user</span>
+<h3 class="font-bold text-slate-700 dark:text-slate-200">안전 및 편의</h3>
+</div>
+<div class="flex flex-wrap gap-2">
+<button class="tag-chip px-4 py-2 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-chip-dark hover:bg-slate-50 dark:hover:bg-slate-700 transition-all text-sm font-medium" onclick="toggleTag(this)">🛡️ 치안 우선</button>
+<button class="tag-chip px-4 py-2 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-chip-dark hover:bg-slate-50 dark:hover:bg-slate-700 transition-all text-sm font-medium" onclick="toggleTag(this)">🚆 대중교통 편리</button>
+<button class="tag-chip px-4 py-2 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-chip-dark hover:bg-slate-50 dark:hover:bg-slate-700 transition-all text-sm font-medium" onclick="toggleTag(this)">♿ 무장애 여행</button>
+</div>
+</section>
+</div>
+</main>
+<div class="fixed bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-background-light dark:from-background-dark via-background-light dark:via-background-dark to-transparent">
+<div class="max-w-2xl mx-auto">
+<button class="w-full bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-600 font-bold py-4 rounded-full flex items-center justify-center gap-2 transition-all cursor-not-allowed" disabled="" id="submit-btn">
+<span>확정하기</span>
+<span class="material-icons-round text-base">arrow_forward</span>
+</button>
+<p class="text-center text-xs text-slate-400 dark:text-slate-500 mt-3">
+                선택하신 태그를 기반으로 AI가 최적의 여행지를 분석합니다.
+            </p>
+</div>
+</div>
+<script>
+        let selectedCount = 0;
+        const maxTags = 10;
+        const minTags = 3;
+        const counterEl = document.getElementById('counter');
+        const submitBtn = document.getElementById('submit-btn');
+        function toggleTag(el) {
+            const isSelected = el.classList.contains('chip-selected');
+            if (!isSelected && selectedCount >= maxTags) {
+                alert(`최대 ${maxTags}개까지만 선택할 수 있습니다.`);
+                return;
+            }
+            if (isSelected) {
+                el.classList.remove('chip-selected');
+                selectedCount--;
+            } else {
+                el.classList.add('chip-selected');
+                selectedCount++;
+            }
+            updateUI();
+        }
+        function updateUI() {
+            counterEl.innerText = selectedCount;
+            if (selectedCount >= minTags) {
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('bg-slate-200', 'dark:bg-slate-800', 'text-slate-400', 'dark:text-slate-600', 'cursor-not-allowed');
+                submitBtn.classList.add('bg-primary', 'text-white', 'hover:brightness-110', 'active:scale-[0.98]', 'shadow-lg', 'shadow-primary/20');
+            } else {
+                submitBtn.disabled = true;
+                submitBtn.classList.add('bg-slate-200', 'dark:bg-slate-800', 'text-slate-400', 'dark:text-slate-600', 'cursor-not-allowed');
+                submitBtn.classList.remove('bg-primary', 'text-white', 'hover:brightness-110', 'active:scale-[0.98]', 'shadow-lg', 'shadow-primary/20');
+            }
+        }
+    </script>
+
+</body></html>

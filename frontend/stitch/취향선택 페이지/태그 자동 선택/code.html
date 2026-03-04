@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html class="dark" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>여행 취향 선택 - AI 자동 분석</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#3B82F6",
+                        "background-light": "#F9FAFB",
+                        "background-dark": "#0F172A",
+                        "surface-dark": "#1E293B",
+                        "card-dark": "#111827"
+                    },
+                    fontFamily: {
+                        display: ["Pretendard", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "12px",
+                    },
+                },
+            },
+        };
+    </script>
+<style>
+        body {
+            font-family: 'Pretendard', sans-serif;
+        }
+        .chip-active {
+            background-color: #3B82F6;
+            color: white;
+            border-color: #3B82F6;
+        }
+        .chip-inactive {
+            background-color: #1E293B;
+            color: #94A3B8;
+            border: 1px solid #334155;
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="max-w-3xl mx-auto px-6 py-12 pb-32">
+<header class="flex items-center justify-between mb-8">
+<div class="flex items-center gap-2">
+<span class="material-icons-outlined text-primary">explore</span>
+<h1 class="text-xl font-bold">여행 취향 선택</h1>
+</div>
+<div class="bg-primary/20 text-primary px-4 py-1.5 rounded-full text-sm font-semibold border border-primary/30">
+                5 / 10 선택됨
+            </div>
+</header>
+<div class="bg-blue-600/10 border border-blue-500/20 rounded-2xl p-5 mb-10 flex items-start gap-4">
+<div class="bg-red-500 rounded-full p-1.5 flex items-center justify-center shrink-0 mt-0.5">
+<span class="material-icons-outlined text-white text-[16px]">play_arrow</span>
+</div>
+<div class="flex-1">
+<p class="text-slate-300 text-sm leading-relaxed">
+<span class="font-bold text-white">YouTube 활동</span>을 바탕으로 일부 태그가 자동 선택되었습니다.<br/>
+                    사용자의 시청 기록을 분석하여 취향을 반영했습니다. 자유롭게 수정 가능합니다.
+                </p>
+</div>
+<button class="text-xs text-slate-400 hover:text-white flex items-center gap-1 transition-colors">
+                자세히 보기 <span class="material-icons-outlined text-[14px]">chevron_right</span>
+</button>
+</div>
+<div class="space-y-10">
+<section>
+<h2 class="text-lg font-bold mb-5 flex items-center gap-2">
+<span class="text-primary text-sm">01</span> 여행 분위기 ✨
+                </h2>
+<div class="flex flex-wrap gap-3">
+<button class="chip-active px-5 py-2.5 rounded-full flex items-center gap-2 text-sm font-medium transition-all hover:brightness-110">
+<span class="material-icons-outlined text-[16px]">check</span> 힐링
+                    </button>
+<button class="chip-active px-5 py-2.5 rounded-full flex items-center gap-2 text-sm font-medium transition-all hover:brightness-110">
+<span class="material-icons-outlined text-[16px]">check</span> 도시감성
+                    </button>
+<button class="chip-inactive px-5 py-2.5 rounded-full text-sm font-medium hover:bg-slate-700 transition-colors">
+                        활기찬
+                    </button>
+<button class="chip-inactive px-5 py-2.5 rounded-full text-sm font-medium hover:bg-slate-700 transition-colors">
+                        조용한/여유로운
+                    </button>
+<button class="chip-inactive px-5 py-2.5 rounded-full text-sm font-medium hover:bg-slate-700 transition-colors">
+                        로맨틱한
+                    </button>
+</div>
+</section>
+<section>
+<h2 class="text-lg font-bold mb-5 flex items-center gap-2">
+<span class="text-primary text-sm">02</span> 활동 유형 👟
+                </h2>
+<div class="flex flex-wrap gap-3">
+<button class="chip-active px-5 py-2.5 rounded-full flex items-center gap-2 text-sm font-medium transition-all">
+<span class="material-icons-outlined text-[16px]">check</span> 맛집 투어
+                    </button>
+<button class="chip-inactive px-5 py-2.5 rounded-full text-sm font-medium hover:bg-slate-700 transition-colors">
+                        쇼핑
+                    </button>
+<button class="chip-inactive px-5 py-2.5 rounded-full text-sm font-medium hover:bg-slate-700 transition-colors">
+                        박물관/전시회
+                    </button>
+<button class="chip-inactive px-5 py-2.5 rounded-full text-sm font-medium hover:bg-slate-700 transition-colors">
+                        자연 탐방
+                    </button>
+<button class="chip-inactive px-5 py-2.5 rounded-full text-sm font-medium hover:bg-slate-700 transition-colors">
+                        액티비티
+                    </button>
+</div>
+</section>
+<section>
+<h2 class="text-lg font-bold mb-5 flex items-center gap-2">
+<span class="text-primary text-sm">03</span> 여행 목적 🎯
+                </h2>
+<div class="flex flex-wrap gap-3">
+<button class="chip-active px-5 py-2.5 rounded-full flex items-center gap-2 text-sm font-medium transition-all">
+<span class="material-icons-outlined text-[16px]">check</span> 혼자 여행
+                    </button>
+<button class="chip-inactive px-5 py-2.5 rounded-full text-sm font-medium hover:bg-slate-700 transition-colors">
+                        가족과 함께
+                    </button>
+<button class="chip-inactive px-5 py-2.5 rounded-full text-sm font-medium hover:bg-slate-700 transition-colors">
+                        친구와 우정여행
+                    </button>
+<button class="chip-inactive px-5 py-2.5 rounded-full text-sm font-medium hover:bg-slate-700 transition-colors">
+                        커플 데이트
+                    </button>
+</div>
+</section>
+<section>
+<h2 class="text-lg font-bold mb-5 flex items-center gap-2">
+<span class="text-primary text-sm">04</span> 예산 성향 💰
+                </h2>
+<div class="flex flex-wrap gap-3">
+<button class="chip-inactive px-5 py-2.5 rounded-full text-sm font-medium hover:bg-slate-700 transition-colors">
+                        가성비 중시
+                    </button>
+<button class="chip-active px-5 py-2.5 rounded-full flex items-center gap-2 text-sm font-medium transition-all">
+<span class="material-icons-outlined text-[16px]">check</span> 럭셔리/플렉스
+                    </button>
+<button class="chip-inactive px-5 py-2.5 rounded-full text-sm font-medium hover:bg-slate-700 transition-colors">
+                        합리적 소비
+                    </button>
+</div>
+</section>
+<section>
+<h2 class="text-lg font-bold mb-5 flex items-center gap-2">
+<span class="text-primary text-sm">05</span> 안전/리스크 성향 🛡️
+                </h2>
+<div class="flex flex-wrap gap-3">
+<button class="chip-inactive px-5 py-2.5 rounded-full text-sm font-medium hover:bg-slate-700 transition-colors">
+                        철저한 계획형
+                    </button>
+<button class="chip-inactive px-5 py-2.5 rounded-full text-sm font-medium hover:bg-slate-700 transition-colors">
+                        즉흥적인 모험가
+                    </button>
+<button class="chip-inactive px-5 py-2.5 rounded-full text-sm font-medium hover:bg-slate-700 transition-colors">
+                        안전 최우선
+                    </button>
+</div>
+</section>
+</div>
+</div>
+<footer class="fixed bottom-0 left-0 right-0 p-6 glass border-t border-slate-700/50 flex flex-col items-center gap-4">
+<button class="w-full max-w-md bg-primary hover:bg-blue-600 text-white font-bold py-4 rounded-full flex items-center justify-center gap-2 transition-all shadow-lg shadow-primary/20">
+            맞춤 여행 추천 받기 <span class="material-icons-outlined">arrow_forward</span>
+</button>
+<button class="text-slate-400 text-sm hover:text-white transition-colors underline underline-offset-4">
+            취소 및 처음으로
+        </button>
+<p class="text-[10px] text-slate-500 mt-2">
+            선택하신 태그를 기반으로 AI가 최적의 여행지를 분석합니다.
+        </p>
+</footer>
+
+</body></html>
