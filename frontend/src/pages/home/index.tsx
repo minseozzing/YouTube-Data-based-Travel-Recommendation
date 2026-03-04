@@ -36,7 +36,7 @@ export default function HomePage() {
         {/* 지구본 박스: 정사각형 + 원형 마스킹 */}
         <div
           ref={wrapRef}
-          className="aspect-square h-[300px] md:h-[400px] lg:h-[450px] rounded-full overflow-hidden shadow-2xl"
+          className="aspect-square h-[400px] md:h-[500px] lg:h-[600px] rounded-full overflow-hidden shadow-2xl"
         >
           <Globe
             width={size.w}
