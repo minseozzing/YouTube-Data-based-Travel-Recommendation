@@ -1,10 +1,23 @@
-import * as React from "react";
-import { Outlet, createRootRoute } from "@tanstack/react-router";
+import { createRootRouteWithContext, Outlet } from '@tanstack/react-router';
+import { QueryClient } from '@tanstack/react-query';
+import { Suspense } from 'react';
+import ErrorBoundary from '@/components/common/ErrorBoundary';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
 
-export const Route = createRootRoute({
+interface RouterContext {
+  queryClient: QueryClient;
+}
+
+export const Route = createRootRouteWithContext<RouterContext>()({
   component: RootComponent,
 });
 
 function RootComponent() {
-  return <Outlet />;
+  return (
+    <ErrorBoundary>
+      <Suspense fallback={<LoadingSpinner />}>
+        <Outlet />
+      </Suspense>
+    </ErrorBoundary>
+  );
 }

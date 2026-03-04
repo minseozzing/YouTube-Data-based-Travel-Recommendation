@@ -9,38 +9,184 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as PreferenceRouteImport } from './routes/preference'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
+import { Route as AuthenticatedMypageRouteImport } from './routes/_authenticated/mypage'
+import { Route as AuthenticatedMainRouteImport } from './routes/_authenticated/main'
+import { Route as AuthenticatedCostRouteImport } from './routes/_authenticated/cost'
+import { Route as AuthenticatedBookmarksRouteImport } from './routes/_authenticated/bookmarks'
+import { Route as AuthenticatedCostCountryIdRouteImport } from './routes/_authenticated/cost.$countryId'
+import { Route as AuthenticatedBookmarksIdRouteImport } from './routes/_authenticated/bookmarks.$id'
 
+const PreferenceRoute = PreferenceRouteImport.update({
+  id: '/preference',
+  path: '/preference',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/auth/callback',
+  path: '/auth/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedMypageRoute = AuthenticatedMypageRouteImport.update({
+  id: '/mypage',
+  path: '/mypage',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedMainRoute = AuthenticatedMainRouteImport.update({
+  id: '/main',
+  path: '/main',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedCostRoute = AuthenticatedCostRouteImport.update({
+  id: '/cost',
+  path: '/cost',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedBookmarksRoute = AuthenticatedBookmarksRouteImport.update({
+  id: '/bookmarks',
+  path: '/bookmarks',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedCostCountryIdRoute =
+  AuthenticatedCostCountryIdRouteImport.update({
+    id: '/$countryId',
+    path: '/$countryId',
+    getParentRoute: () => AuthenticatedCostRoute,
+  } as any)
+const AuthenticatedBookmarksIdRoute =
+  AuthenticatedBookmarksIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AuthenticatedBookmarksRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/preference': typeof PreferenceRoute
+  '/bookmarks': typeof AuthenticatedBookmarksRouteWithChildren
+  '/cost': typeof AuthenticatedCostRouteWithChildren
+  '/main': typeof AuthenticatedMainRoute
+  '/mypage': typeof AuthenticatedMypageRoute
+  '/auth/callback': typeof AuthCallbackRoute
+  '/bookmarks/$id': typeof AuthenticatedBookmarksIdRoute
+  '/cost/$countryId': typeof AuthenticatedCostCountryIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/preference': typeof PreferenceRoute
+  '/bookmarks': typeof AuthenticatedBookmarksRouteWithChildren
+  '/cost': typeof AuthenticatedCostRouteWithChildren
+  '/main': typeof AuthenticatedMainRoute
+  '/mypage': typeof AuthenticatedMypageRoute
+  '/auth/callback': typeof AuthCallbackRoute
+  '/bookmarks/$id': typeof AuthenticatedBookmarksIdRoute
+  '/cost/$countryId': typeof AuthenticatedCostCountryIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/login': typeof LoginRoute
+  '/preference': typeof PreferenceRoute
+  '/_authenticated/bookmarks': typeof AuthenticatedBookmarksRouteWithChildren
+  '/_authenticated/cost': typeof AuthenticatedCostRouteWithChildren
+  '/_authenticated/main': typeof AuthenticatedMainRoute
+  '/_authenticated/mypage': typeof AuthenticatedMypageRoute
+  '/auth/callback': typeof AuthCallbackRoute
+  '/_authenticated/bookmarks/$id': typeof AuthenticatedBookmarksIdRoute
+  '/_authenticated/cost/$countryId': typeof AuthenticatedCostCountryIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/preference'
+    | '/bookmarks'
+    | '/cost'
+    | '/main'
+    | '/mypage'
+    | '/auth/callback'
+    | '/bookmarks/$id'
+    | '/cost/$countryId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/login'
+    | '/preference'
+    | '/bookmarks'
+    | '/cost'
+    | '/main'
+    | '/mypage'
+    | '/auth/callback'
+    | '/bookmarks/$id'
+    | '/cost/$countryId'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/login'
+    | '/preference'
+    | '/_authenticated/bookmarks'
+    | '/_authenticated/cost'
+    | '/_authenticated/main'
+    | '/_authenticated/mypage'
+    | '/auth/callback'
+    | '/_authenticated/bookmarks/$id'
+    | '/_authenticated/cost/$countryId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  LoginRoute: typeof LoginRoute
+  PreferenceRoute: typeof PreferenceRoute
+  AuthCallbackRoute: typeof AuthCallbackRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/preference': {
+      id: '/preference'
+      path: '/preference'
+      fullPath: '/preference'
+      preLoaderRoute: typeof PreferenceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +194,107 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/auth/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/mypage': {
+      id: '/_authenticated/mypage'
+      path: '/mypage'
+      fullPath: '/mypage'
+      preLoaderRoute: typeof AuthenticatedMypageRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/main': {
+      id: '/_authenticated/main'
+      path: '/main'
+      fullPath: '/main'
+      preLoaderRoute: typeof AuthenticatedMainRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/cost': {
+      id: '/_authenticated/cost'
+      path: '/cost'
+      fullPath: '/cost'
+      preLoaderRoute: typeof AuthenticatedCostRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/bookmarks': {
+      id: '/_authenticated/bookmarks'
+      path: '/bookmarks'
+      fullPath: '/bookmarks'
+      preLoaderRoute: typeof AuthenticatedBookmarksRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/cost/$countryId': {
+      id: '/_authenticated/cost/$countryId'
+      path: '/$countryId'
+      fullPath: '/cost/$countryId'
+      preLoaderRoute: typeof AuthenticatedCostCountryIdRouteImport
+      parentRoute: typeof AuthenticatedCostRoute
+    }
+    '/_authenticated/bookmarks/$id': {
+      id: '/_authenticated/bookmarks/$id'
+      path: '/$id'
+      fullPath: '/bookmarks/$id'
+      preLoaderRoute: typeof AuthenticatedBookmarksIdRouteImport
+      parentRoute: typeof AuthenticatedBookmarksRoute
+    }
   }
 }
 
+interface AuthenticatedBookmarksRouteChildren {
+  AuthenticatedBookmarksIdRoute: typeof AuthenticatedBookmarksIdRoute
+}
+
+const AuthenticatedBookmarksRouteChildren: AuthenticatedBookmarksRouteChildren =
+  {
+    AuthenticatedBookmarksIdRoute: AuthenticatedBookmarksIdRoute,
+  }
+
+const AuthenticatedBookmarksRouteWithChildren =
+  AuthenticatedBookmarksRoute._addFileChildren(
+    AuthenticatedBookmarksRouteChildren,
+  )
+
+interface AuthenticatedCostRouteChildren {
+  AuthenticatedCostCountryIdRoute: typeof AuthenticatedCostCountryIdRoute
+}
+
+const AuthenticatedCostRouteChildren: AuthenticatedCostRouteChildren = {
+  AuthenticatedCostCountryIdRoute: AuthenticatedCostCountryIdRoute,
+}
+
+const AuthenticatedCostRouteWithChildren =
+  AuthenticatedCostRoute._addFileChildren(AuthenticatedCostRouteChildren)
+
+interface AuthenticatedRouteChildren {
+  AuthenticatedBookmarksRoute: typeof AuthenticatedBookmarksRouteWithChildren
+  AuthenticatedCostRoute: typeof AuthenticatedCostRouteWithChildren
+  AuthenticatedMainRoute: typeof AuthenticatedMainRoute
+  AuthenticatedMypageRoute: typeof AuthenticatedMypageRoute
+}
+
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedBookmarksRoute: AuthenticatedBookmarksRouteWithChildren,
+  AuthenticatedCostRoute: AuthenticatedCostRouteWithChildren,
+  AuthenticatedMainRoute: AuthenticatedMainRoute,
+  AuthenticatedMypageRoute: AuthenticatedMypageRoute,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  LoginRoute: LoginRoute,
+  PreferenceRoute: PreferenceRoute,
+  AuthCallbackRoute: AuthCallbackRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
