@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>유튜브 연동 동의 - 여행 취향 분석</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"/>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#3B82F6",
+              "background-light": "#F9FAFB",
+              "background-dark": "#0F172A",
+              "card-light": "#FFFFFF",
+              "card-dark": "#1E293B",
+            },
+            fontFamily: {
+              display: ["Pretendard", "sans-serif"],
+            },
+            borderRadius: {
+              DEFAULT: "12px",
+            },
+          },
+        },
+      };
+    </script>
+<style>
+        body {
+            font-family: 'Pretendard', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark min-h-screen flex items-center justify-center p-4 transition-colors duration-300">
+<div class="max-w-md w-full bg-card-light dark:bg-card-dark rounded-2xl shadow-xl overflow-hidden border border-gray-100 dark:border-gray-800">
+<div class="pt-10 pb-6 flex flex-col items-center">
+<div class="w-16 h-16 bg-red-50 dark:bg-red-900/20 rounded-2xl flex items-center justify-center mb-4">
+<img alt="YouTube Icon" class="w-10 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBosA3rsR7IaGUwIfs7WTsEscwFqEmKxtKWeOoq5upM1Mfnfo2Ld-epvhDIBGiRSOseV3iwUCUA6Z9XXpRVa7KC1zu9GB98JfYHK_Ce5HMVLT9iBdJy_GuJ8FUGwqnv6e5mGLhHw6Lcez84qn0-ynIynhcRDqRHZhMiSVqnd359xp8X67PRfFixp4l5P0XwjZjWNKj9M5t1BeBTttf_p-RCo6qerCN7VE9b106H7ZKLvgiHRQryLaIdC0VRDfxL98_-_Q1EaLH10B-F"/>
+</div>
+<h1 class="text-xl font-bold text-gray-900 dark:text-white text-center px-6 leading-tight">
+                YouTube 좋아요/저장 영상을<br/>분석합니다.
+            </h1>
+</div>
+<div class="px-8 pb-8">
+<div class="space-y-4 py-6 border-y border-gray-100 dark:border-gray-800">
+<div class="flex items-start gap-3">
+<span class="material-icons-round text-primary text-xl mt-0.5">check_circle</span>
+<div>
+<p class="font-medium text-gray-800 dark:text-gray-200">데이터 최소 활용</p>
+<p class="text-sm text-gray-500 dark:text-gray-400">영상 제목과 키워드만 사용하여 취향을 파악합니다.</p>
+</div>
+</div>
+<div class="flex items-start gap-3">
+<span class="material-icons-round text-primary text-xl mt-0.5">lock</span>
+<div>
+<p class="font-medium text-gray-800 dark:text-gray-200">개인정보 보호</p>
+<p class="text-sm text-gray-500 dark:text-gray-400">로그인 정보나 개인 식별 정보는 저장하지 않습니다.</p>
+</div>
+</div>
+<div class="flex items-start gap-3">
+<span class="material-icons-round text-primary text-xl mt-0.5">settings_backup_restore</span>
+<div>
+<p class="font-medium text-gray-800 dark:text-gray-200">언제든지 해제 가능</p>
+<p class="text-sm text-gray-500 dark:text-gray-400">설정 메뉴에서 언제든지 연동을 해제할 수 있습니다.</p>
+</div>
+</div>
+</div>
+<div class="mt-8 space-y-3">
+<button class="w-full bg-primary hover:bg-blue-600 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20" onclick="alert('분석을 시작합니다.')">
+<span class="material-icons-round text-lg">analytics</span>
+                    동의하고 분석하기
+                </button>
+<button class="w-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 font-medium py-4 px-6 rounded-xl transition-all duration-200" onclick="history.back()">
+                    취소
+                </button>
+</div>
+<p class="mt-6 text-center text-xs text-gray-400 dark:text-gray-500">
+                연동 시 서비스 이용약관 및 개인정보 처리방침에 동의하게 됩니다.
+            </p>
+</div>
+</div>
+<div class="fixed bottom-6 right-6">
+<button class="p-3 rounded-full bg-card-light dark:bg-card-dark shadow-lg border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-white flex items-center justify-center" onclick="document.documentElement.classList.toggle('dark')">
+<span class="material-icons-round dark:hidden">dark_mode</span>
+<span class="material-icons-round hidden dark:block">light_mode</span>
+</button>
+</div>
+
+</body></html>
