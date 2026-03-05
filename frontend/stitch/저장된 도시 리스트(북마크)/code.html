@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html class="light" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>VoyageWise - 저장된 도시 리스트</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#3B82F6", // Sky Blue Primary
+                        "background-light": "#F0F7FF", // Very light pastel sky blue
+                        "background-dark": "#0F172A",
+                    },
+                    fontFamily: {
+                        display: ["Pretendard", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.75rem",
+                    },
+                },
+            },
+        };
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Pretendard', sans-serif;
+        }
+        .city-card:hover .delete-btn {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-100 transition-colors duration-300 min-h-screen">
+<nav class="sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-blue-100 dark:border-slate-800">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex justify-between items-center h-16">
+<div class="flex items-center gap-2 cursor-pointer">
+<span class="material-icons-outlined text-primary text-3xl">explore</span>
+<span class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">VoyageWise</span>
+</div>
+<div class="hidden md:flex flex-1 max-w-md mx-8">
+<div class="relative w-full">
+<span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-icons-outlined text-slate-400 text-sm">search</span>
+</span>
+<input class="block w-full pl-10 pr-3 py-2 border border-slate-200 dark:border-slate-700 rounded-full bg-slate-50 dark:bg-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 dark:focus:ring-primary/30 transition-all" placeholder="목적지 검색..." type="text"/>
+</div>
+</div>
+<div class="hidden lg:flex items-center space-x-8 text-sm font-medium">
+<a class="text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary transition-colors" href="#">여행지</a>
+<a class="text-primary font-semibold" href="#">내 여행</a>
+<a class="text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary transition-colors" href="#">가이드</a>
+<button class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" onclick="toggleDarkMode()">
+<span class="material-icons-outlined text-slate-600 dark:text-slate-300">dark_mode</span>
+</button>
+<div class="flex items-center gap-3 pl-4 border-l border-slate-200 dark:border-slate-700">
+<button class="px-4 py-2 rounded-full bg-primary text-white font-semibold hover:bg-blue-600 transition-shadow shadow-md shadow-blue-200 dark:shadow-none">회원가입</button>
+<div class="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center cursor-pointer overflow-hidden border-2 border-white dark:border-slate-800">
+<span class="material-icons-outlined text-slate-500">person</span>
+</div>
+</div>
+</div>
+<div class="lg:hidden">
+<span class="material-icons-outlined text-slate-600">menu</span>
+</div>
+</div>
+</div>
+</nav>
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+<div class="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
+<div>
+<nav class="flex mb-2 text-xs text-slate-500 dark:text-slate-400 gap-2 items-center">
+<span>마이페이지</span>
+<span class="material-icons-outlined text-[10px]">chevron_right</span>
+<span class="text-primary font-medium">저장된 도시</span>
+</nav>
+<h1 class="text-3xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
+                    총 저장한 도시 : <span class="text-primary">12개</span>
+</h1>
+</div>
+<div class="relative">
+<button class="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm hover:border-primary dark:hover:border-primary transition-all text-sm font-medium">
+<span class="material-icons-outlined text-slate-500 dark:text-slate-400 text-lg">filter_list</span>
+<span>필터링</span>
+<span class="material-icons-outlined text-slate-400 text-sm">expand_more</span>
+</button>
+</div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+<div class="city-card group relative bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-700">
+<div class="relative h-48 overflow-hidden">
+<img alt="Paris" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDRxurD6iAKpFMeDbaGEdseZCBx0Rlv4-y6mWOoW8ZIeGkzPrHEWHmsCFXD-JrdKRtj8rYaPPIp-8kJjIJ8nOyyDeNOg-T4xfTJvkFbq95_wKrrhtoK7lKioEWJGFMVYlv2B140LPwHN8h7w9mhKjOCcuxMBntNHK6LiSLtCcmIGzbSiQM3PwKJ4WNN3jeEEnz5koMTrFrVRymviNcemqKLp2Sac7UHmF_tbJQK2WL2K3XqC1hVmgHPGXkN4OpUJb9_WRtH5mSEdOk"/>
+<button class="delete-btn absolute top-3 right-3 w-8 h-8 flex items-center justify-center bg-white/90 dark:bg-slate-900/90 text-red-500 rounded-full opacity-0 transition-opacity hover:bg-red-50">
+<span class="material-icons-outlined text-lg font-bold">close</span>
+</button>
+</div>
+<div class="p-5">
+<div class="flex justify-between items-start mb-2">
+<h3 class="text-xl font-bold text-slate-900 dark:text-white">파리</h3>
+<span class="text-[10px] px-2 py-1 bg-blue-50 dark:bg-blue-900/30 text-primary font-semibold rounded uppercase tracking-wider">Europe</span>
+</div>
+<p class="text-sm text-slate-500 dark:text-slate-400 mb-4 line-clamp-2">낭만과 예술의 도시, 에펠탑과 루브르 박물관이 기다리는 빛의 도시입니다.</p>
+<div class="flex items-center justify-between pt-4 border-t border-slate-50 dark:border-slate-700/50">
+<span class="text-xs text-slate-400 dark:text-slate-500 flex items-center gap-1">
+<span class="material-icons-outlined text-xs">bookmark</span>
+                            2024.03.15에 저장됨
+                        </span>
+</div>
+</div>
+</div>
+<div class="city-card group relative bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-700">
+<div class="relative h-48 overflow-hidden">
+<img alt="Tokyo" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCVWvJGcFmoEtmSW21e7grOV_OxvtNfj0JX-MTTTsRtF4qkowDYlnfs-REv_uggTVZSPsqHIHY88YUHS8ZbZrBZVioQuuHtV3anW2y5CwHr-siV8Bv_liaoCEKWBheHAq8i4DKEtfB1oHlgfRaZ4mCD_iDX1N3IyXFthBRcEzruDiiXy1hH5pT9On3kn9aK5cRr6qCH3FnSXrz3Cg9k5ymQUW-Iw-UnCB6ooYPxXA7mrDKSoLHcMAQwb0WpFjJASU3LcBfRQvYinT4"/>
+<button class="delete-btn absolute top-3 right-3 w-8 h-8 flex items-center justify-center bg-white/90 dark:bg-slate-900/90 text-red-500 rounded-full opacity-0 transition-opacity hover:bg-red-50">
+<span class="material-icons-outlined text-lg font-bold">close</span>
+</button>
+</div>
+<div class="p-5">
+<div class="flex justify-between items-start mb-2">
+<h3 class="text-xl font-bold text-slate-900 dark:text-white">도쿄</h3>
+<span class="text-[10px] px-2 py-1 bg-blue-50 dark:bg-blue-900/30 text-primary font-semibold rounded uppercase tracking-wider">Asia</span>
+</div>
+<p class="text-sm text-slate-500 dark:text-slate-400 mb-4 line-clamp-2">전통과 첨단이 공존하는 역동적인 메트로폴리스입니다.</p>
+<div class="flex items-center justify-between pt-4 border-t border-slate-50 dark:border-slate-700/50">
+<span class="text-xs text-slate-400 dark:text-slate-500 flex items-center gap-1">
+<span class="material-icons-outlined text-xs">bookmark</span>
+                            2024.03.10에 저장됨
+                        </span>
+</div>
+</div>
+</div>
+<div class="city-card group relative bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-700">
+<div class="relative h-48 overflow-hidden">
+<img alt="London" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBX18kKvXyuJQvuv3lvr8SLulg1yf8t7PIgAxN6_mZ5sQyUmE_-0PoGks9B_VwbuaP3ppm-hdKh3boYUqTFbZ4HyxkJtbXIf1e-TPTqQVJ1dpPJ03467yHv3RbcOdHolmdf2kEoHL0XxbTb1Pin-EDKens7swRWVS4KEpMMMXmq_iL0Goz_kEAzUjKbCY9pLE9j24sQ_c8FK3KtAZfuIhrxPAD8GWYqHBBU-rV1ETqHd40RNmnr00tL-9V5w_zbuydyq37i2-JmNMk"/>
+<button class="delete-btn absolute top-3 right-3 w-8 h-8 flex items-center justify-center bg-white/90 dark:bg-slate-900/90 text-red-500 rounded-full opacity-0 transition-opacity hover:bg-red-50">
+<span class="material-icons-outlined text-lg font-bold">close</span>
+</button>
+</div>
+<div class="p-5">
+<div class="flex justify-between items-start mb-2">
+<h3 class="text-xl font-bold text-slate-900 dark:text-white">런던</h3>
+<span class="text-[10px] px-2 py-1 bg-blue-50 dark:bg-blue-900/30 text-primary font-semibold rounded uppercase tracking-wider">Europe</span>
+</div>
+<p class="text-sm text-slate-500 dark:text-slate-400 mb-4 line-clamp-2">역사와 현대가 조화롭게 어우러진 영국 문화의 중심지입니다.</p>
+<div class="flex items-center justify-between pt-4 border-t border-slate-50 dark:border-slate-700/50">
+<span class="text-xs text-slate-400 dark:text-slate-500 flex items-center gap-1">
+<span class="material-icons-outlined text-xs">bookmark</span>
+                            2024.03.05에 저장됨
+                        </span>
+</div>
+</div>
+</div>
+<div class="city-card group relative bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-700">
+<div class="relative h-48 overflow-hidden">
+<img alt="New York" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBGFzHdsWzqWAOzj7D-7UaOi1dwKu1oKUtQuBVUeycMCxulwG7srFjqjvVi5ut8HClpf8JeU9q15pzkrxaGoXhPbedaj0-dEvij0crc8U5tU-iYakLV-yV4PrdAFuwpg3IFRNF1SxgxbwdNCcF2Aj_Dn5ij5wkZ7hFIRVs1jCcEY9O0CvfNWhY5ehw2kiQS0bo_SfzHt95ps3jxXx3ez1rJB99K1sbicKSkTkpxyQXHuaPksX68Rxfr1DAIBBUHeSg5kw65zvIt5z8"/>
+<button class="delete-btn absolute top-3 right-3 w-8 h-8 flex items-center justify-center bg-white/90 dark:bg-slate-900/90 text-red-500 rounded-full opacity-0 transition-opacity hover:bg-red-50">
+<span class="material-icons-outlined text-lg font-bold">close</span>
+</button>
+</div>
+<div class="p-5">
+<div class="flex justify-between items-start mb-2">
+<h3 class="text-xl font-bold text-slate-900 dark:text-white">뉴욕</h3>
+<span class="text-[10px] px-2 py-1 bg-blue-50 dark:bg-blue-900/30 text-primary font-semibold rounded uppercase tracking-wider">Americas</span>
+</div>
+<p class="text-sm text-slate-500 dark:text-slate-400 mb-4 line-clamp-2">잠들지 않는 도시, 잠시도 멈추지 않는 활기가 넘치는 곳입니다.</p>
+<div class="flex items-center justify-between pt-4 border-t border-slate-50 dark:border-slate-700/50">
+<span class="text-xs text-slate-400 dark:text-slate-500 flex items-center gap-1">
+<span class="material-icons-outlined text-xs">bookmark</span>
+                            2024.02.28에 저장됨
+                        </span>
+</div>
+</div>
+</div>
+<div class="city-card group relative bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-slate-700">
+<div class="relative h-48 overflow-hidden">
+<img alt="Porto" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA1-drZL4hqXa2MO9ZknJL0B_0sjelFHoZq3QyEUiLyI3CHz27fq0s0rXTDgGbU5xe8Xg-L7gS02Ed1zykaOfARTfhqLSih73DfnQ8ojBInmPXIHKoHGzwFdm-HezbVJL1FP6aBlCAuIy1hc6ka7Swj37P3TYitzwmaik0YDctV8F918r2tYXKYYWZ5eRethq5nfYAUabcywL7fyX62Xn7xAIXS8yD1zOjFFNFkAt-lR1AqW3Qw9lV12TG2Jpu03da85Q-Zf4IGho8"/>
+<button class="delete-btn absolute top-3 right-3 w-8 h-8 flex items-center justify-center bg-white/90 dark:bg-slate-900/90 text-red-500 rounded-full opacity-0 transition-opacity hover:bg-red-50">
+<span class="material-icons-outlined text-lg font-bold">close</span>
+</button>
+</div>
+<div class="p-5">
+<div class="flex justify-between items-start mb-2">
+<h3 class="text-xl font-bold text-slate-900 dark:text-white">포르투</h3>
+<span class="text-[10px] px-2 py-1 bg-blue-50 dark:bg-blue-900/30 text-primary font-semibold rounded uppercase tracking-wider">Europe</span>
+</div>
+<p class="text-sm text-slate-500 dark:text-slate-400 mb-4 line-clamp-2">아름다운 강변과 빈티지한 골목길이 매력적인 포르투갈의 도시입니다.</p>
+<div class="flex items-center justify-between pt-4 border-t border-slate-50 dark:border-slate-700/50">
+<span class="text-xs text-slate-400 dark:text-slate-500 flex items-center gap-1">
+<span class="material-icons-outlined text-xs">bookmark</span>
+                            2024.02.20에 저장됨
+                        </span>
+</div>
+</div>
+</div>
+<div class="group relative flex flex-col items-center justify-center h-full min-h-[340px] border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-2xl bg-white/50 dark:bg-slate-800/30 hover:border-primary/50 hover:bg-white dark:hover:bg-slate-800 transition-all cursor-pointer">
+<div class="w-12 h-12 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+<span class="material-icons-outlined text-primary">add</span>
+</div>
+<span class="text-sm font-semibold text-slate-500 dark:text-slate-400">도시 추가하기</span>
+</div>
+</div>
+<div class="mt-16 flex justify-center">
+<div class="flex gap-2">
+<button class="w-10 h-10 flex items-center justify-center rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-primary transition-colors">
+<span class="material-icons-outlined">chevron_left</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg bg-primary text-white font-bold">1</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:text-primary transition-colors font-medium">2</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:text-primary transition-colors font-medium">3</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-primary transition-colors">
+<span class="material-icons-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+</main>
+<footer class="mt-20 border-t border-blue-100 dark:border-slate-800 py-10 bg-white/50 dark:bg-slate-900/50">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex flex-col md:flex-row justify-between items-center gap-6">
+<div class="flex items-center gap-2 grayscale opacity-70">
+<span class="material-icons-outlined text-primary">explore</span>
+<span class="text-lg font-bold tracking-tight text-slate-900 dark:text-white">VoyageWise</span>
+</div>
+<p class="text-sm text-slate-400 dark:text-slate-500">© 2024 VoyageWise Inc. All rights reserved.</p>
+<div class="flex gap-6 text-sm text-slate-500 dark:text-slate-400">
+<a class="hover:text-primary transition-colors" href="#">이용약관</a>
+<a class="hover:text-primary transition-colors" href="#">개인정보처리방침</a>
+<a class="hover:text-primary transition-colors" href="#">고객지원</a>
+</div>
+</div>
+</div>
+</footer>
+
+</body></html>

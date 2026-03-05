@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>VoyageWise - 국가별 상세 물가 분석</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Noto+Sans+KR:wght@300;400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#3B82F6", // Professional Blue
+                        "background-light": "#F8FAFC",
+                        "background-dark": "#0F172A",
+                    },
+                    fontFamily: {
+                        display: ["Inter", "Noto Sans KR", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "12px",
+                    },
+                },
+            },
+        };
+    </script>
+<style>
+        body {
+            font-family: 'Inter', 'Noto Sans KR', sans-serif;
+        }
+        .chart-placeholder {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(59, 130, 246, 0.1) 100%);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: rgba(156, 163, 175, 0.5);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 transition-colors duration-200">
+<nav class="sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex justify-between items-center h-16">
+<div class="flex items-center gap-2">
+<span class="material-icons-outlined text-primary text-3xl">explore</span>
+<span class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">VoyageWise</span>
+</div>
+<div class="hidden md:flex items-center space-x-8">
+<a class="text-slate-600 dark:text-slate-400 hover:text-primary transition" href="#">탐색</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-primary transition" href="#">물가 비교</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-primary transition" href="#">커뮤니티</a>
+<button class="bg-primary text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-blue-600 transition">로그인</button>
+<button class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition" id="theme-toggle">
+<span class="material-icons-outlined">dark_mode</span>
+</button>
+</div>
+</div>
+</div>
+</nav>
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+<div class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<div class="flex items-center gap-3 mb-2">
+<img alt="Japan Flag" class="w-8 h-6 rounded-sm shadow-sm" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC6zPvldmP-JxnC4uKFwT6BZ8bQTqMb9aF1bbd0NdTwzftfKPyORnpb4o_RpNCe1daFgAPEzWo08wgiCbO3FqOl7TKSr7Ityi8ewnto9DvFN8lMOloVYQ_CepU8lCRFSCvu4ameNNroo4V57Ew7XU9zNyaJVnvoIwI1qsKDu_SRyo1SLF4FHhCdRyVJQZi4jussuYGoEGw1FfUA_ubLItucLDmNu5WpyoHS1EELk5ZMfRBPuyDs0nRWZ4NLumeM0nJOwWnatICO230"/>
+<span class="text-slate-500 dark:text-slate-400 font-medium">동아시아</span>
+</div>
+<h1 class="text-4xl font-bold text-slate-900 dark:text-white">일본 <span class="text-lg font-normal text-slate-400 ml-2">Japan</span></h1>
+</div>
+<div class="flex gap-2">
+<button class="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm hover:shadow-md transition">
+<span class="material-icons-outlined text-sm">share</span>
+<span class="text-sm font-medium">공유하기</span>
+</button>
+<button class="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm hover:shadow-md transition">
+<span class="material-icons-outlined text-sm text-red-500">favorite</span>
+<span class="text-sm font-medium">저장</span>
+</button>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
+<div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
+<div class="flex justify-between items-start mb-6">
+<div>
+<p class="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">현재 환율 (JPY/KRW)</p>
+<h3 class="text-3xl font-bold text-slate-900 dark:text-white">912.45 <span class="text-lg font-normal text-slate-400">원</span></h3>
+<p class="text-xs text-green-500 mt-1 flex items-center">
+<span class="material-icons-outlined text-xs">arrow_downward</span> 0.2% 전일 대비 하락
+                        </p>
+</div>
+<div class="p-3 bg-blue-50 dark:bg-blue-900/30 rounded-xl text-primary">
+<span class="material-icons-outlined">currency_yen</span>
+</div>
+</div>
+<div class="h-48 w-full chart-placeholder rounded-lg relative overflow-hidden flex items-end px-4 py-2">
+<svg class="w-full h-full" preserveAspectRatio="none" viewBox="0 0 100 40">
+<path d="M0 40 Q 25 35, 50 20 T 100 10 L 100 40 L 0 40 Z" fill="url(#grad1)"></path>
+<path d="M0 40 Q 25 35, 50 20 T 100 10" fill="none" stroke="#3B82F6" stroke-width="2"></path>
+<defs>
+<linearGradient id="grad1" x1="0%" x2="0%" y1="0%" y2="100%">
+<stop offset="0%" style="stop-color:#3B82F6;stop-opacity:0.2"></stop>
+<stop offset="100%" style="stop-color:#3B82F6;stop-opacity:0"></stop>
+</linearGradient>
+</defs>
+</svg>
+<div class="absolute bottom-2 left-0 right-0 flex justify-between px-4 text-[10px] text-slate-400">
+<span>1개월 전</span>
+<span>현재</span>
+</div>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
+<div class="flex justify-between items-start mb-6">
+<div>
+<p class="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">구매력 지수 (PPP)</p>
+<h3 class="text-3xl font-bold text-slate-900 dark:text-white">0.84 <span class="text-lg font-normal text-slate-400">지수</span></h3>
+<p class="text-xs text-slate-400 mt-1 italic">한국(1.0) 대비 물가 수준</p>
+</div>
+<div class="p-3 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl text-indigo-500">
+<span class="material-icons-outlined">shopping_bag</span>
+</div>
+</div>
+<div class="h-48 w-full chart-placeholder rounded-lg relative overflow-hidden flex items-center justify-center">
+<div class="relative w-32 h-32 rounded-full border-4 border-slate-100 dark:border-slate-700 flex items-center justify-center">
+<div class="absolute inset-0 rounded-full border-4 border-primary border-t-transparent animate-pulse" style="transform: rotate(45deg);"></div>
+<span class="text-xs font-bold text-primary">저렴함</span>
+</div>
+<div class="ml-8 space-y-2">
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-primary"></div>
+<span class="text-xs text-slate-600 dark:text-slate-400">생활비</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-indigo-400"></div>
+<span class="text-xs text-slate-600 dark:text-slate-400">외식</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-slate-300"></div>
+<span class="text-xs text-slate-600 dark:text-slate-400">임대료</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<section class="mb-12">
+<div class="flex items-center justify-between mb-6">
+<h2 class="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+<span class="material-icons-outlined text-primary">analytics</span>
+                    물가 비교 상세
+                </h2>
+<div class="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
+<button class="px-4 py-1.5 text-sm font-medium rounded-lg bg-white dark:bg-slate-700 shadow-sm text-slate-900 dark:text-white">리스트형</button>
+<button class="px-4 py-1.5 text-sm font-medium rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-700 transition">차트형</button>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
+<div class="grid grid-cols-1 md:grid-cols-2">
+<div class="p-8 border-b md:border-b-0 md:border-r border-slate-100 dark:border-slate-700">
+<div class="flex items-center justify-between mb-8">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center overflow-hidden">
+<img alt="Japan" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6BP_kT2QZjIwSjWNwHOuEYC5T8EVHWhmFx3BeDGxtflDsJIkJo4bQQm_IypHG6HetslWxV-BIlgYcxIfemWK6AF60dya62DO54IOt8hktA9UEjc2X7RDZ71A6qzF_bao63ZsRwOfOTy8mBGgfp7ov8v8_hAziyuLu7ZI4JGEOolAdDXxdGc6GRncZTV9mRrkOIA4KABptH8iy4hAduyy_fiCKLyzfFJ8_drmNHMzoFhKN04tm1tH5SnfWqeGJUhjgsVayF4h3O0E"/>
+</div>
+<div>
+<h4 class="font-bold text-slate-900 dark:text-white">일본</h4>
+<p class="text-xs text-slate-500">도쿄 기준 평균 물가</p>
+</div>
+</div>
+<span class="text-xs font-semibold px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 rounded uppercase">Target</span>
+</div>
+<div class="space-y-8">
+<div>
+<h5 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">식비 (Eating Out)</h5>
+<div class="space-y-4">
+<div class="flex justify-between items-center">
+<span class="text-sm text-slate-600 dark:text-slate-300">점심 특선 (일반 식당)</span>
+<span class="text-sm font-bold">¥1,000 (약 9,100원)</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-sm text-slate-600 dark:text-slate-300">빅맥 세트</span>
+<span class="text-sm font-bold">¥750 (약 6,800원)</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-sm text-slate-600 dark:text-slate-300">카푸치노 1잔</span>
+<span class="text-sm font-bold">¥550 (약 5,000원)</span>
+</div>
+</div>
+</div>
+<div>
+<h5 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">교통 (Transportation)</h5>
+<div class="space-y-4">
+<div class="flex justify-between items-center">
+<span class="text-sm text-slate-600 dark:text-slate-300">대중교통 편도</span>
+<span class="text-sm font-bold">¥210 (약 1,900원)</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-sm text-slate-600 dark:text-slate-300">택시 기본 요금</span>
+<span class="text-sm font-bold">¥500 (약 4,500원)</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="p-8 bg-slate-50/50 dark:bg-slate-900/30">
+<div class="flex items-center justify-between mb-8">
+<div class="flex items-center gap-3">
+<select class="bg-transparent border-none font-bold text-slate-900 dark:text-white p-0 focus:ring-0 text-base cursor-pointer">
+<option selected="">대한민국 (South Korea)</option>
+<option>미국 (USA)</option>
+<option>베트남 (Vietnam)</option>
+<option>대만 (Taiwan)</option>
+</select>
+</div>
+<span class="text-xs font-semibold px-2 py-1 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400 rounded uppercase">Base</span>
+</div>
+<div class="space-y-8">
+<div>
+<h5 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">식비 (Eating Out)</h5>
+<div class="space-y-4">
+<div class="flex justify-between items-center">
+<span class="text-sm text-slate-600 dark:text-slate-300">점심 특선 (일반 식당)</span>
+<div class="flex items-center gap-2">
+<span class="text-xs text-red-500 font-medium">+10%</span>
+<span class="text-sm font-bold">10,000원</span>
+</div>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-sm text-slate-600 dark:text-slate-300">빅맥 세트</span>
+<div class="flex items-center gap-2">
+<span class="text-xs text-green-500 font-medium">-12%</span>
+<span class="text-sm font-bold">6,000원</span>
+</div>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-sm text-slate-600 dark:text-slate-300">카푸치노 1잔</span>
+<div class="flex items-center gap-2">
+<span class="text-xs text-slate-400 font-medium">동일</span>
+<span class="text-sm font-bold">5,000원</span>
+</div>
+</div>
+</div>
+</div>
+<div>
+<h5 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">교통 (Transportation)</h5>
+<div class="space-y-4">
+<div class="flex justify-between items-center">
+<span class="text-sm text-slate-600 dark:text-slate-300">대중교통 편도</span>
+<div class="flex items-center gap-2">
+<span class="text-xs text-green-500 font-medium">-26%</span>
+<span class="text-sm font-bold">1,400원</span>
+</div>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-sm text-slate-600 dark:text-slate-300">택시 기본 요금</span>
+<div class="flex items-center gap-2">
+<span class="text-xs text-green-500 font-medium">-10%</span>
+<span class="text-sm font-bold">4,000원</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 hidden md:flex w-12 h-12 bg-white dark:bg-slate-800 border-4 border-background-light dark:border-background-dark rounded-full items-center justify-center z-10">
+<span class="text-primary font-black italic">VS</span>
+</div>
+</div>
+</section>
+<section>
+<div class="flex items-center justify-between mb-6">
+<h2 class="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+<span class="material-icons-outlined text-primary">location_city</span>
+                    주요 도시 물가
+                </h2>
+<a class="text-sm font-medium text-primary hover:underline" href="#">전체 보기</a>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+<div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-100 dark:border-slate-700 hover:shadow-lg transition-all cursor-pointer group">
+<div class="relative h-32 mb-4 rounded-xl overflow-hidden">
+<img alt="Tokyo" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCdVzcbxY4BVqJtMPKPfZeKQP4kO24BVs6IAuDvbPPfCT2MOQEZfFjjr_MCdPFq1j-1bq0Uqr0GyLOHYt3K2ldUG0dK4tXNGdlizfAqPjWxitKhq6YFNKfVXIt4uZiECMPxZJS-PFgrW69DdrXCVKYciH7GmJABozJdcR_2hOWs3bD0JUnqJkrFNjhrcqM6Vw7fGvYdwZaezGPVo3SSP9FfWcynlRrxMesOItfdSZVbpylF9e3qNQ_-dHII3pne2UiefYbQFQV_7Oo"/>
+<div class="absolute top-2 right-2 bg-white/90 dark:bg-slate-900/90 px-2 py-1 rounded-md text-[10px] font-bold">HIGH</div>
+</div>
+<h5 class="font-bold text-lg mb-1">도쿄 <span class="text-slate-400 font-normal text-sm">Tokyo</span></h5>
+<div class="flex items-center justify-between text-sm">
+<span class="text-slate-500">1일 평균 생활비</span>
+<span class="font-semibold text-primary">약 12만원</span>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-100 dark:border-slate-700 hover:shadow-lg transition-all cursor-pointer group">
+<div class="relative h-32 mb-4 rounded-xl overflow-hidden">
+<img alt="Osaka" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAEMEWGpGlLXD_GoFRsut3XjgW8xbVNgZkCrcJWpUKpa5DYvG7RAyiShV2tyvY2VypEubYDYG_jkKZnt0kVA8HhipOQaKVuOFiKHV4gHuv56Qgp1ObyN5mSoK49Ksea7aWSjeqHnouoiqfqwUy4qdf3kuzAFs_Tz0B7RWXmIB8TnSRIJJq_we0tlVpbwkoee6iNntSeBekQqTt30BQE44KWHVH4uAEEWxxsG7svJGIDZQzNupSFn4ppEwbG0tXZcarg2UQ3MRSibeg"/>
+<div class="absolute top-2 right-2 bg-white/90 dark:bg-slate-900/90 px-2 py-1 rounded-md text-[10px] font-bold">MID</div>
+</div>
+<h5 class="font-bold text-lg mb-1">오사카 <span class="text-slate-400 font-normal text-sm">Osaka</span></h5>
+<div class="flex items-center justify-between text-sm">
+<span class="text-slate-500">1일 평균 생활비</span>
+<span class="font-semibold text-primary">약 9.5만원</span>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-100 dark:border-slate-700 hover:shadow-lg transition-all cursor-pointer group">
+<div class="relative h-32 mb-4 rounded-xl overflow-hidden">
+<img alt="Kyoto" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAHTCbkRhttzxyB5gHC5y_uCjr0U26cLwHOgOYfGlueeJ5zBssctpvFuzcMHqjCa0YTSUX27yuemJanr19zbZAk6Dp030HhZ18EamObJIJV1yheWmwtwXdSLEo0k8vG37fsnmkT3KcNl2bgkfIR7-KCg6bmG1MS6e6qw7y2OIiiwEn3jSmh_AddqMI94eJTE_M1GAvfJTLgnIXxFOtGpM3s3bECDYIYxHpf_3jUOnX_u4w2u0Vx4xODj4_2jnkjt_t-Gi2n_rDaMpU"/>
+<div class="absolute top-2 right-2 bg-white/90 dark:bg-slate-900/90 px-2 py-1 rounded-md text-[10px] font-bold">MID</div>
+</div>
+<h5 class="font-bold text-lg mb-1">교토 <span class="text-slate-400 font-normal text-sm">Kyoto</span></h5>
+<div class="flex items-center justify-between text-sm">
+<span class="text-slate-500">1일 평균 생활비</span>
+<span class="font-semibold text-primary">약 8.8만원</span>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-100 dark:border-slate-700 hover:shadow-lg transition-all cursor-pointer group">
+<div class="relative h-32 mb-4 rounded-xl overflow-hidden">
+<img alt="Fukuoka" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCuk2G3xyuhNCoKfjEOaMWgxtbRGoqAUq7Xbrgc3mlWYBpGhrU_xkfidOgwmdEpdnzhoJhFH9we7dChzb-6nJwZFypGCecSMYxYlXqUKx4XQlYikbs7wazAaXFjRtGrzYhuSypgPY4glGKYZfp-SKnFLLFzxEuLpcUr6un7lZ82TMfulAKICc-aadqnV8fwPmIWWoCw7PSxxjpzl96LD-VRLwO_mRzOUFZjdrirxtmlGZAyKEv79Mg9841096y3hlVCeEAqb21DFOo"/>
+<div class="absolute top-2 right-2 bg-white/90 dark:bg-slate-900/90 px-2 py-1 rounded-md text-[10px] font-bold text-green-600">LOW</div>
+</div>
+<h5 class="font-bold text-lg mb-1">후쿠오카 <span class="text-slate-400 font-normal text-sm">Fukuoka</span></h5>
+<div class="flex items-center justify-between text-sm">
+<span class="text-slate-500">1일 평균 생활비</span>
+<span class="font-semibold text-primary">약 7.2만원</span>
+</div>
+</div>
+</div>
+</section>
+</main>
+<footer class="mt-20 border-t border-slate-200 dark:border-slate-800 py-12 bg-white dark:bg-slate-900">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+<div class="flex items-center justify-center gap-2 mb-4">
+<span class="material-icons-outlined text-primary">explore</span>
+<span class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">VoyageWise</span>
+</div>
+<p class="text-slate-500 text-sm mb-6">전 세계 물가 정보를 실시간으로 비교하고 스마트한 여행 계획을 세우세요.</p>
+<div class="flex justify-center gap-6 mb-8">
+<a class="text-slate-400 hover:text-primary" href="#"><span class="material-icons-outlined">facebook</span></a>
+<a class="text-slate-400 hover:text-primary" href="#"><span class="material-icons-outlined">photo_camera</span></a>
+<a class="text-slate-400 hover:text-primary" href="#"><span class="material-icons-outlined">alternate_email</span></a>
+</div>
+<p class="text-slate-400 text-xs">© 2024 VoyageWise. All rights reserved.</p>
+</div>
+</footer>
+<script>
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+        themeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            const isDark = html.classList.contains('dark');
+            themeToggle.innerHTML = `<span class="material-icons-outlined">${isDark ? 'light_mode' : 'dark_mode'}</span>`;
+        });
+    </script>
+
+</body></html>
