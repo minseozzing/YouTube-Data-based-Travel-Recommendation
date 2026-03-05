@@ -15,6 +15,10 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -37,6 +41,14 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             throw new OAuth2AuthenticationException("Unsupported provider: " + registrationId);
         }
 
+        // 구글 토큰 정보 추출
+        String googleAccessToken = userRequest.getAccessToken().getTokenValue();
+        Instant expiresAtInstant = userRequest.getAccessToken().getExpiresAt();
+        LocalDateTime expiresAt = LocalDateTime.ofInstant(
+                expiresAtInstant != null ? expiresAtInstant : Instant.now().plusSeconds(3600),
+                ZoneId.systemDefault()
+        );
+
         String socialId = oAuth2Response.getProvider() + ":" + oAuth2Response.getProviderId();
         String email = oAuth2Response.getEmail();
         String nickname = oAuth2Response.getName();
@@ -52,15 +64,16 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                     .profileImageUrl(profileImageUrl)
                     .role("ROLE_USER")
                     .build();
-
-            memberRepository.save(member);
             log.info("[CustomOAuth2UserService] 신규 회원 생성: socialId={}", socialId);
         } else {
-            // 로그인 때마다 최신 프로필로 동기화 (원치 않으면 조건 걸어도 됨)
+            // 로그인 때마다 최신 프로필로 동기화
             member.updateProfile(nickname, profileImageUrl);
-            // save 호출 안 해도 @Transactional + dirty checking으로 반영됨
             log.info("[CustomOAuth2UserService] 기존 회원 프로필 갱신: socialId={}", socialId);
         }
+
+        // 구글 토큰 업데이트 (refresh_token은 SuccessHandler나 별도 처리가 필요할 수 있음)
+        member.updateGoogleTokens(googleAccessToken, null, expiresAt);
+        memberRepository.save(member);
 
         MemberDto memberDto = MemberDto.builder()
                 .id(member.getId())
