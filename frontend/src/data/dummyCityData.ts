@@ -1,4 +1,4 @@
-import type { CityDetail } from '@/schemas/city.schema';
+import type { CityDetail, CityListItem } from '@/schemas/city.schema';
 
 /**
  * 백엔드 없이 UI 확인용 더미 도시 상세 데이터
@@ -21,3 +21,21 @@ export const DUMMY_CITY_DETAILS: Record<number, CityDetail> = {
   14: { cityId: 14, cityName: '프라하',     countryId: 14, countryName: '체코',       imgUrl: 'https://picsum.photos/seed/prague/800/1200',    matchingScore: 80, recommendReason: '백탑의 도시 프라하는 중세 건축의 보고로 카를 교와 프라하 성이 문화/역사 취향과 80% 매칭됩니다.', keywords: ['중세건축', '맥주', '야경', '저물가', '유적지'], dailyCost: 100000, flightPrice: 870000, latitude: 50.0755,  longitude: 14.4378  },
   15: { cityId: 15, cityName: '칸쿤',       countryId: 15, countryName: '멕시코',     imgUrl: 'https://picsum.photos/seed/cancun/800/1200',    matchingScore: 55, recommendReason: '카리브해의 에메랄드빛 바다와 마야 문명 유적이 공존하는 칸쿤은 액티비티 취향과 55% 매칭됩니다.', keywords: ['해변', '스노클링', '마야유적', '리조트', '서핑'], dailyCost: 130000, flightPrice: 1100000, latitude: 21.1619, longitude: -86.8515 },
 };
+
+const RISK_LEVEL_BY_CITY: Record<number, number> = {
+  1: 1, 2: 2, 3: 2, 4: 1, 5: 2,
+  6: 1, 7: 2, 8: 1, 9: 2, 10: 2,
+  11: 1, 12: 1, 13: 3, 14: 1, 15: 3,
+};
+
+export const DUMMY_CITIES: CityListItem[] = Object.values(DUMMY_CITY_DETAILS).map((d) => ({
+  cityId: d.cityId,
+  cityName: d.cityName,
+  countryName: d.countryName,
+  imgUrl: d.imgUrl,
+  estimatedBudget: (d.dailyCost ?? 0) * 7,
+  riskLevel: RISK_LEVEL_BY_CITY[d.cityId] ?? 2,
+  latitude: d.latitude,
+  longitude: d.longitude,
+  matchingScore: d.matchingScore,
+}));

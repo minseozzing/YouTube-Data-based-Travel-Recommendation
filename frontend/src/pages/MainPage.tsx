@@ -1,16 +1,19 @@
-import { useSearch } from '@tanstack/react-router';
-import { CityDetailModal } from '@/components/city/CityDetailModal';
-import { MainNavBar } from '@/components/main/MainNavBar';
-import { LeftSidebar } from '@/components/main/LeftSidebar';
-import { HeroTextBlock } from '@/components/main/HeroTextBlock';
-import { StatBar } from '@/components/main/StatBar';
-import { GlobeContainer } from '@/components/globe/GlobeContainer';
-import { RightPanel } from '@/components/main/RightPanel';
-import maldivesBg from '@/assets/Maldive_beach_1.jpg';
-
+import { useSearch } from "@tanstack/react-router";
+import { CityDetailModal } from "@/components/city/CityDetailModal";
+import { MainNavBar } from "@/components/main/MainNavBar";
+import { LeftSidebar } from "@/components/main/LeftSidebar";
+import { HeroTextBlock } from "@/components/main/HeroTextBlock";
+import { StatBar } from "@/components/main/StatBar";
+import { GlobeContainer } from "@/components/globe/GlobeContainer";
+import { RightPanel } from "@/components/main/RightPanel";
+import maldivesBg from "@/assets/Maldive_beach_1.jpg";
+import { useUiStore } from "@/stores/uiStore";
 const MainPage = () => {
   // Activates TanStack Router search param subscription for this route
-  useSearch({ from: '/_authenticated/main' });
+  useSearch({ from: "/_authenticated/main" });
+  const isRightPanelOpen = useUiStore((s) => s.isRightPanelOpen);
+  const selectedCityImgUrl = useUiStore((s) => s.selectedCityImgUrl);
+  const bgImage = selectedCityImgUrl ?? maldivesBg;
 
   return (
     <div
@@ -21,7 +24,7 @@ const MainPage = () => {
       {/* Background image */}
       <div
         className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: `url(${maldivesBg})` }}
+        style={{ backgroundImage: `url(${bgImage})` }}
         aria-hidden="true"
       />
       {/* Dark overlay */}
@@ -33,9 +36,18 @@ const MainPage = () => {
       {/* Left Sidebar — absolute overlay */}
       <LeftSidebar />
 
-      {/* Globe Container — fills remaining space (right of sidebar, below navbar) */}
-      {/* top-[72px] = navbar(48) + gap*2(24); left-[280px] = sidebar(256) + gap*2(24); right-3; bottom-3 */}
-      <GlobeContainer className="absolute top-[72px] left-[280px] right-3 bottom-3" />
+      {/*
+        Globe 영역은 기본적으로 right-3(12px)까지 사용합니다.
+        오른쪽 패널이 열리면 패널 폭(300px) + 패널과의 간격(12px) + 여유 간격(12px)만큼 오른쪽 공간을 비워
+        지구가 좌측 사이드바와 우측 패널 사이의 가운데 영역으로 오도록 합니다.
+      */}
+      <GlobeContainer
+        className={[
+          "absolute top-[72px] left-[280px] bottom-3",
+          "transition-all duration-300 ease-in-out",
+          isRightPanelOpen ? "right-[324px]" : "right-3",
+        ].join(" ")}
+      />
 
       {/* Hero Text — overlaid on globe area, pointer-events-none */}
       <HeroTextBlock />

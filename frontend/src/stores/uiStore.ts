@@ -5,6 +5,8 @@ type CityDetailTab = 'recommend' | 'cost' | 'flight' | 'news';
 interface UiState {
   // 선택된 도시 (RightPanel + CityDetailModal 공유)
   selectedCityId: number | null;
+  selectedCityImgUrl: string | null;
+  selectedCityCoords: { lat: number; lng: number } | null;
 
   // 우측 요약 패널
   isRightPanelOpen: boolean;
@@ -18,7 +20,7 @@ interface UiState {
   globeRiskFilter: number;
 
   // 액션
-  openRightPanel: (cityId: number) => void;
+  openRightPanel: (cityId: number, imgUrl?: string, coords?: { lat: number; lng: number }) => void;
   closeRightPanel: () => void;
   openCityModal: (tab?: CityDetailTab) => void;
   closeCityModal: () => void;
@@ -29,14 +31,16 @@ interface UiState {
 
 export const useUiStore = create<UiState>((set) => ({
   selectedCityId: null,
+  selectedCityImgUrl: null,
+  selectedCityCoords: null,
   isRightPanelOpen: false,
   isCityModalOpen: false,
   activeCityTab: 'recommend',
   globeBudgetFilter: [0, 5_000_000],
   globeRiskFilter: 5,
 
-  openRightPanel: (cityId) =>
-    set({ selectedCityId: cityId, isRightPanelOpen: true, isCityModalOpen: false }),
+  openRightPanel: (cityId, imgUrl, coords) =>
+    set({ selectedCityId: cityId, selectedCityImgUrl: imgUrl ?? null, selectedCityCoords: coords ?? null, isRightPanelOpen: true, isCityModalOpen: false }),
   closeRightPanel: () =>
     set({ isRightPanelOpen: false }),
   openCityModal: (tab = 'recommend') =>

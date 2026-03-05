@@ -1,9 +1,10 @@
-import { useRef, useState, useLayoutEffect, Suspense, lazy } from 'react';
-import { Loader2 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { useRef, useState, useLayoutEffect, Suspense, lazy } from "react";
+import { Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { useUiStore } from "@/stores/uiStore";
 
 const GlobeViewer = lazy(() =>
-  import('./GlobeViewer').then((m) => ({ default: m.GlobeViewer })),
+  import("./GlobeViewer").then((m) => ({ default: m.GlobeViewer })),
 );
 
 interface GlobeContainerProps {
@@ -13,13 +14,19 @@ interface GlobeContainerProps {
 function GlobeFallback() {
   return (
     <div className="flex items-center justify-center w-full h-full">
-      <Loader2 className="size-8 animate-spin text-blue-400" aria-hidden="true" />
+      <Loader2
+        className="size-8 animate-spin text-blue-400"
+        aria-hidden="true"
+      />
     </div>
   );
 }
 
 export function GlobeContainer({ className }: GlobeContainerProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const selectedCityId = useUiStore((s) => s.selectedCityId);
+  const isRightPanelOpen = useUiStore((s) => s.isRightPanelOpen);
+
   const [globeSize, setGlobeSize] = useState(500);
 
   useLayoutEffect(() => {
@@ -40,7 +47,7 @@ export function GlobeContainer({ className }: GlobeContainerProps) {
     <div
       ref={containerRef}
       className={cn(
-        'rounded-full overflow-hidden flex items-center justify-center',
+        "rounded-full overflow-hidden flex items-center justify-center",
         className,
       )}
       aria-label="3D 지구본 시각화"

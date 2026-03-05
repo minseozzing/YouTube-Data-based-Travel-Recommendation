@@ -40,7 +40,7 @@ const CITY_POINTS: CityPoint[] = [
   { name: "발리", lat: -8.3405, lng: 115.092, size: 0.22 },
 ];
 
-export default function HomePage() {
+export default function Page() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [globeSize, setGlobeSize] = useState(500);
   const [isPanelOpen, setIsPanelOpen] = useState(true);

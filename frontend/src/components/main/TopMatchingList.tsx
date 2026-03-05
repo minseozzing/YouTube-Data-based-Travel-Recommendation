@@ -2,23 +2,34 @@ import { useMemo } from 'react';
 import { MapPin } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useCityList } from '@/hooks/city/useCityList';
+import { useUiStore } from '@/stores/uiStore';
 import { TopMatchingCard } from './TopMatchingCard';
 import { cn } from '@/lib/utils';
+import { DUMMY_CITIES } from '@/data/dummyCityData';
 
 const TOP_N = 5;
 
 export function TopMatchingList() {
-  const { data: cities, isLoading } = useCityList();
+  const { data: citiesFromApi, isLoading } = useCityList();
+  const { globeBudgetFilter, globeRiskFilter } = useUiStore();
+
+  const cities = citiesFromApi?.length ? citiesFromApi : DUMMY_CITIES;
 
   const topCities = useMemo(() => {
-    if (!cities) return [];
-    const sorted = [...cities].sort((a, b) => {
+    const filtered = cities.filter((city) => {
+      const withinBudget =
+        city.estimatedBudget >= globeBudgetFilter[0] &&
+        city.estimatedBudget <= globeBudgetFilter[1];
+      const withinRisk = city.riskLevel <= globeRiskFilter;
+      return withinBudget && withinRisk;
+    });
+    const sorted = [...filtered].sort((a, b) => {
       const scoreA = a.matchingScore ?? 0;
       const scoreB = b.matchingScore ?? 0;
       return scoreB - scoreA;
     });
     return sorted.slice(0, TOP_N);
-  }, [cities]);
+  }, [cities, globeBudgetFilter, globeRiskFilter]);
 
   return (
     <section
