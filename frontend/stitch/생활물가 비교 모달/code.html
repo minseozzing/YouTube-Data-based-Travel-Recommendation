@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>VoyageWise | 상세 생활물가 비교 분석</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;family=Noto+Sans+KR:wght@300;400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#2563eb",
+                        accent: "#bae6fd",
+                        "background-light": "#f8fafc",
+                        "background-dark": "#0f172a",
+                    },
+                    fontFamily: {
+                        display: ["Plus Jakarta Sans", "Noto Sans KR", "sans-serif"],
+                        sans: ["Noto Sans KR", "Plus Jakarta Sans", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "12px",
+                    },
+                },
+            },
+        };
+    </script>
+<style type="text/tailwindcss">
+        @layer base {
+            body {
+                @apply font-sans antialiased;
+            }
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .dark .glass-card {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #e2e8f0;
+            border-radius: 10px;
+        }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #334155;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark min-h-screen transition-colors duration-300">
+<header class="fixed top-0 w-full z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+<div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-white">explore</span>
+</div>
+<span class="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">VoyageWise</span>
+</div>
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors" href="#">탐색</a>
+<a class="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors" href="#">여행지</a>
+<a class="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors" href="#">요금제</a>
+<button class="px-5 py-2.5 rounded-full border border-slate-200 dark:border-slate-700 text-sm font-semibold text-slate-900 dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">로그아웃</button>
+</nav>
+</div>
+</header>
+<main class="pt-28 pb-12 min-h-screen flex items-center justify-center p-4">
+<div class="max-w-6xl w-full bg-white dark:bg-slate-900 rounded-[32px] overflow-hidden shadow-2xl border border-slate-100 dark:border-slate-800 flex flex-col md:flex-row h-full max-h-[850px]">
+<div class="md:w-5/12 relative min-h-[300px] md:min-h-full">
+<img alt="시드니 오페라 하우스" class="absolute inset-0 w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCEpFmQubDJ9at1846cnrBlVexShFupcaaRFPReOqj4uTlfo4i-HfH-8V1VKpiqPuVaS3IsRt7iEgD4XUaM1MCJ_3a9ycmeG_qOpaB0JlakxqFAmv0uKsOqyRLZpbFHEu7kF8U9eh8Svn0jdln3Vf03N2n3x1rxYnjsurHuOI_Tz3PnCVWIdnlUXbEysQhahEq1oHdKtl6t-HQC7X_dEbQve_YLqllurcGBYrUTek-kzgWM-bC_aVFcJXSoqqXK307J4_oC_odraRo"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-8 w-full text-white">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-blue-400">location_on</span>
+<span class="text-xs font-bold tracking-widest uppercase opacity-90">호주, 뉴사우스웨일스</span>
+</div>
+<h2 class="text-4xl font-extrabold mb-2">시드니</h2>
+<p class="text-white/80 text-sm leading-relaxed mb-6">현대적인 도시미와 아름다운 해안선이 공존하는 남반구 최고의 도시</p>
+<button class="w-full bg-primary hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-2xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined">bookmark</span>
+                        저장하기
+                    </button>
+</div>
+</div>
+<div class="md:w-7/12 bg-white dark:bg-slate-900 flex flex-col overflow-hidden">
+<div class="px-8 pt-8">
+<div class="flex flex-wrap gap-2 mb-6 p-1 bg-slate-100 dark:bg-slate-800 rounded-2xl">
+<button class="flex-1 py-3 px-4 rounded-xl text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-slate-700">추천 이유</button>
+<button class="flex-1 py-3 px-4 rounded-xl text-sm font-bold bg-white dark:bg-slate-700 text-primary shadow-sm">생활물가 비교</button>
+<button class="flex-1 py-3 px-4 rounded-xl text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-slate-700">항공권 정보</button>
+<button class="flex-1 py-3 px-4 rounded-xl text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-slate-700">현지 뉴스</button>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto px-8 pb-8 custom-scrollbar">
+<div class="space-y-8">
+<div class="flex flex-col md:flex-row gap-6 items-start">
+<div class="flex-1 w-full bg-blue-50 dark:bg-blue-900/20 p-6 rounded-2xl border border-blue-100 dark:border-blue-800/50">
+<div class="flex justify-between items-start mb-4">
+<h3 class="text-sm font-bold text-blue-800 dark:text-blue-300">서울 대비 물가 수준</h3>
+<span class="px-2 py-1 bg-blue-100 dark:bg-blue-800 text-[10px] font-extrabold text-blue-600 dark:text-blue-300 rounded uppercase">Updated Today</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="text-3xl font-black text-blue-900 dark:text-white">약 15% 높음</span>
+<span class="material-symbols-outlined text-blue-600 text-xl">trending_up</span>
+</div>
+<p class="text-xs text-blue-600 dark:text-blue-400 mt-2">교통비 및 외식비 비중이 높은 편입니다.</p>
+</div>
+<div class="flex-1 w-full bg-slate-50 dark:bg-slate-800/50 p-6 rounded-2xl border border-slate-100 dark:border-slate-800/50">
+<h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 mb-4">예상 1일 체류 비용</h3>
+<div class="flex items-baseline gap-1">
+<span class="text-3xl font-black text-slate-900 dark:text-white">185,000</span>
+<span class="text-sm font-bold text-slate-500">KRW</span>
+</div>
+<div class="mt-4 flex gap-1 h-2 rounded-full overflow-hidden">
+<div class="w-[45%] bg-blue-500" title="식비"></div>
+<div class="w-[35%] bg-blue-300" title="숙박"></div>
+<div class="w-[20%] bg-blue-100 dark:bg-blue-800" title="교통"></div>
+</div>
+<div class="mt-3 flex gap-4 text-[10px] font-bold text-slate-400">
+<div class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span> 식비 45%</div>
+<div class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-blue-300"></span> 숙박 35%</div>
+<div class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-blue-100 dark:bg-blue-800"></span> 교통 20%</div>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<div>
+<h4 class="text-sm font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-blue-500 text-lg">analytics</span>
+                                    최근 5년 PPP 지수 추이
+                                </h4>
+<div class="h-40 w-full bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl p-4 flex items-end justify-between gap-2">
+<div class="flex-1 flex flex-col items-center gap-2">
+<div class="w-full bg-slate-100 dark:bg-slate-700 h-24 relative rounded-t-md overflow-hidden">
+<div class="absolute bottom-0 w-full bg-accent h-[70%]"></div>
+</div>
+<span class="text-[10px] text-slate-400 font-bold">2020</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2">
+<div class="w-full bg-slate-100 dark:bg-slate-700 h-24 relative rounded-t-md overflow-hidden">
+<div class="absolute bottom-0 w-full bg-accent h-[75%]"></div>
+</div>
+<span class="text-[10px] text-slate-400 font-bold">2021</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2">
+<div class="w-full bg-slate-100 dark:bg-slate-700 h-24 relative rounded-t-md overflow-hidden">
+<div class="absolute bottom-0 w-full bg-accent h-[85%]"></div>
+</div>
+<span class="text-[10px] text-slate-400 font-bold">2022</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2">
+<div class="w-full bg-slate-100 dark:bg-slate-700 h-24 relative rounded-t-md overflow-hidden">
+<div class="absolute bottom-0 w-full bg-accent h-[92%]"></div>
+</div>
+<span class="text-[10px] text-slate-400 font-bold">2023</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2">
+<div class="w-full bg-slate-100 dark:bg-slate-700 h-24 relative rounded-t-md overflow-hidden">
+<div class="absolute bottom-0 w-full bg-primary h-[95%]"></div>
+</div>
+<span class="text-[10px] text-primary font-bold">2024</span>
+</div>
+</div>
+</div>
+<div>
+<h4 class="text-sm font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-green-500 text-lg">currency_exchange</span>
+                                    환율 정보 (AUD/KRW)
+                                </h4>
+<div class="h-40 w-full bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl p-5 flex flex-col justify-between">
+<div class="flex justify-between items-center">
+<span class="text-2xl font-black text-slate-900 dark:text-white">912.45</span>
+<span class="text-[10px] font-bold text-red-500 flex items-center bg-red-50 dark:bg-red-900/20 px-2 py-1 rounded-full">
+<span class="material-symbols-outlined text-xs">arrow_drop_up</span> 0.5%
+                                        </span>
+</div>
+<div class="flex items-end gap-1 h-12">
+<div class="flex-1 bg-slate-100 dark:bg-slate-700 h-6 rounded-sm"></div>
+<div class="flex-1 bg-slate-100 dark:bg-slate-700 h-8 rounded-sm"></div>
+<div class="flex-1 bg-slate-100 dark:bg-slate-700 h-7 rounded-sm"></div>
+<div class="flex-1 bg-slate-100 dark:bg-slate-700 h-10 rounded-sm"></div>
+<div class="flex-1 bg-primary/40 h-12 rounded-sm"></div>
+<div class="flex-1 bg-primary h-11 rounded-sm"></div>
+</div>
+<p class="text-[10px] text-slate-400 text-center font-bold">최근 6개월 환율 추이</p>
+</div>
+</div>
+</div>
+<div class="border-t border-slate-100 dark:border-slate-800 pt-8">
+<div class="flex justify-between items-center mb-6">
+<h4 class="text-sm font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">주요 항목별 세부 비교</h4>
+<div class="flex gap-4 text-[10px] font-bold">
+<span class="flex items-center gap-1.5 text-slate-400"><span class="w-2 h-2 rounded-full bg-slate-200 dark:bg-slate-700"></span> 서울</span>
+<span class="flex items-center gap-1.5 text-primary"><span class="w-2 h-2 rounded-full bg-primary"></span> 시드니</span>
+</div>
+</div>
+<div class="space-y-6">
+<div class="space-y-2">
+<div class="flex justify-between text-xs font-bold text-slate-600 dark:text-slate-300">
+<span>점심 한 끼 (비즈니스 지구)</span>
+<span class="text-primary">약 22,000 KRW</span>
+</div>
+<div class="relative h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+<div class="absolute left-0 h-full bg-slate-300 dark:bg-slate-600 w-[45%]" title="Seoul"></div>
+<div class="absolute left-0 h-full bg-primary/60 w-[70%]" title="Sydney"></div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-xs font-bold text-slate-600 dark:text-slate-300">
+<span>저녁 외식 (2인 기준)</span>
+<span class="text-primary">약 95,000 KRW</span>
+</div>
+<div class="relative h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+<div class="absolute left-0 h-full bg-slate-300 dark:bg-slate-600 w-[55%]" title="Seoul"></div>
+<div class="absolute left-0 h-full bg-primary/60 w-[85%]" title="Sydney"></div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-xs font-bold text-slate-600 dark:text-slate-300">
+<span>빅맥 지수 (단품)</span>
+<span class="text-primary">약 6,800 KRW</span>
+</div>
+<div class="relative h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+<div class="absolute left-0 h-full bg-slate-300 dark:bg-slate-600 w-[80%]" title="Seoul"></div>
+<div class="absolute left-0 h-full bg-primary/60 w-[95%]" title="Sydney"></div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-xs font-bold text-slate-600 dark:text-slate-300">
+<span>카푸치노 (레귤러)</span>
+<span class="text-primary">약 4,800 KRW</span>
+</div>
+<div class="relative h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+<div class="absolute left-0 h-full bg-slate-300 dark:bg-slate-600 w-[90%]" title="Seoul"></div>
+<div class="absolute left-0 h-full bg-primary/60 w-[85%]" title="Sydney"></div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-xs font-bold text-slate-600 dark:text-slate-300">
+<span>시내버스 편도 요금</span>
+<span class="text-primary">약 3,200 KRW</span>
+</div>
+<div class="relative h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+<div class="absolute left-0 h-full bg-slate-300 dark:bg-slate-600 w-[40%]" title="Seoul"></div>
+<div class="absolute left-0 h-full bg-primary/60 w-[90%]" title="Sydney"></div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-xs font-bold text-slate-600 dark:text-slate-300">
+<span>택시 기본 거리 (8km)</span>
+<span class="text-primary">약 28,000 KRW</span>
+</div>
+<div class="relative h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+<div class="absolute left-0 h-full bg-slate-300 dark:bg-slate-600 w-[50%]" title="Seoul"></div>
+<div class="absolute left-0 h-full bg-primary/60 w-[95%]" title="Sydney"></div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-6">
+<div class="space-y-2">
+<p class="text-[10px] font-bold text-slate-400">브랜드 청바지</p>
+<p class="text-sm font-black text-slate-900 dark:text-white">115,000 <span class="text-[10px] font-medium text-slate-500">KRW</span></p>
+</div>
+<div class="space-y-2">
+<p class="text-[10px] font-bold text-slate-400">브랜드 스니커즈</p>
+<p class="text-sm font-black text-slate-900 dark:text-white">142,000 <span class="text-[10px] font-medium text-slate-500">KRW</span></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<footer class="py-12 px-6">
+<div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+<div class="flex items-center gap-2 text-slate-400 dark:text-slate-500 text-sm">
+<span class="material-symbols-outlined text-lg">explore</span>
+<span>VoyageWise Inc. © 2024</span>
+</div>
+<div class="flex items-center gap-8 text-[11px] font-bold tracking-widest uppercase text-slate-500 dark:text-slate-400">
+<a class="hover:text-primary transition-colors" href="#">고객지원</a>
+<a class="hover:text-primary transition-colors" href="#">안전 정보</a>
+<a class="hover:text-primary transition-colors" href="#">개인정보 처리방침</a>
+</div>
+</div>
+</footer>
+<button class="fixed bottom-8 right-8 w-12 h-12 bg-white dark:bg-slate-800 rounded-full shadow-lg border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-400 hover:scale-110 transition-all z-50" onclick="document.documentElement.classList.toggle('dark')">
+<span class="material-symbols-outlined">dark_mode</span>
+</button>
+
+</body></html>
