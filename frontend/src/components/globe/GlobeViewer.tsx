@@ -9,8 +9,8 @@ import {
 } from "react-simple-maps";
 import { useUiStore } from "@/stores/uiStore";
 import { useCityList } from "@/hooks/city/useCityList";
-import type { CityListItem } from "@/schemas/city.schema";
 import { DUMMY_CITIES } from "@/data/dummyCityData";
+import { COUNTRY_NAME_KO } from "@/data/countryNameKo";
 
 const GEO_URL =
   "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
@@ -69,16 +69,24 @@ export function GlobeViewer({ width, height }: GlobeViewerProps) {
   const { data: citiesFromApi } = useCityList();
   const cities = citiesFromApi?.length ? citiesFromApi : DUMMY_CITIES;
 
-  const filteredCities = useMemo<CityListItem[]>(() => {
-    if (!isRecommendActive) return cities;
-    return cities.filter((city) => {
+  const matchedCityIds = useMemo<Set<number>>(() => {
+    if (!isRecommendActive) return new Set();
+    const matched = cities.filter((city) => {
+      const adjustedBudget = (city.estimatedBudget / 7) * globeDuration;
       const withinBudget =
-        (city.estimatedBudget / 7) * globeDuration >= globeBudgetFilter[0] &&
-        (city.estimatedBudget / 7) * globeDuration <= globeBudgetFilter[1];
+        adjustedBudget >= globeBudgetFilter[0] &&
+        adjustedBudget <= globeBudgetFilter[1];
       const withinRisk = city.riskLevel <= globeRiskFilter;
       return withinBudget && withinRisk;
     });
-  }, [cities, globeBudgetFilter, globeRiskFilter, globeDuration, isRecommendActive]);
+    return new Set(matched.map((c) => c.cityId));
+  }, [
+    cities,
+    globeBudgetFilter,
+    globeRiskFilter,
+    globeDuration,
+    isRecommendActive,
+  ]);
 
   return (
     <>
@@ -86,7 +94,7 @@ export function GlobeViewer({ width, height }: GlobeViewerProps) {
         width={width}
         height={height}
         projection="geoMercator"
-        projectionConfig={{ scale: width / 6.3 }}
+        projectionConfig={{ scale: width / 7 }}
         style={{ width: "100%", height: "100%" }}
       >
         <ZoomableGroup
@@ -107,7 +115,7 @@ export function GlobeViewer({ width, height }: GlobeViewerProps) {
           }}
         >
           <Geographies geography={GEO_URL}>
-            {({ geographies }: { geographies: { rsmKey: string }[] }) =>
+            {({ geographies }: { geographies: { rsmKey: string; properties: { name?: string } }[] }) =>
               geographies.map((geo) => (
                 <Geography
                   key={geo.rsmKey}
@@ -120,45 +128,66 @@ export function GlobeViewer({ width, height }: GlobeViewerProps) {
                     hover: { fill: "#058900", outline: "none" },
                     pressed: { outline: "none" },
                   }}
+                  onMouseEnter={(e) =>
+                    setTooltip({
+                      name: COUNTRY_NAME_KO[geo.properties.name ?? ""] ?? geo.properties.name ?? "",
+                      x: e.clientX,
+                      y: e.clientY,
+                    })
+                  }
+                  onMouseMove={(e) =>
+                    setTooltip({
+                      name: COUNTRY_NAME_KO[geo.properties.name ?? ""] ?? geo.properties.name ?? "",
+                      x: e.clientX,
+                      y: e.clientY,
+                    })
+                  }
+                  onMouseLeave={() => setTooltip(null)}
                 />
               ))
             }
           </Geographies>
-          {filteredCities.map((city) => (
-            <Marker
-              key={city.cityId}
-              coordinates={[city.longitude, city.latitude]}
-              onClick={() =>
-                openRightPanel(city.cityId, city.imgUrl, {
-                  lat: city.latitude,
-                  lng: city.longitude,
-                })
-              }
-            >
-              <circle
-                r={5 / zoom}
-                fill={getMarkerColor(city.matchingScore)}
-                stroke="#fff"
-                strokeWidth={0.2}
-                style={{ cursor: "pointer" }}
-                onMouseEnter={(e) =>
-                  setTooltip({
-                    name: city.cityName,
-                    x: e.clientX,
-                    y: e.clientY,
+          {cities.map((city) => {
+            const isMatched =
+              !isRecommendActive || matchedCityIds.has(city.cityId);
+            return (
+              <Marker
+                key={city.cityId}
+                coordinates={[city.longitude, city.latitude]}
+                onClick={() =>
+                  openRightPanel(city.cityId, city.imgUrl, {
+                    lat: city.latitude,
+                    lng: city.longitude,
                   })
                 }
-                onMouseMove={(e) =>
-                  setTooltip({
-                    name: city.cityName,
-                    x: e.clientX,
-                    y: e.clientY,
-                  })
-                }
-                onMouseLeave={() => setTooltip(null)}
-              />
-            </Marker>
-          ))}
+              >
+                <circle
+                  r={5 / zoom}
+                  fill={
+                    isMatched ? getMarkerColor(city.matchingScore) : "#CBD5E1"
+                  }
+                  stroke="#fff"
+                  strokeWidth={0.2}
+                  style={{ cursor: "pointer" }}
+                  onMouseEnter={(e) =>
+                    setTooltip({
+                      name: city.cityName,
+                      x: e.clientX,
+                      y: e.clientY,
+                    })
+                  }
+                  onMouseMove={(e) =>
+                    setTooltip({
+                      name: city.cityName,
+                      x: e.clientX,
+                      y: e.clientY,
+                    })
+                  }
+                  onMouseLeave={() => setTooltip(null)}
+                />
+              </Marker>
+            );
+          })}
         </ZoomableGroup>
       </ComposableMap>
       {tooltip && (
