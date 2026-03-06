@@ -36,9 +36,29 @@ public class Member extends BaseEntity {
     @Column(length = 20, nullable = false)
     private String role;
 
+    @Column(name = "google_access_token", columnDefinition = "TEXT")
+    private String googleAccessToken;
+
+    @Column(name = "google_refresh_token", columnDefinition = "TEXT")
+    private String googleRefreshToken;
+
+    @Column(name = "google_token_expires_at")
+    private LocalDateTime googleTokenExpiresAt;
+
     public void updateProfile(String nickname, String profileImageUrl) {
         this.nickname = nickname;
         this.profileImageUrl = profileImageUrl;
+    }
+
+    /**
+     * 구글 토큰 정보 업데이트
+     */
+    public void updateGoogleTokens(String accessToken, String refreshToken, LocalDateTime expiresAt) {
+        this.googleAccessToken = accessToken;
+        if (refreshToken != null) {
+            this.googleRefreshToken = refreshToken;
+        }
+        this.googleTokenExpiresAt = expiresAt;
     }
 
     /**
