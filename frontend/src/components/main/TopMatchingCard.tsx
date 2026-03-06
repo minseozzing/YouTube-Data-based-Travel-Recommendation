@@ -22,17 +22,17 @@ export function TopMatchingCard({ city, rank }: TopMatchingCardProps) {
   const [imgError, setImgError] = useState(false);
 
   const handleClick = useCallback(() => {
-    openRightPanel(city.cityId);
-  }, [city.cityId, openRightPanel]);
+    openRightPanel(city.cityId, city.imgUrl, { lat: city.latitude, lng: city.longitude });
+  }, [city, openRightPanel]);
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent<HTMLDivElement>) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
-        openRightPanel(city.cityId);
+        openRightPanel(city.cityId, city.imgUrl, { lat: city.latitude, lng: city.longitude });
       }
     },
-    [city.cityId, openRightPanel],
+    [city, openRightPanel],
   );
 
   return (

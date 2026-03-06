@@ -2,23 +2,34 @@ import { useMemo } from 'react';
 import { MapPin } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useCityList } from '@/hooks/city/useCityList';
+import { useUiStore } from '@/stores/uiStore';
 import { TopMatchingCard } from './TopMatchingCard';
 import { cn } from '@/lib/utils';
+import { DUMMY_CITIES } from '@/data/dummyCityData';
 
 const TOP_N = 5;
 
 export function TopMatchingList() {
-  const { data: cities, isLoading } = useCityList();
+  const { data: citiesFromApi, isLoading } = useCityList();
+  const { globeBudgetFilter, globeRiskFilter, globeDuration, isRecommendActive } = useUiStore();
+
+  const cities = citiesFromApi?.length ? citiesFromApi : DUMMY_CITIES;
 
   const topCities = useMemo(() => {
-    if (!cities) return [];
-    const sorted = [...cities].sort((a, b) => {
-      const scoreA = a.matchingScore ?? 0;
-      const scoreB = b.matchingScore ?? 0;
-      return scoreB - scoreA;
-    });
-    return sorted.slice(0, TOP_N);
-  }, [cities]);
+    const base = isRecommendActive
+      ? cities.filter((city) => {
+          const adjustedBudget = (city.estimatedBudget / 7) * globeDuration;
+          const withinBudget =
+            adjustedBudget >= globeBudgetFilter[0] &&
+            adjustedBudget <= globeBudgetFilter[1];
+          const withinRisk = city.riskLevel <= globeRiskFilter;
+          return withinBudget && withinRisk;
+        })
+      : cities;
+    return [...base]
+      .sort((a, b) => (b.matchingScore ?? 0) - (a.matchingScore ?? 0))
+      .slice(0, TOP_N);
+  }, [cities, globeBudgetFilter, globeRiskFilter, globeDuration, isRecommendActive]);
 
   return (
     <section

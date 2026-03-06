@@ -1,5 +1,6 @@
-import { TripSettingsPanel } from './TripSettingsPanel';
-import { TopMatchingList } from './TopMatchingList';
+import { TripSettingsPanel } from "./TripSettingsPanel";
+import { TopMatchingList } from "./TopMatchingList";
+import { useUiStore } from "@/stores/uiStore";
 
 // top-[72px] = NavBar(48px) + gap(12px) + top-offset(12px)
 // left-3 = 12px from left
@@ -7,6 +8,7 @@ import { TopMatchingList } from './TopMatchingList';
 // w-64 = 256px
 
 export function LeftSidebar() {
+  const { isRecommendActive } = useUiStore();
   return (
     <aside
       className="absolute z-20 flex flex-col gap-3 top-[72px] left-3 bottom-3 w-64"

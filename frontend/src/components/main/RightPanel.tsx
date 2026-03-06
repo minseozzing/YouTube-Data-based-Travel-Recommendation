@@ -178,7 +178,8 @@ export function RightPanel() {
           <div className="px-4 py-3 border-t border-slate-100 bg-white/80 shrink-0">
             <Button
               onClick={handleOpenDetail}
-              className="w-full gap-2 bg-slate-800 hover:bg-slate-900 text-white font-semibold"
+              variant="dark"
+              className="w-full gap-2"
               size="lg"
               disabled={!city}
             >

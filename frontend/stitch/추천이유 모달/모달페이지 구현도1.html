@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>User-Centric City Detail Modal Variant 2</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#137fec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 flex items-center justify-center min-h-screen p-4 sm:p-8">
+<div class="fixed inset-0 bg-slate-900/50 dark:bg-black/60 backdrop-blur-sm z-40 flex items-center justify-center p-4 sm:p-8">
+<div class="bg-white dark:bg-slate-900 rounded-xl shadow-2xl w-full max-w-[1200px] h-[85vh] sm:h-[90vh] flex flex-col sm:flex-row overflow-hidden relative z-50">
+<button class="absolute top-4 right-4 z-50 p-2 bg-white/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 rounded-full transition-colors backdrop-blur-md shadow-sm">
+<span class="material-symbols-outlined text-slate-700 dark:text-slate-300">close</span>
+</button>
+<div class="relative w-full sm:w-1/3 h-1/2 sm:h-full shrink-0 overflow-hidden">
+<div class="absolute inset-0 bg-cover bg-center" data-alt="Beautiful cityscape of Paris with Eiffel Tower at sunset" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCljcnQYMSLGkcmuG7k3ujsRAMqFsBTYGQ3GMAxDFwXIN6UsxxwLx4DjSqrqra94DTCQMlUO_3WlPNjF8jqYq38KliTZSGjqbzGnQKs0hzkythptBIsysxGX8PhdhtVA4QD7Ta3ctV7Ir1vtS8hY25U4mDdDcwSV-EFLwMEvJCbMB0hUqMdDA9y4y38oSKuOXbHHW8DLy_Y_BLagzx60iAta-egRSKIz11bDhwG1DIRMZqcTOihyR3DNCH20NzPyJniC1_62aeGqBE');"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-slate-900/95 via-slate-900/50 to-transparent"></div>
+<div class="absolute inset-x-0 bottom-0 p-6 flex flex-col gap-6">
+<div>
+<h1 class="text-white text-3xl sm:text-4xl font-bold tracking-tight mb-1">Paris, France</h1>
+<p class="text-slate-300 text-sm sm:text-base">The City of Light awaits</p>
+</div>
+<div class="flex flex-col gap-4">
+<div class="flex items-center gap-4 p-3.5 rounded-xl backdrop-blur-md bg-white/10 border border-white/20">
+<div class="flex-1">
+<p class="text-xs font-medium text-slate-300 uppercase tracking-wider mb-1">Your Match</p>
+<p class="text-3xl font-bold text-white">95%</p>
+</div>
+<div class="w-14 h-14 rounded-full border-[3px] border-primary/80 bg-primary/20 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary text-3xl">favorite</span>
+</div>
+</div>
+<div>
+<div class="flex flex-wrap gap-2">
+<div class="flex items-center gap-1.5 px-3 py-1.5 rounded-full backdrop-blur-md bg-white/10 border border-white/20">
+<span class="material-symbols-outlined text-[18px] text-white">restaurant</span>
+<span class="text-sm font-medium text-white">#Foodie</span>
+</div>
+<div class="flex items-center gap-1.5 px-3 py-1.5 rounded-full backdrop-blur-md bg-white/10 border border-white/20">
+<span class="material-symbols-outlined text-[18px] text-white">museum</span>
+<span class="text-sm font-medium text-white">#Culture</span>
+</div>
+<div class="flex items-center gap-1.5 px-3 py-1.5 rounded-full backdrop-blur-md bg-white/10 border border-white/20">
+<span class="material-symbols-outlined text-[18px] text-white">stroller</span>
+<span class="text-sm font-medium text-white">#Romantic</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="w-full sm:w-2/3 h-1/2 sm:h-full overflow-y-auto bg-white dark:bg-slate-900">
+<div class="p-6 sm:p-8 lg:p-10 flex flex-col gap-10">
+<section>
+<h2 class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white mb-4">Why you'll love Paris</h2>
+<p class="text-slate-600 dark:text-slate-300 leading-relaxed text-lg">
+                            Paris offers an unmatched blend of art, fashion, gastronomy, and culture. From strolling along the Seine to exploring world-class museums like the Louvre, every corner exudes romance and history. Your high match score reflects your love for rich culinary experiences and vibrant cultural scenes.
+                        </p>
+</section>
+<hr class="border-slate-200 dark:border-slate-800"/>
+<section>
+<h3 class="text-xl font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">account_balance_wallet</span>
+                            Financial Planning
+                        </h3>
+<div class="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-6 border border-slate-100 dark:border-slate-800">
+<p class="text-sm font-medium text-slate-500 dark:text-slate-400 mb-4 uppercase tracking-wider">Estimated Cost Per Day</p>
+<div class="flex items-end gap-2 mb-6">
+<span class="text-4xl font-bold text-slate-900 dark:text-white">$250</span>
+<span class="text-slate-500 dark:text-slate-400 mb-1">/ day avg.</span>
+</div>
+<div class="space-y-4">
+<div>
+<div class="flex justify-between text-sm mb-1">
+<span class="font-medium text-slate-700 dark:text-slate-300">Accommodation</span>
+<span class="text-slate-500 dark:text-slate-400">$120</span>
+</div>
+<div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2">
+<div class="bg-primary h-2 rounded-full" style="width: 48%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-sm mb-1">
+<span class="font-medium text-slate-700 dark:text-slate-300">Food &amp; Dining</span>
+<span class="text-slate-500 dark:text-slate-400">$80</span>
+</div>
+<div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2">
+<div class="bg-emerald-500 h-2 rounded-full" style="width: 32%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-sm mb-1">
+<span class="font-medium text-slate-700 dark:text-slate-300">Activities &amp; Transport</span>
+<span class="text-slate-500 dark:text-slate-400">$50</span>
+</div>
+<div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2">
+<div class="bg-amber-500 h-2 rounded-full" style="width: 20%"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-6 flex flex-col sm:flex-row gap-4">
+<div class="flex-1 p-4 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center gap-4">
+<div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary">flight_takeoff</span>
+</div>
+<div>
+<p class="text-sm text-slate-500 dark:text-slate-400">Avg. Round Trip</p>
+<p class="text-lg font-bold text-slate-900 dark:text-white">$650 - $850</p>
+</div>
+</div>
+<div class="flex-1 p-4 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center gap-4">
+<div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary">schedule</span>
+</div>
+<div>
+<p class="text-sm text-slate-500 dark:text-slate-400">Best Time to Visit</p>
+<p class="text-lg font-bold text-slate-900 dark:text-white">Apr - Jun, Sep - Oct</p>
+</div>
+</div>
+</div>
+</section>
+<hr class="border-slate-200 dark:border-slate-800"/>
+<section>
+<h3 class="text-xl font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">gpp_good</span>
+                            Safety &amp; News
+                        </h3>
+<div class="mb-6 flex items-center gap-3 p-4 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-xl">
+<span class="material-symbols-outlined text-emerald-600 dark:text-emerald-400 text-3xl">verified_user</span>
+<div>
+<p class="font-bold text-emerald-800 dark:text-emerald-300">High Safety Rating</p>
+<p class="text-sm text-emerald-700 dark:text-emerald-400">Generally safe for tourists. Exercise normal precautions against pickpocketing.</p>
+</div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<div class="group flex gap-3 p-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-primary/50 dark:hover:border-primary/50 transition-colors cursor-pointer">
+<div class="w-20 h-20 rounded-lg bg-cover bg-center shrink-0" data-alt="New museum exhibition opening in Paris" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD7Ke88Aa_kOQvG1b2oer-WCYHCUhziikwQOF2Twuw7TmOqG8kEk5tP2QPZcQDE3n3nwFYQaxPPBjcBURjudIAJMR8yCTkiQ9nDeGBcDnaRE-L24yMAQPDrQ42tD-zRlhRaItYJ4rZ_6rfPPSe6RI9w4JNJs3hEMVe1GpA9xgZYjcQR1t3LI8OFRy5MJIT1SEqptGJHx9yAHRNobHs2CCKFTXGZ8BL3v5RgRAc6SzqStpg5c5tqbkRc9ReFMdsx33Lb1iKjfLG4eCc');"></div>
+<div class="flex flex-col justify-between py-1">
+<h4 class="font-medium text-slate-900 dark:text-white line-clamp-2 text-sm group-hover:text-primary transition-colors">Louvre Announces New Extended Evening Hours for Summer</h4>
+<p class="text-xs text-slate-500 dark:text-slate-400">2 days ago • Travel News</p>
+</div>
+</div>
+<div class="group flex gap-3 p-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-primary/50 dark:hover:border-primary/50 transition-colors cursor-pointer">
+<div class="w-20 h-20 rounded-lg bg-cover bg-center shrink-0" data-alt="French cuisine restaurant dining experience" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCb3YkGQqBhCpX3bTmsQtBvZ_bNRKwN9PDX5Uysym0xA4myw05hT71r6LPlNAWSYcKKnKPHFcN9xtbGktCSyqD_jsotbQYLE6zDesG7ck1WCjRTfRt_A1y4pi3AdHg4Io0nKFbO2yNbIJmkKVJoAVAuDqqXNScll4VKq-JAdgYUYy3ttCiSXoq9DKJdp6A_OxCqy5EZTst-ts444c8c51TTNytv74Jh5nIGvKSNkkU1IyU1_2jF6MF5SfWqltIHgZV2k3Iws5hmu7I');"></div>
+<div class="flex flex-col justify-between py-1">
+<h4 class="font-medium text-slate-900 dark:text-white line-clamp-2 text-sm group-hover:text-primary transition-colors">Paris Restaurant Week Features Top Michelin Chefs</h4>
+<p class="text-xs text-slate-500 dark:text-slate-400">5 days ago • Culinary</p>
+</div>
+</div>
+</div>
+</section>
+</div>
+</div>
+</div>
+</div>
+
+</body></html>
