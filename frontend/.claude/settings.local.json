@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm add react-simple-maps world-atlas topojson-client)",
+      "Bash(pnpm add -D @types/topojson-client @types/world-atlas)",
+      "Bash(pnpm add -D @types/topojson-client)",
+      "Bash(node -e \":*)"
+    ]
+  }
+}

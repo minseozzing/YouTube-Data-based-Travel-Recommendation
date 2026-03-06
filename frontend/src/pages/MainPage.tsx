@@ -23,12 +23,14 @@ const MainPage = () => {
     >
       {/* Background image */}
       <div
-        className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: `url(${bgImage})` }}
+        className="absolute inset-0"
+        style={{
+          background: "linear-gradient(135deg, #93C5FD 0%, #93C5FD 100%)",
+        }}
         aria-hidden="true"
       />
       {/* Dark overlay */}
-      <div className="absolute inset-0 bg-black/20" aria-hidden="true" />
+      <div className="absolute inset-0 bg-black/1" aria-hidden="true" />
 
       {/* MainNavBar — absolute overlay */}
       <MainNavBar />
@@ -43,9 +45,9 @@ const MainPage = () => {
       */}
       <GlobeContainer
         className={[
-          "absolute top-[72px] left-[280px] bottom-3",
+          "absolute top-[60px] left-[268px] bottom-3",
           "transition-all duration-300 ease-in-out",
-          isRightPanelOpen ? "right-[324px]" : "right-3",
+          isRightPanelOpen ? "right-[312px]" : "right-3",
         ].join(" ")}
       />
 
