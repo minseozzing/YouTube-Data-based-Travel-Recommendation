@@ -179,16 +179,17 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
-      {/* 전체 화면 2열 레이아웃 */}
-      <div className="flex flex-1 min-h-screen">
-        {/* ── 좌측 패널 (로그인 폼) ── */}
-        <motion.div
-          className="flex flex-col w-full lg:w-[55%] px-8 sm:px-12 lg:px-16 py-10"
-          variants={staggerContainer}
-          initial="hidden"
-          animate="visible"
-        >
+    <div className="min-h-screen flex flex-col bg-slate-50">
+      {/* 가운데 정렬된 카드 레이아웃 */}
+      <div className="flex-1 flex items-center justify-center px-4 py-10">
+        <div className="w-full max-w-[1400px] mx-auto bg-white rounded-[2.5rem] shadow-2xl border border-slate-100 overflow-hidden flex flex-col lg:flex-row min-h-[520px]">
+          {/* ── 좌측 패널 (로그인 폼) ── */}
+          <motion.div
+            className="flex flex-col w-full lg:w-[52%] px-8 sm:px-10 lg:px-12 py-8 lg:py-10"
+            variants={staggerContainer}
+            initial="hidden"
+            animate="visible"
+          >
           {/* 로고 */}
           <motion.div variants={fadeInUp} className="mb-10">
             <a
@@ -200,8 +201,8 @@ const LoginPage = () => {
             </a>
           </motion.div>
 
-          {/* 메인 콘텐츠 — 수직 중앙 배치 */}
-          <div className="flex-1 flex flex-col justify-center max-w-md">
+            {/* 메인 콘텐츠 — 수직 중앙 배치 */}
+            <div className="flex-1 flex flex-col justify-center max-w-md">
             {/* 헤드라인 */}
             <motion.div variants={fadeInUp} className="mb-8">
               <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 leading-tight">
@@ -260,35 +261,36 @@ const LoginPage = () => {
               ))}
             </motion.div>
 
-            {/* 하단 약관 텍스트 */}
+              {/* 하단 약관 텍스트 */}
+              <motion.p
+                variants={fadeInUp}
+                className="mt-8 text-xs text-gray-400 leading-relaxed"
+              >
+                로그인하면 다행의{' '}
+                <a href="#" className="underline hover:text-gray-600 transition-colors">
+                  서비스 이용약관
+                </a>{' '}
+                및{' '}
+                <a href="#" className="underline hover:text-gray-600 transition-colors">
+                  개인정보처리방침
+                </a>
+                에 동의하게 됩니다.
+              </motion.p>
+            </div>
+
+            {/* 푸터 */}
             <motion.p
               variants={fadeInUp}
-              className="mt-8 text-xs text-gray-400 leading-relaxed"
+              className="mt-auto pt-8 text-xs text-gray-400"
             >
-              로그인하면 다행의{' '}
-              <a href="#" className="underline hover:text-gray-600 transition-colors">
-                서비스 이용약관
-              </a>{' '}
-              및{' '}
-              <a href="#" className="underline hover:text-gray-600 transition-colors">
-                개인정보처리방침
-              </a>
-              에 동의하게 됩니다.
+              &copy; 2026 다행. All rights reserved.
             </motion.p>
+          </motion.div>
+
+          {/* ── 우측 패널 (이미지) ── */}
+          <div className="hidden lg:block lg:w-[48%]">
+            <RightImagePanel />
           </div>
-
-          {/* 푸터 */}
-          <motion.p
-            variants={fadeInUp}
-            className="mt-auto pt-8 text-xs text-gray-400"
-          >
-            &copy; 2026 다행. All rights reserved.
-          </motion.p>
-        </motion.div>
-
-        {/* ── 우측 패널 (이미지) ── */}
-        <div className="hidden lg:block lg:w-[45%]">
-          <RightImagePanel />
         </div>
       </div>
     </div>

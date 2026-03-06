@@ -100,8 +100,18 @@ import { Dialog as DialogPrimitive } from 'radix-ui';
 - `AuthenticatedLayout` wraps `TopNavBar` + `<main>` + `Footer`
   - Bypasses chrome for routes in `CHROMELESS_ROUTES = new Set(['/main'])`
   - Uses `useLocation({ select: (l) => l.pathname })` from `@tanstack/react-router`
-- `TopNavBar` — sticky top-0 z-50
+- `TopNavBar` — `fixed top-0 left-0 right-0 z-50 h-16`, glass morphism via `style={{ backdropFilter: 'blur(20px) saturate(180%)' }}` + `bg-white/8 border-b border-white/10`
+  - Responsive: desktop links `hidden md:flex`, hamburger `md:hidden`
+  - Mobile menu: `AnimatePresence` + `motion.div` drawer `fixed top-16 left-0 right-0 z-40`, overlay `fixed inset-0 top-16 z-40 bg-black/60`
+  - `liquid-glass-react` removed — never use this library for full-width navbars (designed for pill/badge shapes only)
 - `Footer` — Privacy · Safety links, copyright 2026
+
+## Glass Morphism Pattern (without liquid-glass-react)
+```tsx
+style={{ backdropFilter: 'blur(20px) saturate(180%)', WebkitBackdropFilter: 'blur(20px) saturate(180%)', backgroundColor: 'rgba(255,255,255,0.08)' }}
+className="border-b border-white/10"
+```
+For dark panels: `backgroundColor: 'rgba(10, 17, 40, 0.92)'` + same blur
 
 ## MainPage Architecture (Globe Full-Screen)
 - `src/pages/MainPage.tsx` — `fixed inset-0 z-0` covers viewport; background: `Maldive_beach_1.jpg` + bg-black/20 overlay

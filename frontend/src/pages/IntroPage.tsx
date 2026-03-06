@@ -3,6 +3,7 @@ import { motion, type Variants } from 'framer-motion';
 import { type LucideIcon, Globe, TrendingDown, Plane, ArrowRight, Sparkles, Star, Zap } from 'lucide-react';
 import TopNavBar from '@/components/layout/TopNavBar';
 import Footer from '@/components/layout/Footer';
+import introBg from '@/assets/nightpic.jpg';
 
 // ─── 애니메이션 variants ───────────────────────────────────────────
 const fadeInUp: Variants = {
@@ -151,564 +152,518 @@ const FeatureCard = ({ icon: Icon, title, description, accentColor, glowColor, t
 // ─── IntroPage ────────────────────────────────────────────────────
 const IntroPage = () => {
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: '#050d1a' }}>
-      <TopNavBar />
+    <div className="min-h-screen flex flex-col relative w-full bg-transparent overflow-x-hidden" style={{ zIndex: 0 }}>
+      {/* Background Image Layer */}
+      <div
+        className="fixed inset-0 bg-cover bg-center"
+        style={{
+          backgroundImage: `url(${introBg})`,
+          zIndex: -2,
+        }}
+        aria-hidden="true"
+      />
 
-      <main className="flex-1">
-        {/* ── Hero 섹션 ── */}
-        <section
-          className="relative w-full overflow-hidden flex flex-col justify-center"
-          aria-labelledby="hero-headline"
-          style={{ minHeight: '100vh' }}
-        >
-          {/* 풀스크린 배경 레이어들 */}
-          {/* 기본 그라데이션 */}
-          <div
-            className="absolute inset-0"
-            style={{
-              background: `
-                radial-gradient(ellipse 80% 60% at 50% -10%, rgba(59,130,246,0.35) 0%, transparent 60%),
-                radial-gradient(ellipse 60% 40% at 80% 80%, rgba(99,102,241,0.2) 0%, transparent 50%),
-                radial-gradient(ellipse 50% 40% at 10% 60%, rgba(6,182,212,0.15) 0%, transparent 50%),
-                linear-gradient(180deg, #050d1a 0%, #0a1628 40%, #050d1a 100%)
-              `,
-            }}
-            aria-hidden="true"
-          />
 
-          {/* 움직이는 오브 1 */}
-          <motion.div
-            className="absolute rounded-full"
-            style={{
-              width: '40vw',
-              height: '40vw',
-              top: '-10%',
-              left: '55%',
-              background: 'radial-gradient(circle, rgba(59,130,246,0.18) 0%, transparent 70%)',
-              filter: 'blur(60px)',
-            }}
-            animate={{
-              x: [0, 30, -20, 0],
-              y: [0, -20, 10, 0],
-              scale: [1, 1.1, 0.95, 1],
-            }}
-            transition={{ duration: 15, repeat: Infinity, ease: 'easeInOut' }}
-            aria-hidden="true"
-          />
+      <div className="relative z-10 flex flex-col min-h-screen">
+        <TopNavBar />
 
-          {/* 움직이는 오브 2 */}
-          <motion.div
-            className="absolute rounded-full"
-            style={{
-              width: '30vw',
-              height: '30vw',
-              bottom: '5%',
-              left: '-5%',
-              background: 'radial-gradient(circle, rgba(6,182,212,0.15) 0%, transparent 70%)',
-              filter: 'blur(50px)',
-            }}
-            animate={{
-              x: [0, -20, 15, 0],
-              y: [0, 25, -15, 0],
-              scale: [1, 0.9, 1.05, 1],
-            }}
-            transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
-            aria-hidden="true"
-          />
+        <main className="flex-1 w-full pt-16">
+          {/* ── Hero 섹션 ── */}
+          <section
+            className="relative w-full overflow-hidden flex flex-col justify-center"
+            aria-labelledby="hero-headline"
+            style={{ minHeight: '100vh' }}
+          >
 
-          {/* 그리드 패턴 오버레이 */}
-          <div
-            className="absolute inset-0 opacity-[0.04]"
-            style={{
-              backgroundImage: `
+            {/* 그리드 패턴 오버레이 */}
+            <div
+              className="absolute inset-0 opacity-[0.04]"
+              style={{
+                backgroundImage: `
                 linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)
               `,
-              backgroundSize: '80px 80px',
-            }}
-            aria-hidden="true"
-          />
+                backgroundSize: '80px 80px',
+              }}
+              aria-hidden="true"
+            />
 
-          {/* 12컬럼 그리드 컨테이너 */}
-          <div className="relative w-full px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 py-28 sm:py-32 lg:py-36">
-            {/* 12컬럼 그리드 */}
-            <div className="grid grid-cols-12 gap-4 items-center">
-              {/* 왼쪽 콘텐츠: col 1-7 */}
-              <motion.div
-                className="col-span-12 lg:col-span-7 flex flex-col gap-8"
-                variants={staggerContainer}
-                initial="hidden"
-                animate="visible"
-              >
-                {/* 배지 */}
-                <motion.div variants={fadeInUp}>
-                  <span
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold"
+            {/* 12컬럼 그리드 컨테이너 */}
+            <div className="relative w-full px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 py-28 sm:py-32 lg:py-36">
+              {/* 12컬럼 그리드 */}
+              <div className="grid grid-cols-12 gap-4 items-center">
+                {/* 왼쪽 콘텐츠: col 1-7 */}
+                <motion.div
+                  className="col-span-12 lg:col-span-7 flex flex-col gap-8"
+                  variants={staggerContainer}
+                  initial="hidden"
+                  animate="visible"
+                >
+                  {/* 배지 */}
+                  <motion.div variants={fadeInUp}>
+                    <span
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold"
+                      style={{
+                        background: 'rgba(59,130,246,0.12)',
+                        border: '1px solid rgba(59,130,246,0.35)',
+                        color: '#60a5fa',
+                        backdropFilter: 'blur(12px)',
+                        WebkitBackdropFilter: 'blur(12px)',
+                      }}
+                    >
+                      <Sparkles className="size-4" aria-hidden="true" />
+                      AI 기반 맞춤 여행 플래너
+                      <Zap className="size-3.5 text-yellow-400" aria-hidden="true" />
+                    </span>
+                  </motion.div>
+
+                  {/* 헤드라인 및 서브 카피 묶음 (Liquid Glass 적용) */}
+                  <motion.div
+                    variants={fadeInUp}
+                    className="p-7 sm:p-10 rounded-[2.5rem] flex flex-col gap-6 backdrop-blur-xl group"
                     style={{
-                      background: 'rgba(59,130,246,0.12)',
-                      border: '1px solid rgba(59,130,246,0.35)',
-                      color: '#60a5fa',
-                      backdropFilter: 'blur(12px)',
-                      WebkitBackdropFilter: 'blur(12px)',
+                      background: 'rgba(255,255,255,0.05)',
+                      border: '1.5px solid rgba(255,255,255,0.12)',
+                      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1), 0 20px 50px rgba(0,0,0,0.2)',
+                      maxWidth: 'fit-content',
                     }}
                   >
-                    <Sparkles className="size-4" aria-hidden="true" />
-                    AI 기반 맞춤 여행 플래너
-                    <Zap className="size-3.5 text-yellow-400" aria-hidden="true" />
-                  </span>
+                    {/* 헤드라인 */}
+                    <h1
+                      id="hero-headline"
+                      className="font-black leading-[1.1] tracking-tighter"
+                      style={{ fontSize: 'clamp(2.4rem, 5vw, 4.8rem)', color: '#ffffff' }}
+                    >
+                      다음 여행을{' '}
+                      <span
+                        style={{
+                          backgroundImage: 'linear-gradient(135deg, #fde047 0%, #f97316 50%, #e11d48 100%)',
+                          WebkitBackgroundClip: 'text',
+                          WebkitTextFillColor: 'transparent',
+                          backgroundClip: 'text',
+                        }}
+                      >
+                        행복하게
+                      </span>
+                      <br />
+                      <span className="text-white/90 font-extrabold" style={{ fontSize: '55%' }}>
+                        스마트하고 완벽하게 설계하세요
+                      </span>
+                    </h1>
+
+                    {/* 서브 카피 */}
+                    <p
+                      className="text-slate-200 font-bold leading-relaxed"
+                      style={{ fontSize: 'clamp(1rem, 1.25vw, 1.25rem)', maxWidth: '540px' }}
+                    >
+                      AI가 추천하는 맞춤 여행지를 3D 글로브로 탐색하고,
+                      실시간 물가 비교와 항공권 최저가로{' '}
+                      <span className="text-white font-black underline decoration-f97316/50 underline-offset-4">완벽한 여행</span>을 설계하세요.
+                    </p>
+                  </motion.div>
+
+                  {/* CTA 버튼 그룹 */}
+                  <motion.div
+                    variants={fadeInUp}
+                    className="flex flex-col sm:flex-row items-start sm:items-center gap-4 pt-2"
+                  >
+                    {/* Primary CTA */}
+                    <Link
+                      to="/login"
+                      className="group relative inline-flex items-center gap-3 px-8 py-4 rounded-2xl font-bold text-base no-underline overflow-hidden"
+                      style={{
+                        background: 'linear-gradient(135deg, #f97316 0%, #ea580c 50%, #e11d48 100%)',
+                        color: '#ffffff',
+                        boxShadow: '0 8px 32px rgba(234,88,12,0.4), 0 2px 8px rgba(0,0,0,0.3)',
+                        minWidth: '200px',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      {/* 호버 글로우 */}
+                      <span
+                        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                        style={{ background: 'linear-gradient(135deg, #fb923c 0%, #f97316 50%, #f43f5e 100%)' }}
+                        aria-hidden="true"
+                      />
+                      <span className="relative">지금 시작하기</span>
+                      <ArrowRight className="relative size-5 group-hover:translate-x-1 transition-transform duration-200" aria-hidden="true" />
+                    </Link>
+
+                    {/* Secondary CTA */}
+                    <a
+                      href="#features"
+                      className="group inline-flex items-center gap-3 px-8 py-4 rounded-2xl font-semibold text-base no-underline"
+                      style={{
+                        background: 'rgba(255,255,255,0.07)',
+                        border: '1.5px solid rgba(255,255,255,0.15)',
+                        color: '#e2e8f0',
+                        backdropFilter: 'blur(12px)',
+                        WebkitBackdropFilter: 'blur(12px)',
+                        minWidth: '200px',
+                        justifyContent: 'center',
+                        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1)',
+                        transition: 'all 0.25s ease',
+                      }}
+                      onMouseEnter={(e) => {
+                        (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.12)';
+                        (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.3)';
+                        (e.currentTarget as HTMLElement).style.color = '#ffffff';
+                      }}
+                      onMouseLeave={(e) => {
+                        (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.07)';
+                        (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.15)';
+                        (e.currentTarget as HTMLElement).style.color = '#e2e8f0';
+                      }}
+                    >
+                      서비스 소개 보기
+                    </a>
+                  </motion.div>
+
+                  {/* 통계 지표 */}
+                  <motion.div variants={fadeInUp} className="flex items-center gap-8 pt-2">
+                    {STATS.map((stat, i) => (
+                      <div key={stat.label} className="flex flex-col gap-0.5">
+                        <span className="text-2xl font-black text-white tracking-tight">{stat.value}</span>
+                        <span className="text-xs text-slate-500 font-medium uppercase tracking-wider">{stat.label}</span>
+                        {i < STATS.length - 1 && (
+                          <span className="absolute" aria-hidden="true" />
+                        )}
+                      </div>
+                    ))}
+                  </motion.div>
                 </motion.div>
 
-                {/* 헤드라인 */}
-                <motion.h1
-                  id="hero-headline"
-                  variants={fadeInUp}
-                  className="font-black leading-[1.05] tracking-tighter"
-                  style={{ fontSize: 'clamp(2.8rem, 5.5vw, 5.5rem)', color: '#ffffff' }}
-                >
-                  다음 여행을{' '}
-                  <span
-                    style={{
-                      backgroundImage: 'linear-gradient(135deg, #60a5fa 0%, #06b6d4 50%, #8b5cf6 100%)',
-                      WebkitBackgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent',
-                      backgroundClip: 'text',
-                    }}
-                  >
-                    행복하게
-                  </span>
-                  <br />
-                  <span className="text-slate-300 font-semibold" style={{ fontSize: '55%' }}>
-                    스마트하고 완벽하게 설계하세요
-                  </span>
-                </motion.h1>
-
-                {/* 서브 카피 */}
-                <motion.p
-                  variants={fadeInUp}
-                  className="text-slate-400 leading-relaxed"
-                  style={{ fontSize: 'clamp(1rem, 1.3vw, 1.2rem)', maxWidth: '520px' }}
-                >
-                  AI가 추천하는 맞춤 여행지를 3D 글로브로 탐색하고,
-                  실시간 물가 비교와 항공권 최저가로{' '}
-                  <span className="text-white font-medium">완벽한 여행</span>을 설계하세요.
-                </motion.p>
-
-                {/* CTA 버튼 그룹 */}
+                {/* 오른쪽 Liquid Glass 장식 카드: col 9-12 */}
                 <motion.div
-                  variants={fadeInUp}
-                  className="flex flex-col sm:flex-row items-start sm:items-center gap-4 pt-2"
+                  className="col-span-12 lg:col-span-5 flex items-center justify-center lg:justify-end"
+                  initial={{ opacity: 0, x: 40 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.8, delay: 0.4, ease: 'easeOut' }}
                 >
-                  {/* Primary CTA */}
-                  <Link
-                    to="/login"
-                    className="group relative inline-flex items-center gap-3 px-8 py-4 rounded-2xl font-bold text-base no-underline overflow-hidden"
-                    style={{
-                      background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #6366f1 100%)',
-                      color: '#ffffff',
-                      boxShadow: '0 8px 32px rgba(59,130,246,0.4), 0 2px 8px rgba(0,0,0,0.3)',
-                      minWidth: '200px',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    {/* 호버 글로우 */}
-                    <span
-                      className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                      style={{ background: 'linear-gradient(135deg, #60a5fa 0%, #3b82f6 50%, #818cf8 100%)' }}
+                  <div className="relative w-full max-w-sm lg:max-w-md">
+                    {/* 배경 글로우 */}
+                    <div
+                      className="absolute inset-0 rounded-[2rem]"
+                      style={{
+                        background: 'radial-gradient(ellipse at 50% 50%, rgba(59,130,246,0.25) 0%, transparent 70%)',
+                        filter: 'blur(30px)',
+                        transform: 'scale(1.2)',
+                      }}
                       aria-hidden="true"
                     />
-                    <span className="relative">지금 시작하기</span>
-                    <ArrowRight className="relative size-5 group-hover:translate-x-1 transition-transform duration-200" aria-hidden="true" />
-                  </Link>
 
-                  {/* Secondary CTA */}
-                  <a
-                    href="#features"
-                    className="group inline-flex items-center gap-3 px-8 py-4 rounded-2xl font-semibold text-base no-underline"
-                    style={{
-                      background: 'rgba(255,255,255,0.07)',
-                      border: '1.5px solid rgba(255,255,255,0.15)',
-                      color: '#e2e8f0',
-                      backdropFilter: 'blur(12px)',
-                      WebkitBackdropFilter: 'blur(12px)',
-                      minWidth: '200px',
-                      justifyContent: 'center',
-                      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1)',
-                      transition: 'all 0.25s ease',
-                    }}
-                    onMouseEnter={(e) => {
-                      (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.12)';
-                      (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.3)';
-                      (e.currentTarget as HTMLElement).style.color = '#ffffff';
-                    }}
-                    onMouseLeave={(e) => {
-                      (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.07)';
-                      (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.15)';
-                      (e.currentTarget as HTMLElement).style.color = '#e2e8f0';
-                    }}
-                  >
-                    서비스 소개 보기
-                  </a>
-                </motion.div>
-
-                {/* 통계 지표 */}
-                <motion.div variants={fadeInUp} className="flex items-center gap-8 pt-2">
-                  {STATS.map((stat, i) => (
-                    <div key={stat.label} className="flex flex-col gap-0.5">
-                      <span className="text-2xl font-black text-white tracking-tight">{stat.value}</span>
-                      <span className="text-xs text-slate-500 font-medium uppercase tracking-wider">{stat.label}</span>
-                      {i < STATS.length - 1 && (
-                        <span className="absolute" aria-hidden="true" />
-                      )}
-                    </div>
-                  ))}
-                </motion.div>
-              </motion.div>
-
-              {/* 오른쪽 Liquid Glass 장식 카드: col 9-12 */}
-              <motion.div
-                className="col-span-12 lg:col-span-5 flex items-center justify-center lg:justify-end"
-                initial={{ opacity: 0, x: 40 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.8, delay: 0.4, ease: 'easeOut' }}
-              >
-                <div className="relative w-full max-w-sm lg:max-w-md">
-                  {/* 배경 글로우 */}
-                  <div
-                    className="absolute inset-0 rounded-[2rem]"
-                    style={{
-                      background: 'radial-gradient(ellipse at 50% 50%, rgba(59,130,246,0.25) 0%, transparent 70%)',
-                      filter: 'blur(30px)',
-                      transform: 'scale(1.2)',
-                    }}
-                    aria-hidden="true"
-                  />
-
-                  {/* 메인 Liquid Glass 패널 */}
-                  <div
-                    className="relative rounded-[2rem] p-6 sm:p-8"
-                    style={{
-                      background: 'rgba(15, 23, 42, 0.55)',
-                      backdropFilter: 'blur(40px) saturate(200%) brightness(1.1)',
-                      WebkitBackdropFilter: 'blur(40px) saturate(200%) brightness(1.1)',
-                      border: '1px solid rgba(255,255,255,0.12)',
-                      boxShadow: `
+                    {/* 메인 Liquid Glass 패널 */}
+                    <div
+                      className="relative rounded-[2rem] p-6 sm:p-8"
+                      style={{
+                        background: 'rgba(15, 23, 42, 0.55)',
+                        backdropFilter: 'blur(40px) saturate(200%) brightness(1.1)',
+                        WebkitBackdropFilter: 'blur(40px) saturate(200%) brightness(1.1)',
+                        border: '1px solid rgba(255,255,255,0.12)',
+                        boxShadow: `
                           0 32px 64px rgba(0,0,0,0.5),
                           0 0 0 1px rgba(255,255,255,0.05),
                           inset 0 1px 0 rgba(255,255,255,0.15),
                           inset 0 -1px 0 rgba(0,0,0,0.2)
                         `,
-                    }}
-                  >
-                    {/* 상단 글로우 라인 */}
-                    <div
-                      className="absolute top-0 left-1/2 -translate-x-1/2 rounded-b-full"
-                      style={{
-                        width: '60%',
-                        height: '1px',
-                        background: 'linear-gradient(90deg, transparent, rgba(99,163,250,0.8), transparent)',
                       }}
-                      aria-hidden="true"
-                    />
-
-                    {/* 미니 스탯 아이템들 */}
-                    <div className="flex flex-col gap-4">
-                      <div className="flex items-center gap-3 mb-2">
-                        <div
-                          className="w-8 h-8 rounded-xl flex items-center justify-center"
-                          style={{ background: 'rgba(59,130,246,0.2)' }}
-                        >
-                          <Globe className="size-4 text-blue-400" aria-hidden="true" />
-                        </div>
-                        <div>
-                          <div className="text-white font-semibold text-sm">AI 여행 분석 중</div>
-                          <div className="text-slate-500 text-xs">도쿄 · 파리 · 발리 비교</div>
-                        </div>
-                      </div>
-
-                      {/* 프로그레스 바들 */}
-                      {[
-                        { label: '도쿄', value: 88, color: '#3b82f6' },
-                        { label: '파리', value: 72, color: '#8b5cf6' },
-                        { label: '발리', value: 95, color: '#10b981' },
-                      ].map((item) => (
-                        <div key={item.label} className="flex flex-col gap-1.5">
-                          <div className="flex justify-between">
-                            <span className="text-slate-400 text-xs">{item.label}</span>
-                            <span className="text-white text-xs font-bold">{item.value}점</span>
-                          </div>
-                          <div
-                            className="h-2 w-full rounded-full overflow-hidden"
-                            style={{ background: 'rgba(255,255,255,0.08)' }}
-                          >
-                            <motion.div
-                              className="h-full rounded-full"
-                              style={{ background: `linear-gradient(90deg, ${item.color}, ${item.color}80)` }}
-                              initial={{ width: 0 }}
-                              animate={{ width: `${item.value}%` }}
-                              transition={{ duration: 1, delay: 0.8, ease: 'easeOut' }}
-                            />
-                          </div>
-                        </div>
-                      ))}
-
-                      {/* 구분선 */}
+                    >
+                      {/* 상단 글로우 라인 */}
                       <div
-                        className="my-1"
-                        style={{ height: '1px', background: 'rgba(255,255,255,0.07)' }}
+                        className="absolute top-0 left-1/2 -translate-x-1/2 rounded-b-full"
+                        style={{
+                          width: '60%',
+                          height: '1px',
+                          background: 'linear-gradient(90deg, transparent, rgba(99,163,250,0.8), transparent)',
+                        }}
                         aria-hidden="true"
                       />
 
-                      {/* 항공권 최저가 표시 */}
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <Plane className="size-4 text-blue-400" aria-hidden="true" />
-                          <span className="text-slate-400 text-xs">최저가 항공</span>
+                      {/* 미니 스탯 아이템들 */}
+                      <div className="flex flex-col gap-4">
+                        <div className="flex items-center gap-3 mb-2">
+                          <div
+                            className="w-8 h-8 rounded-xl flex items-center justify-center"
+                            style={{ background: 'rgba(59,130,246,0.2)' }}
+                          >
+                            <Globe className="size-4 text-blue-400" aria-hidden="true" />
+                          </div>
+                          <div>
+                            <div className="text-white font-semibold text-sm">AI 여행 분석 중</div>
+                            <div className="text-slate-500 text-xs">도쿄 · 파리 · 발리 비교</div>
+                          </div>
                         </div>
-                        <div className="text-right">
-                          <span className="text-emerald-400 font-black text-lg">₩319,000</span>
-                          <div className="text-slate-600 text-xs line-through">₩485,000</div>
+
+                        {/* 프로그레스 바들 */}
+                        {[
+                          { label: '도쿄', value: 88, color: '#3b82f6' },
+                          { label: '파리', value: 72, color: '#8b5cf6' },
+                          { label: '발리', value: 95, color: '#10b981' },
+                        ].map((item) => (
+                          <div key={item.label} className="flex flex-col gap-1.5">
+                            <div className="flex justify-between">
+                              <span className="text-slate-400 text-xs">{item.label}</span>
+                              <span className="text-white text-xs font-bold">{item.value}점</span>
+                            </div>
+                            <div
+                              className="h-2 w-full rounded-full overflow-hidden"
+                              style={{ background: 'rgba(255,255,255,0.08)' }}
+                            >
+                              <motion.div
+                                className="h-full rounded-full"
+                                style={{ background: `linear-gradient(90deg, ${item.color}, ${item.color}80)` }}
+                                initial={{ width: 0 }}
+                                animate={{ width: `${item.value}%` }}
+                                transition={{ duration: 1, delay: 0.8, ease: 'easeOut' }}
+                              />
+                            </div>
+                          </div>
+                        ))}
+
+                        {/* 구분선 */}
+                        <div
+                          className="my-1"
+                          style={{ height: '1px', background: 'rgba(255,255,255,0.07)' }}
+                          aria-hidden="true"
+                        />
+
+                        {/* 항공권 최저가 표시 */}
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Plane className="size-4 text-blue-400" aria-hidden="true" />
+                            <span className="text-slate-400 text-xs">최저가 항공</span>
+                          </div>
+                          <div className="text-right">
+                            <span className="text-emerald-400 font-black text-lg">₩319,000</span>
+                            <div className="text-slate-600 text-xs line-through">₩485,000</div>
+                          </div>
                         </div>
                       </div>
                     </div>
+
+                    {/* 플로팅 미니 카드 - 왼쪽 아래 */}
+                    <motion.div
+                      className="absolute -bottom-4 -left-4 rounded-2xl px-4 py-3"
+                      style={{
+                        background: 'rgba(16,185,129,0.15)',
+                        backdropFilter: 'blur(20px)',
+                        WebkitBackdropFilter: 'blur(20px)',
+                        border: '1px solid rgba(16,185,129,0.25)',
+                        boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
+                      }}
+                      animate={{ y: [0, -6, 0] }}
+                      transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                    >
+                      <div className="text-emerald-400 font-black text-sm">34% 절약</div>
+                      <div className="text-slate-400 text-xs">AI 추천 플랜 기준</div>
+                    </motion.div>
+
+                    {/* 플로팅 미니 카드 - 오른쪽 위 */}
+                    <motion.div
+                      className="absolute -top-4 -right-2 rounded-2xl px-4 py-3"
+                      style={{
+                        background: 'rgba(99,102,241,0.15)',
+                        backdropFilter: 'blur(20px)',
+                        WebkitBackdropFilter: 'blur(20px)',
+                        border: '1px solid rgba(99,102,241,0.25)',
+                        boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
+                      }}
+                      animate={{ y: [0, 6, 0] }}
+                      transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+                    >
+                      <div className="text-violet-400 font-black text-sm">1,240개</div>
+                      <div className="text-slate-400 text-xs">연결 항공편</div>
+                    </motion.div>
                   </div>
-
-                  {/* 플로팅 미니 카드 - 왼쪽 아래 */}
-                  <motion.div
-                    className="absolute -bottom-4 -left-4 rounded-2xl px-4 py-3"
-                    style={{
-                      background: 'rgba(16,185,129,0.15)',
-                      backdropFilter: 'blur(20px)',
-                      WebkitBackdropFilter: 'blur(20px)',
-                      border: '1px solid rgba(16,185,129,0.25)',
-                      boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
-                    }}
-                    animate={{ y: [0, -6, 0] }}
-                    transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-                  >
-                    <div className="text-emerald-400 font-black text-sm">34% 절약</div>
-                    <div className="text-slate-400 text-xs">AI 추천 플랜 기준</div>
-                  </motion.div>
-
-                  {/* 플로팅 미니 카드 - 오른쪽 위 */}
-                  <motion.div
-                    className="absolute -top-4 -right-2 rounded-2xl px-4 py-3"
-                    style={{
-                      background: 'rgba(99,102,241,0.15)',
-                      backdropFilter: 'blur(20px)',
-                      WebkitBackdropFilter: 'blur(20px)',
-                      border: '1px solid rgba(99,102,241,0.25)',
-                      boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
-                    }}
-                    animate={{ y: [0, 6, 0] }}
-                    transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
-                  >
-                    <div className="text-violet-400 font-black text-sm">1,240개</div>
-                    <div className="text-slate-400 text-xs">연결 항공편</div>
-                  </motion.div>
-                </div>
-              </motion.div>
+                </motion.div>
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
 
-        {/* ── Feature 섹션 ── */}
-        <section
-          id="features"
-          className="relative w-full overflow-hidden"
-          aria-labelledby="features-headline"
-          style={{
-            background: 'linear-gradient(180deg, #050d1a 0%, #080f20 50%, #050d1a 100%)',
-          }}
-        >
-          {/* 배경 장식 */}
-          <div
-            className="absolute inset-0 opacity-[0.03]"
-            style={{
-              backgroundImage: `
+          {/* ── Feature 섹션 ── */}
+          <section
+            id="features"
+            className="relative w-full overflow-hidden"
+            aria-labelledby="features-headline"
+          >
+            {/* 배경 장식 */}
+            <div
+              className="absolute inset-0 opacity-[0.03]"
+              style={{
+                backgroundImage: `
                 linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)
               `,
-              backgroundSize: '80px 80px',
-            }}
-            aria-hidden="true"
-          />
+                backgroundSize: '80px 80px',
+              }}
+              aria-hidden="true"
+            />
 
-          <div className="relative w-full px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 py-24 sm:py-32">
-            {/* 12컬럼 그리드 */}
-            <div className="grid grid-cols-12 gap-4">
-              {/* 섹션 헤더: 가운데 col 3-10 */}
-              <motion.div
-                className="col-span-12 lg:col-span-8 lg:col-start-3 text-center flex flex-col gap-4 mb-16"
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-60px' }}
-                transition={{ duration: 0.6 }}
-              >
-                <span
-                  className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-widest self-center"
-                  style={{
-                    background: 'rgba(99,102,241,0.12)',
-                    border: '1px solid rgba(99,102,241,0.3)',
-                    color: '#818cf8',
-                  }}
+            <div className="relative w-full px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 py-24 sm:py-32">
+              {/* 12컬럼 그리드 */}
+              <div className="grid grid-cols-12 gap-4">
+                {/* 섹션 헤더: 가운데 col 3-10 */}
+                <motion.div
+                  className="col-span-12 lg:col-span-8 lg:col-start-3 text-center flex flex-col gap-4 mb-16"
+                  initial={{ opacity: 0, y: 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: '-60px' }}
+                  transition={{ duration: 0.6 }}
                 >
-                  <Sparkles className="size-3" aria-hidden="true" />
-                  핵심 기능
-                </span>
-                <h2
-                  id="features-headline"
-                  className="font-black text-white tracking-tight"
-                  style={{ fontSize: 'clamp(2rem, 3.5vw, 3.5rem)' }}
-                >
-                  왜{' '}
                   <span
+                    className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-widest self-center"
                     style={{
-                      backgroundImage: 'linear-gradient(135deg, #60a5fa, #06b6d4)',
-                      WebkitBackgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent',
-                      backgroundClip: 'text',
+                      background: 'rgba(99,102,241,0.12)',
+                      border: '1px solid rgba(99,102,241,0.3)',
+                      color: '#818cf8',
                     }}
                   >
-                    다행
+                    <Sparkles className="size-3" aria-hidden="true" />
+                    핵심 기능
                   </span>
-                  인가요?
-                </h2>
-                <p className="text-slate-400 leading-relaxed" style={{ fontSize: 'clamp(1rem, 1.1vw, 1.15rem)' }}>
-                  여행 계획의 처음부터 끝까지, 다행이 함께합니다.
-                  <br />
-                  AI 분석부터 실시간 예약까지 원스톱으로 해결하세요.
-                </p>
-              </motion.div>
+                  <h2
+                    id="features-headline"
+                    className="font-black text-white tracking-tight"
+                    style={{ fontSize: 'clamp(2rem, 3.5vw, 3.5rem)' }}
+                  >
+                    왜{' '}
+                    <span
+                      style={{
+                        backgroundImage: 'linear-gradient(135deg, #fde047, #f97316)',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        backgroundClip: 'text',
+                      }}
+                    >
+                      다행
+                    </span>
+                    인가요?
+                  </h2>
+                  <p className="text-slate-400 leading-relaxed" style={{ fontSize: 'clamp(1rem, 1.1vw, 1.15rem)' }}>
+                    여행 계획의 처음부터 끝까지, 다행이 함께합니다.
+                    <br />
+                    AI 분석부터 실시간 예약까지 원스톱으로 해결하세요.
+                  </p>
+                </motion.div>
 
-              {/* 카드 그리드: 3열 (각 4컬럼) */}
-              <motion.div
-                className="col-span-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-                variants={staggerContainer}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: '-60px' }}
-              >
-                {FEATURES.map((feature, idx) => (
-                  <FeatureCard key={feature.title} {...feature} index={idx} />
-                ))}
-              </motion.div>
+                {/* 카드 그리드: 3열 (각 4컬럼) */}
+                <motion.div
+                  className="col-span-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+                  variants={staggerContainer}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, margin: '-60px' }}
+                >
+                  {FEATURES.map((feature, idx) => (
+                    <FeatureCard key={feature.title} {...feature} index={idx} />
+                  ))}
+                </motion.div>
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
 
-        {/* ── CTA 배너 섹션 ── */}
-        <section
-          className="relative w-full overflow-hidden"
-          style={{ background: '#050d1a' }}
-        >
-          {/* 배경 */}
-          <div
-            className="absolute inset-0"
-            style={{
-              background: `
-                radial-gradient(ellipse 70% 60% at 50% 100%, rgba(59,130,246,0.2) 0%, transparent 60%),
-                radial-gradient(ellipse 40% 40% at 20% 50%, rgba(99,102,241,0.15) 0%, transparent 50%)
-              `,
-            }}
-            aria-hidden="true"
-          />
+          {/* ── CTA 배너 섹션 ── */}
+          <section
+            className="relative w-full overflow-hidden py-12"
+          >
 
-          <div className="relative w-full px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 py-24 sm:py-32">
-            <div className="grid grid-cols-12 gap-4">
-              {/* CTA 카드: col 2-11 */}
-              <motion.div
-                className="col-span-12 lg:col-span-10 lg:col-start-2"
-                initial={{ opacity: 0, y: 32 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.7 }}
-              >
-                <div
-                  className="relative rounded-[2.5rem] p-10 sm:p-14 lg:p-16 overflow-hidden"
-                  style={{
-                    background: 'rgba(15, 23, 42, 0.7)',
-                    backdropFilter: 'blur(40px) saturate(180%)',
-                    WebkitBackdropFilter: 'blur(40px) saturate(180%)',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    boxShadow: `
+            <div className="relative w-full px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 py-24 sm:py-32">
+              <div className="grid grid-cols-12 gap-4">
+                {/* CTA 카드: col 2-11 */}
+                <motion.div
+                  className="col-span-12 lg:col-span-10 lg:col-start-2"
+                  initial={{ opacity: 0, y: 32 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.7 }}
+                >
+                  <div
+                    className="relative rounded-[2.5rem] p-10 sm:p-14 lg:p-16 overflow-hidden"
+                    style={{
+                      background: 'rgba(15, 23, 42, 0.7)',
+                      backdropFilter: 'blur(40px) saturate(180%)',
+                      WebkitBackdropFilter: 'blur(40px) saturate(180%)',
+                      border: '1px solid rgba(255,255,255,0.1)',
+                      boxShadow: `
                       0 40px 80px rgba(0,0,0,0.5),
                       inset 0 1px 0 rgba(255,255,255,0.12),
                       0 0 0 1px rgba(59,130,246,0.1)
                     `,
-                  }}
-                >
-                  {/* 배경 글로우 */}
-                  <div
-                    className="absolute inset-0"
-                    style={{
-                      background: 'radial-gradient(ellipse 60% 80% at 80% 50%, rgba(59,130,246,0.08) 0%, transparent 60%)',
                     }}
-                    aria-hidden="true"
-                  />
+                  >
+                    {/* 배경 글로우 */}
+                    <div
+                      className="absolute inset-0"
+                      style={{
+                        background: 'radial-gradient(ellipse 60% 80% at 80% 50%, rgba(59,130,246,0.08) 0%, transparent 60%)',
+                      }}
+                      aria-hidden="true"
+                    />
 
-                  {/* 상단 글로우 라인 */}
-                  <div
-                    className="absolute top-0 left-1/2 -translate-x-1/2"
-                    style={{
-                      width: '40%',
-                      height: '1px',
-                      background: 'linear-gradient(90deg, transparent, rgba(99,163,250,0.7), transparent)',
-                    }}
-                    aria-hidden="true"
-                  />
+                    {/* 상단 글로우 라인 */}
+                    <div
+                      className="absolute top-0 left-1/2 -translate-x-1/2"
+                      style={{
+                        width: '40%',
+                        height: '1px',
+                        background: 'linear-gradient(90deg, transparent, rgba(99,163,250,0.7), transparent)',
+                      }}
+                      aria-hidden="true"
+                    />
 
-                  <div className="relative flex flex-col lg:flex-row items-center justify-between gap-10">
-                    <div className="text-center lg:text-left flex flex-col gap-3">
-                      <h2
-                        className="font-black text-white tracking-tight"
-                        style={{ fontSize: 'clamp(1.8rem, 3vw, 2.8rem)' }}
-                      >
-                        지금 바로 여행을{' '}
-                        <span
+                    <div className="relative flex flex-col lg:flex-row items-center justify-between gap-10">
+                      <div className="text-center lg:text-left flex flex-col gap-3">
+                        <h2
+                          className="font-black text-white tracking-tight"
+                          style={{ fontSize: 'clamp(1.8rem, 3vw, 2.8rem)' }}
+                        >
+                          지금 바로 여행을{' '}
+                          <span
+                            style={{
+                              backgroundImage: 'linear-gradient(135deg, #fde047, #f97316)',
+                              WebkitBackgroundClip: 'text',
+                              WebkitTextFillColor: 'transparent',
+                              backgroundClip: 'text',
+                            }}
+                          >
+                            시작하세요
+                          </span>
+                        </h2>
+                        <p className="text-slate-400" style={{ fontSize: 'clamp(0.95rem, 1.1vw, 1.1rem)' }}>
+                          무료로 가입하고 AI 맞춤 추천을 경험하세요. 카드 등록 없이 바로 시작 가능합니다.
+                        </p>
+                      </div>
+
+                      <div className="flex flex-col sm:flex-row gap-4 shrink-0">
+                        <Link
+                          to="/login"
+                          className="group relative inline-flex items-center justify-center gap-2 px-10 py-4 rounded-2xl font-bold text-base no-underline overflow-hidden"
                           style={{
-                            backgroundImage: 'linear-gradient(135deg, #60a5fa, #06b6d4)',
-                            WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent',
-                            backgroundClip: 'text',
+                            background: 'linear-gradient(135deg, #f97316 0%, #ea580c 60%, #e11d48 100%)',
+                            color: '#ffffff',
+                            boxShadow: '0 8px 32px rgba(234,88,12,0.45), 0 2px 8px rgba(0,0,0,0.3)',
+                            minWidth: '180px',
                           }}
                         >
-                          시작하세요
-                        </span>
-                      </h2>
-                      <p className="text-slate-400" style={{ fontSize: 'clamp(0.95rem, 1.1vw, 1.1rem)' }}>
-                        무료로 가입하고 AI 맞춤 추천을 경험하세요. 카드 등록 없이 바로 시작 가능합니다.
-                      </p>
-                    </div>
-
-                    <div className="flex flex-col sm:flex-row gap-4 shrink-0">
-                      <Link
-                        to="/login"
-                        className="group relative inline-flex items-center justify-center gap-2 px-10 py-4 rounded-2xl font-bold text-base no-underline overflow-hidden"
-                        style={{
-                          background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 60%, #6366f1 100%)',
-                          color: '#ffffff',
-                          boxShadow: '0 8px 32px rgba(59,130,246,0.45), 0 2px 8px rgba(0,0,0,0.3)',
-                          minWidth: '180px',
-                        }}
-                      >
-                        <span
-                          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                          style={{ background: 'linear-gradient(135deg, #60a5fa 0%, #3b82f6 60%, #818cf8 100%)' }}
-                          aria-hidden="true"
-                        />
-                        <span className="relative">무료로 시작하기</span>
-                        <ArrowRight className="relative size-4 group-hover:translate-x-1 transition-transform duration-200" aria-hidden="true" />
-                      </Link>
+                          <span
+                            className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                            style={{ background: 'linear-gradient(135deg, #fb923c 0%, #f97316 60%, #f43f5e 100%)' }}
+                            aria-hidden="true"
+                          />
+                          <span className="relative">무료로 시작하기</span>
+                          <ArrowRight className="relative size-4 group-hover:translate-x-1 transition-transform duration-200" aria-hidden="true" />
+                        </Link>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </motion.div>
+                </motion.div>
+              </div>
             </div>
-          </div>
-        </section>
-      </main>
+          </section>
+        </main>
 
-      <Footer />
+        <Footer />
+      </div>
     </div >
   );
 };
