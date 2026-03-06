@@ -1,84 +1,103 @@
-import { useState, useCallback, type ChangeEvent } from 'react';
-import { SlidersHorizontal, RefreshCw } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { useUiStore } from '@/stores/uiStore';
-import { useRecommend } from '@/hooks/city/useRecommend';
-import { cn } from '@/lib/utils';
+import { useState, useCallback, type ChangeEvent } from "react";
+import { SlidersHorizontal, RefreshCw } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useUiStore } from "@/stores/uiStore";
+import { useRecommend } from "@/hooks/city/useRecommend";
+import { cn } from "@/lib/utils";
 
 const RISK_LABELS: Record<number, string> = {
-  1: '매우 낮음',
-  2: '낮음',
-  3: '보통',
-  4: '높음',
-  5: '매우 높음',
+  1: "매우 낮음",
+  2: "낮음",
+  3: "보통",
+  4: "높음",
+  5: "매우 높음",
 };
 
 export function TripSettingsPanel() {
-  const {
-    globeBudgetFilter,
-    globeRiskFilter,
-    setGlobeBudgetFilter,
-    setGlobeRiskFilter,
-  } = useUiStore();
+  const { setGlobeBudgetFilter, setGlobeRiskFilter, setGlobeDuration, setRecommendActive } =
+    useUiStore();
 
-  const [duration, setDuration] = useState<number>(7);
-  const [budgetInput, setBudgetInput] = useState<string>(
-    String(globeBudgetFilter[1]),
-  );
+  const [budgetInput, setBudgetInput] = useState<string>("10,000,000");
+  const [durationInput, setDurationInput] = useState<string>("2");
+  const [riskLevel, setRiskLevel] = useState<number>(5);
 
   const { mutate: recommend, isPending } = useRecommend();
 
-  const handleBudgetChange = useCallback(
-    (e: ChangeEvent<HTMLInputElement>) => {
-      const raw = e.target.value.replace(/[^0-9]/g, '');
-      setBudgetInput(raw);
-      const num = parseInt(raw, 10);
-      if (!isNaN(num)) {
-        setGlobeBudgetFilter([globeBudgetFilter[0], num]);
-      }
-    },
-    [globeBudgetFilter, setGlobeBudgetFilter],
-  );
+  const handleReset = useCallback(() => {
+    setBudgetInput("10,000,000");
+    setDurationInput("2");
+    setRiskLevel(5);
+    setGlobeBudgetFilter([0, 5_000_000]);
+    setGlobeRiskFilter(5);
+    setGlobeDuration(2);
+    setRecommendActive(false);
+  }, [setGlobeBudgetFilter, setGlobeRiskFilter, setRecommendActive]);
 
-  const handleRiskChange = useCallback(
-    (e: ChangeEvent<HTMLInputElement>) => {
-      setGlobeRiskFilter(parseInt(e.target.value, 10));
-    },
-    [setGlobeRiskFilter],
-  );
+  const handleBudgetChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    const digits = e.target.value.replace(/[^0-9]/g, "");
+    const formatted = digits.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    setBudgetInput(formatted);
+  }, []);
 
   const handleDurationChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
-      const val = parseInt(e.target.value, 10);
-      if (!isNaN(val) && val > 0) {
-        setDuration(val);
-      }
+      const raw = e.target.value.replace(/[^0-9]/g, "");
+      setDurationInput(raw);
     },
     [],
   );
 
+  const handleRiskChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    setRiskLevel(parseInt(e.target.value, 10));
+  }, []);
+
   const handleUpdateRecommendations = useCallback(() => {
-    const budget = parseInt(budgetInput, 10);
-    if (!isNaN(budget) && duration > 0) {
+    const budget = parseInt(budgetInput.replace(/,/g, ""), 10);
+    const duration = parseInt(durationInput, 10);
+    if (!isNaN(budget) && budget > 0 && !isNaN(duration) && duration > 0) {
+      setGlobeBudgetFilter([0, budget]);
+      setGlobeRiskFilter(riskLevel);
+      setGlobeDuration(duration);
+      setRecommendActive(true);
       recommend({ budget, duration });
     }
-  }, [budgetInput, duration, recommend]);
+  }, [
+    budgetInput,
+    durationInput,
+    riskLevel,
+    setGlobeBudgetFilter,
+    setGlobeRiskFilter,
+    setGlobeDuration,
+    setRecommendActive,
+    recommend,
+  ]);
 
   return (
     <section
       className={cn(
-        'bg-white/85 backdrop-blur-md rounded-2xl shadow-lg p-4',
-        'flex flex-col gap-4',
+        "bg-white/85 backdrop-blur-md rounded-2xl shadow-lg p-4",
+        "flex flex-col gap-4",
       )}
       aria-label="여행 설정"
     >
       {/* 헤더 */}
-      <div className="flex items-center gap-2">
-        <SlidersHorizontal className="size-4 text-blue-500" aria-hidden="true" />
-        <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wide">
-          여행 설정
-        </h2>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <SlidersHorizontal
+            className="size-4 text-blue-500"
+            aria-hidden="true"
+          />
+          <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wide">
+            여행 설정
+          </h2>
+        </div>
+        <button
+          onClick={handleReset}
+          className="text-xs text-slate-400 hover:text-slate-600"
+        >
+          초기화
+        </button>
       </div>
 
       {/* 예산 */}
@@ -115,13 +134,12 @@ export function TripSettingsPanel() {
         </label>
         <Input
           id="duration-input"
-          type="number"
-          min={1}
-          max={365}
-          value={duration}
+          type="text"
+          inputMode="numeric"
+          value={durationInput}
           onChange={handleDurationChange}
           className="text-sm bg-white/70 border-slate-200 focus-visible:ring-blue-300"
-          placeholder="7"
+          placeholder="-"
         />
       </div>
 
@@ -135,7 +153,7 @@ export function TripSettingsPanel() {
             위험도 허용 수준
           </label>
           <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">
-            {RISK_LABELS[globeRiskFilter] ?? '보통'}
+            {RISK_LABELS[riskLevel] ?? "보통"}
           </span>
         </div>
         <input
@@ -144,17 +162,17 @@ export function TripSettingsPanel() {
           min={1}
           max={5}
           step={1}
-          value={globeRiskFilter}
+          value={riskLevel}
           onChange={handleRiskChange}
           className={cn(
-            'w-full h-2 rounded-lg appearance-none cursor-pointer',
-            'accent-blue-500',
+            "w-full h-2 rounded-lg appearance-none cursor-pointer",
+            "accent-blue-500",
           )}
           aria-label="위험도 허용 수준 슬라이더"
           aria-valuemin={1}
           aria-valuemax={5}
-          aria-valuenow={globeRiskFilter}
-          aria-valuetext={RISK_LABELS[globeRiskFilter]}
+          aria-valuenow={riskLevel}
+          aria-valuetext={RISK_LABELS[riskLevel]}
         />
         <div className="flex justify-between text-[10px] text-slate-400">
           <span>안전</span>
@@ -166,7 +184,8 @@ export function TripSettingsPanel() {
       <Button
         onClick={handleUpdateRecommendations}
         disabled={isPending}
-        className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-xl text-sm font-semibold"
+        variant="primary"
+        className="w-full"
         aria-label="추천 여행지 업데이트"
       >
         {isPending ? (
