@@ -1,4 +1,4 @@
-import { useState, useCallback, type ChangeEvent } from "react";
+import { useState, useCallback, useRef, type ChangeEvent } from "react";
 import { SlidersHorizontal, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,12 +15,53 @@ const RISK_LABELS: Record<number, string> = {
 };
 
 export function TripSettingsPanel() {
-  const { setGlobeBudgetFilter, setGlobeRiskFilter, setGlobeDuration, setRecommendActive } =
-    useUiStore();
+  const {
+    setGlobeBudgetFilter,
+    setGlobeRiskFilter,
+    setGlobeDuration,
+    setRecommendActive,
+  } = useUiStore();
 
   const [budgetInput, setBudgetInput] = useState<string>("10,000,000");
   const [durationInput, setDurationInput] = useState<string>("2");
   const [riskLevel, setRiskLevel] = useState<number>(5);
+  const [isDragging, setIsDragging] = useState(false);
+  const riskTrackRef = useRef<HTMLDivElement>(null);
+  const isDraggingRef = useRef(false);
+
+  // px-1.5(6px) 패딩 고려 — 썸 center 기준
+  const getRiskFromPointer = useCallback((clientX: number) => {
+    const el = riskTrackRef.current;
+    if (!el) return null;
+    const { left, width } = el.getBoundingClientRect();
+    const ratio = Math.max(0, Math.min(1, (clientX - left - 6) / (width - 12)));
+    return Math.round(ratio * 4) + 1;
+  }, []);
+
+  const handlePointerDown = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      isDraggingRef.current = true;
+      setIsDragging(true);
+      e.currentTarget.setPointerCapture(e.pointerId);
+      const level = getRiskFromPointer(e.clientX);
+      if (level !== null) setRiskLevel(level);
+    },
+    [getRiskFromPointer],
+  );
+
+  const handlePointerMove = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      if (!isDraggingRef.current) return;
+      const level = getRiskFromPointer(e.clientX);
+      if (level !== null) setRiskLevel(level);
+    },
+    [getRiskFromPointer],
+  );
+
+  const handlePointerUp = useCallback(() => {
+    isDraggingRef.current = false;
+    setIsDragging(false);
+  }, []);
 
   const { mutate: recommend, isPending } = useRecommend();
 
@@ -47,10 +88,6 @@ export function TripSettingsPanel() {
     },
     [],
   );
-
-  const handleRiskChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    setRiskLevel(parseInt(e.target.value, 10));
-  }, []);
 
   const handleUpdateRecommendations = useCallback(() => {
     const budget = parseInt(budgetInput.replace(/,/g, ""), 10);
@@ -156,25 +193,38 @@ export function TripSettingsPanel() {
             {RISK_LABELS[riskLevel] ?? "보통"}
           </span>
         </div>
-        <input
-          id="risk-slider"
-          type="range"
-          min={1}
-          max={5}
-          step={1}
-          value={riskLevel}
-          onChange={handleRiskChange}
-          className={cn(
-            "w-full h-2 rounded-lg appearance-none cursor-pointer",
-            "accent-blue-500",
-          )}
-          aria-label="위험도 허용 수준 슬라이더"
-          aria-valuemin={1}
-          aria-valuemax={5}
-          aria-valuenow={riskLevel}
-          aria-valuetext={RISK_LABELS[riskLevel]}
-        />
-        <div className="flex justify-between text-[10px] text-slate-400">
+        {/* 커스텀 슬라이더 */}
+        <div
+          ref={riskTrackRef}
+          className="relative py-3 px-0 mx-4 cursor-pointer select-none"
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+        >
+          {/* 트랙 */}
+          <div className="h-[2px] bg-slate-200" />
+          {/* 눈금 점 + 썸: 모두 left % + translateX(-50%)로 정렬 */}
+          {[1, 2, 3, 4, 5].map((i) => (
+            <div
+              key={i}
+              className="absolute top-1/2 w-1 h-1 rounded-full bg-slate-300 pointer-events-none"
+              style={{
+                left: `${(i - 1) * 25}%`,
+                transform: "translate(-50%, -50%)",
+              }}
+            />
+          ))}
+          {/* 썸 */}
+          <div
+            className="absolute top-1/2 w-3 h-3 bg-blue-500 rounded-full ring-2 ring-blue-200 shadow-sm pointer-events-none"
+            style={{
+              left: `${(riskLevel - 1) * 25}%`,
+              transform: "translate(-50%, -50%)",
+              transition: isDragging ? "none" : "left 0.18s ease",
+            }}
+          />
+        </div>
+        <div className="flex justify-between text-[10px] text-slate-400 px-1">
           <span>안전</span>
           <span>모험적</span>
         </div>
