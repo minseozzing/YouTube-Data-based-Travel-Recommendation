@@ -1,13 +1,23 @@
-import { useState } from 'react';
-import { useNavigate } from '@tanstack/react-router';
+import { createFileRoute, Outlet, useNavigate, useLocation } from '@tanstack/react-router';
+import { useState, useEffect } from 'react';
 import { motion, type Variants } from 'framer-motion';
-import { type LucideIcon, Globe, TrendingDown, Plane, ArrowRight, Sparkles, Star, Zap } from 'lucide-react';
+import {
+  type LucideIcon,
+  Globe, TrendingDown, Plane, ArrowRight, Sparkles, Star, Zap, Loader2, Bot, FlaskConical,
+} from 'lucide-react';
 import TopNavBar from '@/components/layout/TopNavBar';
 import Footer from '@/components/layout/Footer';
+import { Button } from '@/components/ui/button';
+import { useGoogleLogin } from '@/hooks/auth/useGoogleLogin';
+import { useAuthStore } from '@/stores/authStore';
 import introBg from '@/assets/treesky.jpg';
 import nukiImg from '@/assets/nuki.png';
+import maldiveImg from '@/assets/Maldive_beach_1.jpg';
 
-// ─── 애니메이션 variants ───────────────────────────────────────────
+// ─── Types ────────────────────────────────────────────────────────
+type Phase = 'intro' | 'leaving' | 'login';
+
+// ─── Intro 애니메이션 variants ────────────────────────────────────
 const fadeInUp: Variants = {
   hidden: { opacity: 0, y: 32 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } },
@@ -23,8 +33,8 @@ const scaleIn: Variants = {
   visible: { opacity: 1, scale: 1, transition: { duration: 0.5, ease: 'easeOut' } },
 };
 
-// ─── Feature 카드 데이터 ──────────────────────────────────────────
-const FEATURES = [
+// ─── Intro 데이터 ─────────────────────────────────────────────────
+const INTRO_FEATURES = [
   {
     icon: Globe,
     title: 'AI 여행 추천',
@@ -51,15 +61,38 @@ const FEATURES = [
   },
 ] as const;
 
-// ─── 통계 데이터 ──────────────────────────────────────────────────
 const STATS = [
   { value: '180+', label: '지원 국가' },
   { value: '50K+', label: '활성 사용자' },
   { value: '99%', label: '고객 만족도' },
 ] as const;
 
-// ─── FeatureCard 컴포넌트 ─────────────────────────────────────────
-interface FeatureCardProps {
+// ─── Login 데이터 ─────────────────────────────────────────────────
+const LOGIN_FEATURES = [
+  {
+    icon: Zap,
+    title: '빠르고 간편함',
+    description: 'Google 계정 하나로 가입과 로그인을 한 번에 완료하세요.',
+    accent: 'text-amber-500',
+    bg: 'bg-amber-50',
+  },
+  {
+    icon: Bot,
+    title: '실시간 도우미',
+    description: 'AI 여행 도우미가 최적의 일정을 실시간으로 제안합니다.',
+    accent: 'text-blue-500',
+    bg: 'bg-blue-50',
+  },
+] as const;
+
+const DUMMY_AVATARS = [
+  { id: 1, bg: 'bg-blue-400', initial: 'K' },
+  { id: 2, bg: 'bg-emerald-400', initial: 'J' },
+  { id: 3, bg: 'bg-violet-400', initial: 'M' },
+];
+
+// ─── Intro 서브 컴포넌트 ──────────────────────────────────────────
+interface IntroFeatureCardProps {
   icon: LucideIcon;
   title: string;
   description: string;
@@ -69,7 +102,7 @@ interface FeatureCardProps {
   index: number;
 }
 
-const FeatureCard = ({ icon: Icon, title, description, accentColor, glowColor, tag, index }: FeatureCardProps) => (
+const IntroFeatureCard = ({ icon: Icon, title, description, accentColor, glowColor, tag, index }: IntroFeatureCardProps) => (
   <motion.div
     variants={scaleIn}
     custom={index}
@@ -77,71 +110,48 @@ const FeatureCard = ({ icon: Icon, title, description, accentColor, glowColor, t
     className="group relative h-full"
     style={{ animationDelay: `${index * 0.1}s` }}
   >
-    {/* Liquid Glass 카드 */}
     <div
       className="relative h-full rounded-3xl p-px overflow-hidden"
-      style={{
-        background: `linear-gradient(135deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.06) 100%)`,
-      }}
+      style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.06) 100%)' }}
     >
-      {/* 테두리 그라데이션 */}
       <div
         className="absolute inset-0 rounded-3xl opacity-60 group-hover:opacity-100 transition-opacity duration-300"
-        style={{
-          background: `linear-gradient(135deg, ${accentColor}40, transparent 60%)`,
-        }}
+        style={{ background: `linear-gradient(135deg, ${accentColor}40, transparent 60%)` }}
         aria-hidden="true"
       />
-
-      {/* 카드 본체 */}
       <div
         className="relative h-full rounded-3xl p-7 flex flex-col gap-5"
         style={{
           background: 'rgba(15, 23, 42, 0.65)',
           backdropFilter: 'blur(24px) saturate(180%)',
           WebkitBackdropFilter: 'blur(24px) saturate(180%)',
-          boxShadow: `0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1)`,
+          boxShadow: '0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1)',
         }}
       >
-        {/* 태그 */}
         <div className="flex items-center justify-between">
           <span
             className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold tracking-wide uppercase"
-            style={{
-              background: `${accentColor}20`,
-              color: accentColor,
-              border: `1px solid ${accentColor}30`,
-            }}
+            style={{ background: `${accentColor}20`, color: accentColor, border: `1px solid ${accentColor}30` }}
           >
             {tag}
           </span>
           <Star className="size-3.5 opacity-0 group-hover:opacity-60 transition-opacity duration-300" style={{ color: accentColor }} aria-hidden="true" />
         </div>
-
-        {/* 아이콘 */}
         <div
           className="w-14 h-14 rounded-2xl flex items-center justify-center relative"
-          style={{
-            background: `linear-gradient(135deg, ${accentColor}25, ${accentColor}10)`,
-            boxShadow: `0 0 20px ${glowColor}, inset 0 1px 0 ${accentColor}30`,
-          }}
+          style={{ background: `linear-gradient(135deg, ${accentColor}25, ${accentColor}10)`, boxShadow: `0 0 20px ${glowColor}, inset 0 1px 0 ${accentColor}30` }}
         >
           <Icon className="size-7" style={{ color: accentColor }} aria-hidden="true" />
-          {/* 글로우 효과 */}
           <div
             className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-400"
             style={{ background: `radial-gradient(circle at 50% 50%, ${glowColor}, transparent 70%)` }}
             aria-hidden="true"
           />
         </div>
-
-        {/* 텍스트 */}
         <div className="flex flex-col gap-2 flex-1">
           <h3 className="text-lg font-bold text-white">{title}</h3>
           <p className="text-sm text-slate-400 leading-relaxed">{description}</p>
         </div>
-
-        {/* 하단 화살표 */}
         <div className="flex items-center gap-2 text-xs font-medium opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-0 group-hover:translate-x-1">
           <span style={{ color: accentColor }}>자세히 보기</span>
           <ArrowRight className="size-3" style={{ color: accentColor }} aria-hidden="true" />
@@ -151,79 +161,279 @@ const FeatureCard = ({ icon: Icon, title, description, accentColor, glowColor, t
   </motion.div>
 );
 
-// ─── IntroPage ────────────────────────────────────────────────────
-const IntroPage = () => {
-  const navigate = useNavigate();
-  const [isLeaving, setIsLeaving] = useState(false);
+// ─── Login 서브 컴포넌트 ──────────────────────────────────────────
+interface GoogleLoginButtonProps {
+  onClick: () => void;
+  isPending: boolean;
+}
 
-  const handleGoToLogin = () => {
-    setIsLeaving(true);
-    setTimeout(() => navigate({ to: '/login' }), 1600);
+const GoogleLoginButton = ({ onClick, isPending }: GoogleLoginButtonProps) => (
+  <Button
+    onClick={onClick}
+    disabled={isPending}
+    variant="outline"
+    size="lg"
+    className="w-full h-12 gap-3 border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-400 font-medium text-sm shadow-sm"
+    aria-label="Google 계정으로 로그인"
+  >
+    {isPending ? (
+      <Loader2 className="size-5 animate-spin text-gray-500" aria-hidden="true" />
+    ) : (
+      <svg className="size-5 shrink-0" viewBox="0 0 24 24" aria-hidden="true" role="img">
+        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
+        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05" />
+        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
+      </svg>
+    )}
+    <span>{isPending ? '이동 중...' : 'Google 계정으로 계속하기'}</span>
+  </Button>
+);
+
+interface LoginFeatureItemProps {
+  icon: LucideIcon;
+  title: string;
+  description: string;
+  accent: string;
+  bg: string;
+}
+
+const LoginFeatureItem = ({ icon: Icon, title, description, accent, bg }: LoginFeatureItemProps) => (
+  <div className="flex flex-col gap-2 p-4 rounded-xl border border-gray-100 bg-white shadow-xs">
+    <div className={`w-8 h-8 rounded-lg ${bg} flex items-center justify-center`}>
+      <Icon className={`size-4 ${accent}`} aria-hidden="true" />
+    </div>
+    <p className="text-sm font-semibold text-gray-800">{title}</p>
+    <p className="text-xs text-gray-500 leading-relaxed">{description}</p>
+  </div>
+);
+
+const AvatarGroup = () => (
+  <div className="flex items-center gap-3">
+    <div className="flex -space-x-2" aria-label="함께하는 여행자들">
+      {DUMMY_AVATARS.map((avatar) => (
+        <div
+          key={avatar.id}
+          className={`w-8 h-8 rounded-full ${avatar.bg} border-2 border-white flex items-center justify-center text-white text-xs font-semibold`}
+          aria-hidden="true"
+        >
+          {avatar.initial}
+        </div>
+      ))}
+    </div>
+    <p className="text-sm text-white/90 font-medium">10,000+ 여행자와 함께</p>
+  </div>
+);
+
+const RightImagePanel = () => (
+  <div className="relative h-full min-h-[280px] lg:min-h-0 overflow-hidden">
+    <img
+      src={maldiveImg}
+      alt="말디브 해변 — 프리미엄 여행지"
+      className="absolute inset-0 w-full h-full object-cover"
+    />
+    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/10" aria-hidden="true" />
+    <div className="absolute inset-0 flex flex-col justify-between p-8">
+      <div>
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 px-3 py-1 text-xs font-medium text-white">
+          ✦ 프리미엄 여행 플래너
+        </span>
+      </div>
+      <div className="flex flex-col gap-6">
+        <div>
+          <h2 className="text-3xl font-bold text-white leading-snug">프리미엄 여행의 시작</h2>
+          <p className="mt-2 text-sm text-white/80">예산과 취향에 맞는 완벽한 여행지를 설계하세요.</p>
+        </div>
+        <AvatarGroup />
+      </div>
+    </div>
+  </div>
+);
+
+// ─── LoginCardContent ─────────────────────────────────────────────
+// hooks를 여기서 호출 (항상 마운트되어 있음)
+const LoginCardContent = () => {
+  const { mutate: loginWithGoogle, isPending } = useGoogleLogin();
+  const { setAccessToken, setUser, setHasCompletedPreference } = useAuthStore();
+  const navigate = useNavigate();
+
+  const handleDevLogin = () => {
+    setAccessToken('dev-mock-token');
+    setUser({ id: 1, email: 'dev@dahaeng.com', name: '개발자', profileImageUrl: '' });
+    setHasCompletedPreference(true);
+    navigate({ to: '/main' });
   };
 
   return (
+    <>
+      {/* 좌측 패널 */}
+      <div className="flex flex-col w-full lg:w-[52%] px-8 sm:px-10 lg:px-12 py-5 lg:py-7">
+        <div className="mb-5">
+          <a
+            href="/"
+            className="text-2xl font-bold text-gray-900 no-underline hover:text-gray-700 transition-colors"
+            aria-label="다행 홈으로 이동"
+          >
+            다행
+          </a>
+        </div>
+        <div className="flex-1 flex flex-col justify-center max-w-md">
+          <div className="mb-5">
+            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 leading-tight">
+              다음 여행을<br />계획해 보세요.
+            </h1>
+            <p className="mt-3 text-base text-gray-500">다행과 함께 당신만의 여행을 설계하세요</p>
+          </div>
+
+          <div className="mb-3">
+            <GoogleLoginButton onClick={() => loginWithGoogle()} isPending={isPending} />
+          </div>
+
+          {import.meta.env.DEV && (
+            <div className="mb-6">
+              <Button
+                onClick={handleDevLogin}
+                variant="outline"
+                size="lg"
+                className="w-full h-10 gap-2 border-dashed border-amber-400 bg-amber-50 text-amber-700 hover:bg-amber-100 text-sm font-medium"
+              >
+                <FlaskConical className="size-4" aria-hidden="true" />
+                개발 모드로 입장 (백엔드 없이)
+              </Button>
+            </div>
+          )}
+
+          <div className="relative flex items-center gap-4 mb-6" aria-hidden="true">
+            <div className="flex-1 h-px bg-gray-200" />
+            <span className="text-xs text-gray-400 font-medium">또는</span>
+            <div className="flex-1 h-px bg-gray-200" />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            {LOGIN_FEATURES.map((feature) => (
+              <LoginFeatureItem key={feature.title} {...feature} />
+            ))}
+          </div>
+
+          <p className="mt-5 text-xs text-gray-400 leading-relaxed">
+            로그인하면 다행의{' '}
+            <a href="#" className="underline hover:text-gray-600 transition-colors">서비스 이용약관</a>{' '}
+            및{' '}
+            <a href="#" className="underline hover:text-gray-600 transition-colors">개인정보처리방침</a>
+            에 동의하게 됩니다.
+          </p>
+        </div>
+
+        <p className="mt-auto pt-4 text-xs text-gray-400">&copy; 2026 다행. All rights reserved.</p>
+      </div>
+
+      {/* 우측 패널 */}
+      <div className="hidden lg:block lg:w-[48%]">
+        <RightImagePanel />
+      </div>
+    </>
+  );
+};
+
+// ─── AuthLayout ───────────────────────────────────────────────────
+const AuthLayout = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const [phase, setPhase] = useState<Phase>(() =>
+    location.pathname === '/login' ? 'login' : 'intro'
+  );
+
+  // 브라우저 뒤로가기 등 URL 변경 시 phase 동기화
+  useEffect(() => {
+    if (location.pathname === '/' && phase !== 'intro') {
+      setPhase('intro');
+    } else if (location.pathname === '/login' && phase === 'intro') {
+      setPhase('login');
+    }
+  }, [location.pathname]);
+
+  // login phase일 때 body 스크롤 차단
+  useEffect(() => {
+    document.body.style.overflow = phase === 'login' ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [phase]);
+
+  const handleGoToLogin = () => {
+    if (phase !== 'intro') return;
+    setPhase('leaving');
+    setTimeout(() => {
+      setPhase('login');
+      navigate({ to: '/login' });
+    }, 1300);
+  };
+
+  const isIntro = phase === 'intro';
+  const isLeaving = phase === 'leaving';
+  const isLogin = phase === 'login';
+
+  // 카드 초기 위치: 직접 /login 접속 시 center, 그 외엔 off-screen
+  const cardInitial = isLogin ? { x: 0, y: 0, opacity: 1 } : { x: -770, y: 640, opacity: 0 };
+
+  return (
     <div className="min-h-screen flex flex-col relative w-full bg-transparent overflow-hidden" style={{ zIndex: 0 }}>
-      {/* Background Image Layer - 페이지와 함께 스크롤 */}
+      {/* Background */}
       <div
         className="absolute inset-0 bg-cover bg-center"
-        style={{
-          backgroundImage: `url(${introBg})`,
-          zIndex: -2,
-        }}
-        aria-hidden="true"
-      />
-      {/* Nuki 오버레이 - 좌측 상단, 버튼 클릭 시 우측 상단으로 날아감 */}
-      <motion.img
-        src={nukiImg}
-        className="absolute top-0 left-0 pointer-events-none"
-        style={{ zIndex: -1 }}
-        animate={isLeaving ? { x: 770, y: -640, scale: 1.5 } : { x: 0, y: 0, scale: 1 }}
-        transition={{ duration: 1.3, ease: [0.2, 0, 1, 0.8] }}
-        alt=""
+        style={{ backgroundImage: `url(${introBg})`, zIndex: -2 }}
         aria-hidden="true"
       />
 
+      {/* Nuki — login phase에서는 숨김 */}
+      {!isLogin && (
+        <motion.img
+          src={nukiImg}
+          className="fixed top-0 left-0 pointer-events-none"
+          style={{ zIndex: isLeaving ? 30 : 5 }}
+          animate={isLeaving ? { x: 2200, y: -1800, scale: 1.5 } : { x: 0, y: 0, scale: 1 }}
+          transition={{ duration: 1.6, ease: [0.2, 0, 1, 0.8] }}
+          alt=""
+          aria-hidden="true"
+        />
+      )}
 
       <div className="relative z-10 flex flex-col min-h-screen">
         <TopNavBar />
 
+        {/* ── Intro 콘텐츠 ── */}
         <motion.main
           className="flex-1 w-full"
-          animate={isLeaving ? { opacity: 0, y: -16 } : { opacity: 1, y: 0 }}
+          animate={!isIntro ? { opacity: 0, y: -16 } : { opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: 'easeIn' }}
+          style={{ pointerEvents: !isIntro ? 'none' : 'auto' }}
         >
-          {/* ── Hero 섹션 ── */}
+          {/* Hero 섹션 */}
           <section
             className="relative w-full overflow-hidden flex flex-col justify-center"
             aria-labelledby="hero-headline"
             style={{ minHeight: '100vh' }}
           >
-
-            {/* 그리드 패턴 오버레이 */}
             <div
               className="absolute inset-0 opacity-[0.04]"
               style={{
                 backgroundImage: `
-                linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)
-              `,
+                  linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px),
+                  linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)
+                `,
                 backgroundSize: '80px 80px',
               }}
               aria-hidden="true"
             />
 
-            {/* 12컬럼 그리드 컨테이너 */}
             <div className="relative w-full px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 pt-20 pb-12 sm:pt-24 sm:pb-16 lg:pt-28 lg:pb-20">
-              {/* 12컬럼 그리드 */}
               <div className="grid grid-cols-12 gap-4 items-center">
-                {/* 왼쪽 콘텐츠: col 1-7 */}
+                {/* 좌측 콘텐츠 */}
                 <motion.div
                   className="col-span-12 lg:col-span-7 flex flex-col gap-8"
                   variants={staggerContainer}
                   initial="hidden"
                   animate="visible"
                 >
-                  {/* 배지 */}
                   <motion.div variants={fadeInUp}>
                     <span
                       className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold"
@@ -241,7 +451,6 @@ const IntroPage = () => {
                     </span>
                   </motion.div>
 
-                  {/* 헤드라인 및 서브 카피 묶음 (Liquid Glass 적용) */}
                   <motion.div
                     variants={fadeInUp}
                     className="p-7 sm:p-10 rounded-[2.5rem] flex flex-col gap-6 backdrop-blur-xl group"
@@ -252,7 +461,6 @@ const IntroPage = () => {
                       maxWidth: 'fit-content',
                     }}
                   >
-                    {/* 헤드라인 */}
                     <h1
                       id="hero-headline"
                       className="font-black leading-[1.1] tracking-tighter"
@@ -274,8 +482,6 @@ const IntroPage = () => {
                         스마트하고 완벽하게 설계하세요
                       </span>
                     </h1>
-
-                    {/* 서브 카피 */}
                     <p
                       className="text-slate-200 font-bold leading-relaxed"
                       style={{ fontSize: 'clamp(1rem, 1.25vw, 1.25rem)', maxWidth: '540px' }}
@@ -286,12 +492,10 @@ const IntroPage = () => {
                     </p>
                   </motion.div>
 
-                  {/* CTA 버튼 그룹 */}
                   <motion.div
                     variants={fadeInUp}
                     className="flex flex-col sm:flex-row items-start sm:items-center gap-4 pt-2"
                   >
-                    {/* Primary CTA */}
                     <button
                       type="button"
                       onClick={handleGoToLogin}
@@ -304,7 +508,6 @@ const IntroPage = () => {
                         justifyContent: 'center',
                       }}
                     >
-                      {/* 호버 글로우 */}
                       <span
                         className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                         style={{ background: 'linear-gradient(135deg, #fb923c 0%, #f97316 50%, #f43f5e 100%)' }}
@@ -314,7 +517,6 @@ const IntroPage = () => {
                       <ArrowRight className="relative size-5 group-hover:translate-x-1 transition-transform duration-200" aria-hidden="true" />
                     </button>
 
-                    {/* Secondary CTA */}
                     <a
                       href="#features"
                       className="group inline-flex items-center gap-3 px-8 py-4 rounded-2xl font-semibold text-base no-underline"
@@ -344,21 +546,17 @@ const IntroPage = () => {
                     </a>
                   </motion.div>
 
-                  {/* 통계 지표 */}
                   <motion.div variants={fadeInUp} className="flex items-center gap-8 pt-2">
-                    {STATS.map((stat, i) => (
+                    {STATS.map((stat) => (
                       <div key={stat.label} className="flex flex-col gap-0.5">
                         <span className="text-2xl font-black text-white tracking-tight">{stat.value}</span>
                         <span className="text-xs text-slate-500 font-medium uppercase tracking-wider">{stat.label}</span>
-                        {i < STATS.length - 1 && (
-                          <span className="absolute" aria-hidden="true" />
-                        )}
                       </div>
                     ))}
                   </motion.div>
                 </motion.div>
 
-                {/* 오른쪽 Liquid Glass 장식 카드: col 9-12 */}
+                {/* 우측 장식 카드 */}
                 <motion.div
                   className="col-span-12 lg:col-span-5 flex items-center justify-center lg:justify-end"
                   initial={{ opacity: 0, x: 40 }}
@@ -366,7 +564,6 @@ const IntroPage = () => {
                   transition={{ duration: 0.8, delay: 0.4, ease: 'easeOut' }}
                 >
                   <div className="relative w-full max-w-sm lg:max-w-md">
-                    {/* 배경 글로우 */}
                     <div
                       className="absolute inset-0 rounded-[2rem]"
                       style={{
@@ -376,8 +573,6 @@ const IntroPage = () => {
                       }}
                       aria-hidden="true"
                     />
-
-                    {/* 메인 Liquid Glass 패널 */}
                     <div
                       className="relative rounded-[2rem] p-6 sm:p-8"
                       style={{
@@ -385,32 +580,17 @@ const IntroPage = () => {
                         backdropFilter: 'blur(40px) saturate(200%) brightness(1.1)',
                         WebkitBackdropFilter: 'blur(40px) saturate(200%) brightness(1.1)',
                         border: '1px solid rgba(255,255,255,0.12)',
-                        boxShadow: `
-                          0 32px 64px rgba(0,0,0,0.5),
-                          0 0 0 1px rgba(255,255,255,0.05),
-                          inset 0 1px 0 rgba(255,255,255,0.15),
-                          inset 0 -1px 0 rgba(0,0,0,0.2)
-                        `,
+                        boxShadow: '0 32px 64px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05), inset 0 1px 0 rgba(255,255,255,0.15), inset 0 -1px 0 rgba(0,0,0,0.2)',
                       }}
                     >
-                      {/* 상단 글로우 라인 */}
                       <div
                         className="absolute top-0 left-1/2 -translate-x-1/2 rounded-b-full"
-                        style={{
-                          width: '60%',
-                          height: '1px',
-                          background: 'linear-gradient(90deg, transparent, rgba(99,163,250,0.8), transparent)',
-                        }}
+                        style={{ width: '60%', height: '1px', background: 'linear-gradient(90deg, transparent, rgba(99,163,250,0.8), transparent)' }}
                         aria-hidden="true"
                       />
-
-                      {/* 미니 스탯 아이템들 */}
                       <div className="flex flex-col gap-4">
                         <div className="flex items-center gap-3 mb-2">
-                          <div
-                            className="w-8 h-8 rounded-xl flex items-center justify-center"
-                            style={{ background: 'rgba(59,130,246,0.2)' }}
-                          >
+                          <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: 'rgba(59,130,246,0.2)' }}>
                             <Globe className="size-4 text-blue-400" aria-hidden="true" />
                           </div>
                           <div>
@@ -418,8 +598,6 @@ const IntroPage = () => {
                             <div className="text-slate-500 text-xs">도쿄 · 파리 · 발리 비교</div>
                           </div>
                         </div>
-
-                        {/* 프로그레스 바들 */}
                         {[
                           { label: '도쿄', value: 88, color: '#3b82f6' },
                           { label: '파리', value: 72, color: '#8b5cf6' },
@@ -430,10 +608,7 @@ const IntroPage = () => {
                               <span className="text-slate-400 text-xs">{item.label}</span>
                               <span className="text-white text-xs font-bold">{item.value}점</span>
                             </div>
-                            <div
-                              className="h-2 w-full rounded-full overflow-hidden"
-                              style={{ background: 'rgba(255,255,255,0.08)' }}
-                            >
+                            <div className="h-2 w-full rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.08)' }}>
                               <motion.div
                                 className="h-full rounded-full"
                                 style={{ background: `linear-gradient(90deg, ${item.color}, ${item.color}80)` }}
@@ -444,15 +619,7 @@ const IntroPage = () => {
                             </div>
                           </div>
                         ))}
-
-                        {/* 구분선 */}
-                        <div
-                          className="my-1"
-                          style={{ height: '1px', background: 'rgba(255,255,255,0.07)' }}
-                          aria-hidden="true"
-                        />
-
-                        {/* 항공권 최저가 표시 */}
+                        <div className="my-1" style={{ height: '1px', background: 'rgba(255,255,255,0.07)' }} aria-hidden="true" />
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <Plane className="size-4 text-blue-400" aria-hidden="true" />
@@ -465,34 +632,18 @@ const IntroPage = () => {
                         </div>
                       </div>
                     </div>
-
-                    {/* 플로팅 미니 카드 - 왼쪽 아래 */}
                     <motion.div
                       className="absolute -bottom-4 -left-4 rounded-2xl px-4 py-3"
-                      style={{
-                        background: 'rgba(16,185,129,0.15)',
-                        backdropFilter: 'blur(20px)',
-                        WebkitBackdropFilter: 'blur(20px)',
-                        border: '1px solid rgba(16,185,129,0.25)',
-                        boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
-                      }}
+                      style={{ background: 'rgba(16,185,129,0.15)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(16,185,129,0.25)', boxShadow: '0 8px 24px rgba(0,0,0,0.3)' }}
                       animate={{ y: [0, -6, 0] }}
                       transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
                     >
                       <div className="text-emerald-400 font-black text-sm">34% 절약</div>
                       <div className="text-slate-400 text-xs">AI 추천 플랜 기준</div>
                     </motion.div>
-
-                    {/* 플로팅 미니 카드 - 오른쪽 위 */}
                     <motion.div
                       className="absolute -top-4 -right-2 rounded-2xl px-4 py-3"
-                      style={{
-                        background: 'rgba(99,102,241,0.15)',
-                        backdropFilter: 'blur(20px)',
-                        WebkitBackdropFilter: 'blur(20px)',
-                        border: '1px solid rgba(99,102,241,0.25)',
-                        boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
-                      }}
+                      style={{ background: 'rgba(99,102,241,0.15)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(99,102,241,0.25)', boxShadow: '0 8px 24px rgba(0,0,0,0.3)' }}
                       animate={{ y: [0, 6, 0] }}
                       transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
                     >
@@ -505,29 +656,21 @@ const IntroPage = () => {
             </div>
           </section>
 
-          {/* ── Feature 섹션 ── */}
-          <section
-            id="features"
-            className="relative w-full overflow-hidden"
-            aria-labelledby="features-headline"
-          >
-            {/* 배경 장식 */}
+          {/* Feature 섹션 */}
+          <section id="features" className="relative w-full overflow-hidden" aria-labelledby="features-headline">
             <div
               className="absolute inset-0 opacity-[0.03]"
               style={{
                 backgroundImage: `
-                linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)
-              `,
+                  linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px),
+                  linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)
+                `,
                 backgroundSize: '80px 80px',
               }}
               aria-hidden="true"
             />
-
             <div className="relative w-full px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 py-24 sm:py-32">
-              {/* 12컬럼 그리드 */}
               <div className="grid grid-cols-12 gap-4">
-                {/* 섹션 헤더: 가운데 col 3-10 */}
                 <motion.div
                   className="col-span-12 lg:col-span-8 lg:col-start-3 text-center flex flex-col gap-4 mb-16"
                   initial={{ opacity: 0, y: 24 }}
@@ -537,11 +680,7 @@ const IntroPage = () => {
                 >
                   <span
                     className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-widest self-center"
-                    style={{
-                      background: 'rgba(99,102,241,0.12)',
-                      border: '1px solid rgba(99,102,241,0.3)',
-                      color: '#818cf8',
-                    }}
+                    style={{ background: 'rgba(99,102,241,0.12)', border: '1px solid rgba(99,102,241,0.3)', color: '#818cf8' }}
                   >
                     <Sparkles className="size-3" aria-hidden="true" />
                     핵심 기능
@@ -552,26 +691,17 @@ const IntroPage = () => {
                     style={{ fontSize: 'clamp(2rem, 3.5vw, 3.5rem)' }}
                   >
                     왜{' '}
-                    <span
-                      style={{
-                        backgroundImage: 'linear-gradient(135deg, #fde047, #f97316)',
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent',
-                        backgroundClip: 'text',
-                      }}
-                    >
+                    <span style={{ backgroundImage: 'linear-gradient(135deg, #fde047, #f97316)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
                       다행
                     </span>
                     인가요?
                   </h2>
                   <p className="text-white leading-relaxed" style={{ fontSize: 'clamp(1rem, 1.1vw, 1.15rem)' }}>
-                    여행 계획의 처음부터 끝까지, 다행이 함께합니다.
-                    <br />
+                    여행 계획의 처음부터 끝까지, 다행이 함께합니다.<br />
                     AI 분석부터 실시간 예약까지 원스톱으로 해결하세요.
                   </p>
                 </motion.div>
 
-                {/* 카드 그리드: 3열 (각 4컬럼) */}
                 <motion.div
                   className="col-span-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
                   variants={staggerContainer}
@@ -579,22 +709,18 @@ const IntroPage = () => {
                   whileInView="visible"
                   viewport={{ once: true, margin: '-60px' }}
                 >
-                  {FEATURES.map((feature, idx) => (
-                    <FeatureCard key={feature.title} {...feature} index={idx} />
+                  {INTRO_FEATURES.map((feature, idx) => (
+                    <IntroFeatureCard key={feature.title} {...feature} index={idx} />
                   ))}
                 </motion.div>
               </div>
             </div>
           </section>
 
-          {/* ── CTA 배너 섹션 ── */}
-          <section
-            className="relative w-full overflow-hidden py-12"
-          >
-
+          {/* CTA 배너 섹션 */}
+          <section className="relative w-full overflow-hidden py-12">
             <div className="relative w-full px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 py-24 sm:py-32">
               <div className="grid grid-cols-12 gap-4">
-                {/* CTA 카드: col 2-11 */}
                 <motion.div
                   className="col-span-12 lg:col-span-10 lg:col-start-2"
                   initial={{ opacity: 0, y: 32 }}
@@ -609,48 +735,24 @@ const IntroPage = () => {
                       backdropFilter: 'blur(40px) saturate(180%)',
                       WebkitBackdropFilter: 'blur(40px) saturate(180%)',
                       border: '1px solid rgba(255,255,255,0.1)',
-                      boxShadow: `
-                      0 40px 80px rgba(0,0,0,0.5),
-                      inset 0 1px 0 rgba(255,255,255,0.12),
-                      0 0 0 1px rgba(59,130,246,0.1)
-                    `,
+                      boxShadow: '0 40px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.12), 0 0 0 1px rgba(59,130,246,0.1)',
                     }}
                   >
-                    {/* 배경 글로우 */}
                     <div
                       className="absolute inset-0"
-                      style={{
-                        background: 'radial-gradient(ellipse 60% 80% at 80% 50%, rgba(59,130,246,0.08) 0%, transparent 60%)',
-                      }}
+                      style={{ background: 'radial-gradient(ellipse 60% 80% at 80% 50%, rgba(59,130,246,0.08) 0%, transparent 60%)' }}
                       aria-hidden="true"
                     />
-
-                    {/* 상단 글로우 라인 */}
                     <div
                       className="absolute top-0 left-1/2 -translate-x-1/2"
-                      style={{
-                        width: '40%',
-                        height: '1px',
-                        background: 'linear-gradient(90deg, transparent, rgba(99,163,250,0.7), transparent)',
-                      }}
+                      style={{ width: '40%', height: '1px', background: 'linear-gradient(90deg, transparent, rgba(99,163,250,0.7), transparent)' }}
                       aria-hidden="true"
                     />
-
                     <div className="relative flex flex-col lg:flex-row items-center justify-between gap-10">
                       <div className="text-center lg:text-left flex flex-col gap-3">
-                        <h2
-                          className="font-black text-white tracking-tight"
-                          style={{ fontSize: 'clamp(1.8rem, 3vw, 2.8rem)' }}
-                        >
+                        <h2 className="font-black text-white tracking-tight" style={{ fontSize: 'clamp(1.8rem, 3vw, 2.8rem)' }}>
                           지금 바로 여행을{' '}
-                          <span
-                            style={{
-                              backgroundImage: 'linear-gradient(135deg, #fde047, #f97316)',
-                              WebkitBackgroundClip: 'text',
-                              WebkitTextFillColor: 'transparent',
-                              backgroundClip: 'text',
-                            }}
-                          >
+                          <span style={{ backgroundImage: 'linear-gradient(135deg, #fde047, #f97316)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
                             시작하세요
                           </span>
                         </h2>
@@ -658,7 +760,6 @@ const IntroPage = () => {
                           무료로 가입하고 AI 맞춤 추천을 경험하세요. 카드 등록 없이 바로 시작 가능합니다.
                         </p>
                       </div>
-
                       <div className="flex flex-col sm:flex-row gap-4 shrink-0">
                         <button
                           type="button"
@@ -689,14 +790,40 @@ const IntroPage = () => {
         </motion.main>
 
         <motion.div
-          animate={isLeaving ? { opacity: 0 } : { opacity: 1 }}
+          animate={!isIntro ? { opacity: 0 } : { opacity: 1 }}
           transition={{ duration: 0.3, ease: 'easeIn' }}
+          style={{ pointerEvents: !isIntro ? 'none' : 'auto' }}
         >
           <Footer />
         </motion.div>
+
+        <Outlet />
       </div>
-    </div >
+
+      {/* ── Login 카드 — 항상 마운트, GPU 레이어 ── */}
+      <div
+        className="fixed left-0 right-0 bottom-0 flex items-start justify-center px-4 py-6"
+        style={{
+          top: '64px',
+          zIndex: !isIntro ? 20 : 2,
+          pointerEvents: !isIntro ? 'auto' : 'none',
+          overflow: 'hidden',
+        }}
+      >
+        <motion.div
+          className="w-full max-w-[1400px] mx-auto bg-white rounded-[2.5rem] shadow-2xl border border-slate-100 overflow-hidden flex flex-col lg:flex-row"
+          initial={cardInitial}
+          animate={!isIntro ? { x: 0, y: 0, opacity: 1 } : { x: -770, y: 640, opacity: 0 }}
+          transition={!isIntro ? { duration: 1.4, ease: [0, 0.2, 0.8, 1] } : { duration: 0 }}
+          style={{ willChange: 'transform', maxHeight: 'calc(100vh - 148px)' }}
+        >
+          <LoginCardContent />
+        </motion.div>
+      </div>
+    </div>
   );
 };
 
-export default IntroPage;
+export const Route = createFileRoute('/_auth')({
+  component: AuthLayout,
+});

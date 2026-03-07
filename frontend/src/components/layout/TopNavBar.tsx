@@ -70,14 +70,15 @@ const TopNavBar = () => {
           'border-b border-white/10',
           'transition-all duration-150 ease-in-out text-white',
         )}
-        style={{ backdropFilter: 'blur(20px) saturate(180%)', WebkitBackdropFilter: 'blur(20px) saturate(180%)', backgroundColor: 'rgba(255,255,255,0.08)' }}
+        style={{ backdropFilter: 'blur(20px) saturate(180%)', WebkitBackdropFilter: 'blur(20px) saturate(180%)', backgroundColor: 'rgba(10, 17, 40, 0.55)' }}
         aria-label="주요 네비게이션"
       >
         <div className="flex items-center justify-between w-full h-full px-4 sm:px-6 lg:px-8">
           {/* 로고 */}
           <Link
             to="/"
-            className="text-xl sm:text-2xl font-black text-white hover:text-white/80 transition-all no-underline tracking-tighter shrink-0"
+            className="text-xl sm:text-2xl font-black !text-white hover:!text-white/80 transition-all no-underline tracking-tighter shrink-0"
+            style={{ color: 'white', fontWeight: 900 }}
             aria-label="다행 홈으로 이동"
             onClick={closeMobileMenu}
           >
@@ -91,7 +92,8 @@ const TopNavBar = () => {
                 <Link
                   key={link.to}
                   to={link.to}
-                  className="px-3 py-2 text-sm font-semibold text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-all no-underline"
+                  className="px-3 py-2 text-sm font-bold !text-white hover:!text-white/80 hover:bg-white/10 rounded-lg transition-all no-underline"
+                  style={{ color: 'white', fontWeight: 700 }}
                 >
                   {link.label}
                 </Link>
@@ -105,7 +107,8 @@ const TopNavBar = () => {
               <>
                 <Link
                   to="/mypage"
-                  className="p-2 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-all no-underline flex items-center"
+                  className="p-2 !text-white hover:!text-white/80 hover:bg-white/10 rounded-lg transition-all no-underline flex items-center"
+                  style={{ color: 'white' }}
                   aria-label="마이페이지"
                 >
                   <User className="size-4" aria-hidden="true" />
@@ -116,7 +119,7 @@ const TopNavBar = () => {
                   onClick={() => logout()}
                   disabled={isPending}
                   aria-label="로그아웃"
-                  className="text-white/80 hover:text-white hover:bg-white/10"
+                  className="text-white hover:text-white/80 hover:bg-white/10 font-bold"
                 >
                   {isPending ? (
                     <Loader2 className="size-4 animate-spin" aria-hidden="true" />
@@ -129,22 +132,20 @@ const TopNavBar = () => {
                 </Button>
               </>
             ) : (
-              <Button
-                asChild
-                size="sm"
-                className="rounded-full bg-white/20 hover:bg-white/30 text-white border border-white/30 px-6 font-bold"
+              <Link
+                to="/login"
+                className="no-underline inline-flex items-center justify-center rounded-full border border-white/30 px-6 py-1.5 text-sm font-bold transition-all hover:bg-white/30"
+                style={{ color: 'white', fontWeight: 700, background: 'rgba(255,255,255,0.2)' }}
               >
-                <Link to="/login" className="no-underline">
-                  로그인
-                </Link>
-              </Button>
+                로그인
+              </Link>
             )}
           </div>
 
           {/* 모바일 햄버거 버튼 (md 미만) */}
           <button
             type="button"
-            className="md:hidden p-2 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-all"
+            className="md:hidden p-2 rounded-lg text-white hover:text-white/80 hover:bg-white/10 transition-all"
             onClick={toggleMobileMenu}
             aria-label={isMobileMenuOpen ? '메뉴 닫기' : '메뉴 열기'}
             aria-expanded={isMobileMenuOpen}

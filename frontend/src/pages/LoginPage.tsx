@@ -5,6 +5,8 @@ import { useGoogleLogin } from '@/hooks/auth/useGoogleLogin';
 import { useAuthStore } from '@/stores/authStore';
 import { useNavigate } from '@tanstack/react-router';
 import maldiveImg from '@/assets/Maldive_beach_1.jpg';
+import TopNavBar from '@/components/layout/TopNavBar';
+import introBg from '@/assets/treesky.jpg';
 
 // ─── 애니메이션 variants ──────────────────────────────────────────
 const fadeInUp: Variants = {
@@ -14,7 +16,8 @@ const fadeInUp: Variants = {
 
 const staggerContainer = {
   hidden: {},
-  visible: { transition: { staggerChildren: 0.1, delayChildren: 0.1 } },
+  // 카드가 도착(1.3s)한 뒤에 내부 콘텐츠 애니메이션 시작
+  visible: { transition: { staggerChildren: 0.08, delayChildren: 1.35 } },
 };
 
 // ─── 더미 아바타 데이터 ───────────────────────────────────────────
@@ -179,10 +182,22 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50">
-      {/* 가운데 정렬된 카드 레이아웃 */}
-      <div className="flex-1 flex items-center justify-center px-4 py-10">
-        <div className="w-full max-w-[1400px] mx-auto bg-white rounded-[2.5rem] shadow-2xl border border-slate-100 overflow-hidden flex flex-col lg:flex-row min-h-[520px]">
+    <div
+      className="min-h-screen flex flex-col relative overflow-hidden"
+      style={{ backgroundImage: `url(${introBg})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+    >
+
+      <TopNavBar />
+
+      {/* 카드만 좌측하단에서 날아들어옴 */}
+      <div className="relative flex-1 flex items-center justify-center px-4 py-10 pt-24" style={{ zIndex: 1 }}>
+        <motion.div
+          className="w-full max-w-[1400px] mx-auto bg-white rounded-[2.5rem] shadow-2xl border border-slate-100 overflow-hidden flex flex-col lg:flex-row min-h-[520px]"
+          initial={{ x: -770, y: 640, opacity: 0 }}
+          animate={{ x: 0, y: 0, opacity: 1 }}
+          transition={{ duration: 1.2, delay: 0.1, ease: [0, 0.2, 0.8, 1] }}
+          style={{ willChange: 'transform' }}
+        >
           {/* ── 좌측 패널 (로그인 폼) ── */}
           <motion.div
             className="flex flex-col w-full lg:w-[52%] px-8 sm:px-10 lg:px-12 py-8 lg:py-10"
@@ -291,7 +306,7 @@ const LoginPage = () => {
           <div className="hidden lg:block lg:w-[48%]">
             <RightImagePanel />
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
