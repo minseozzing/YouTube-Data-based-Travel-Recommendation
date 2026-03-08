@@ -96,16 +96,37 @@ def load_mapping() -> List[Dict]:
         return json.load(f)
 
 
-def load_checkpoint() -> set:
-    if CHECKPOINT_FILE.exists():
+def load_checkpoint(for_date: str) -> set:
+    if not CHECKPOINT_FILE.exists():
+        return set()
+
+    try:
         with CHECKPOINT_FILE.open("r", encoding="utf-8") as f:
-            return set(json.load(f))
+            data = json.load(f)
+    except Exception:
+        return set()
+
+    if isinstance(data, dict):
+        if data.get("date") != for_date:
+            return set()
+        items = data.get("done", [])
+        return set(items) if isinstance(items, list) else set()
+
+    if isinstance(data, list):
+        # Legacy format: treat as empty by default to avoid blocking new-day runs.
+        allow_legacy = os.getenv("ALLOW_LEGACY_CHECKPOINT", "0") == "1"
+        if allow_legacy:
+            return set(data)
+        print("  [Info] legacy checkpoint format detected; ignoring (set ALLOW_LEGACY_CHECKPOINT=1 to use).")
+        return set()
+
     return set()
 
 
-def save_checkpoint(done_keys: set) -> None:
+def save_checkpoint(done_keys: set, for_date: str) -> None:
+    payload = {"date": for_date, "done": sorted(done_keys)}
     with CHECKPOINT_FILE.open("w", encoding="utf-8") as f:
-        json.dump(sorted(done_keys), f, ensure_ascii=False)
+        json.dump(payload, f, ensure_ascii=False)
 
 
 def build_routes(mapping: List[Dict]) -> List[Dict]:
@@ -915,8 +936,26 @@ async def main() -> None:
         )
 
     all_routes = build_routes(mapping)
-    done_keys = load_checkpoint()
-    pending = [route for route in all_routes if route["route_key"] not in done_keys]
+    done_keys = load_checkpoint(dt_str)
+    if os.getenv("IGNORE_CHECKPOINT", "0") == "1":
+        print("  [Info] IGNORE_CHECKPOINT=1 -> skip checkpoint filtering")
+        done_keys = set()
+
+    route_filter = (os.getenv("ROUTE_FILTER") or "").strip()
+    filtered_routes = all_routes
+    if route_filter:
+        needle = route_filter.lower()
+        filtered_routes = [
+            r
+            for r in all_routes
+            if needle in r["route_key"].lower()
+            or needle in r["label"].lower()
+            or needle in r["city_code"].lower()
+            or needle in r["city_name_kr"].lower()
+        ]
+        print(f"  [Info] ROUTE_FILTER='{route_filter}' -> {len(filtered_routes)} routes")
+
+    pending = [route for route in filtered_routes if route["route_key"] not in done_keys]
 
     route_limit = os.getenv("ROUTE_LIMIT")
     if route_limit:
@@ -927,7 +966,7 @@ async def main() -> None:
         except ValueError:
             pass
 
-    print(f"Total routes: {len(all_routes)}")
+    print(f"Total routes: {len(filtered_routes)}")
     print(f"Done routes: {len(done_keys)}")
     print(f"Pending routes: {len(pending)}")
 
@@ -1021,7 +1060,7 @@ async def main() -> None:
                     phase_progress["done"] += 1
                     if records:
                         done_keys.add(route["route_key"])
-                        save_checkpoint(done_keys)
+                        save_checkpoint(done_keys, dt_str)
                         if route["route_key"] in final_failed_map:
                             final_failed_map.pop(route["route_key"], None)
                         print(
