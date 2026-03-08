@@ -1,10 +1,10 @@
 package com.example.dahaeng.member.service;
 
 import com.example.dahaeng.auth.dto.UserResponse;
-import com.example.dahaeng.member.entity.Member;
-import com.example.dahaeng.member.repository.MemberRepository;
 import com.example.dahaeng.global.exception.CustomException;
 import com.example.dahaeng.global.exception.ErrorCode;
+import com.example.dahaeng.member.entity.Member;
+import com.example.dahaeng.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,11 +17,11 @@ public class MemberService {
     private final MemberRepository memberRepository;
 
     /**
-     * ?��? ?�보 조회 (UserResponse 변??
+     * 사용자 정보 조회 (UserResponse 변환)
      */
     public UserResponse getMemberResponse(Long memberId) {
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "?�용?��? 찾을 ???�습?�다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "사용자를 찾을 수 없습니다."));
 
         return UserResponse.builder()
                 .id(member.getId())
@@ -32,15 +32,15 @@ public class MemberService {
     }
 
     /**
-     * ?�원 ?�퇴 (Soft Delete)
+     * 회원 탈퇴 (Soft Delete)
      */
     @Transactional
     public void withdraw(Long memberId) {
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "?�용?��? 찾을 ???�습?�다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "사용자를 찾을 수 없습니다."));
 
         if (member.getDeletedAt() != null) {
-            throw new CustomException(ErrorCode.INVALID_REQUEST, "?��? ?�퇴???�용?�입?�다.");
+            throw new CustomException(ErrorCode.INVALID_REQUEST, "이미 탈퇴한 사용자입니다.");
         }
 
         member.withdraw();

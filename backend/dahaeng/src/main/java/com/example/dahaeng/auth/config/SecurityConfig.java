@@ -1,12 +1,11 @@
 package com.example.dahaeng.auth.config;
 
-
 import com.example.dahaeng.auth.jwt.JwtFilter;
 import com.example.dahaeng.auth.jwt.JwtProperties;
 import com.example.dahaeng.auth.jwt.JwtUtil;
 import com.example.dahaeng.auth.oauth2.CustomSuccessHandler;
-import com.example.dahaeng.member.repository.MemberRepository;
 import com.example.dahaeng.auth.service.CustomOAuth2UserService;
+import com.example.dahaeng.member.repository.MemberRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -38,9 +37,9 @@ public class SecurityConfig {
     private final ClientRegistrationRepository clientRegistrationRepository;
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-        // 1. CORS ?�정 (?�나??filterChain ?�에 ?�합)
+        // 1. CORS 설정 (filterChain 안에 통합)
         http
                 .cors(corsCustomizer -> corsCustomizer.configurationSource(new CorsConfigurationSource() {
                     @Override
@@ -53,7 +52,7 @@ public class SecurityConfig {
                         configuration.setAllowedHeaders(Collections.singletonList("*"));
                         configuration.setMaxAge(3600L);
 
-                        // 브라?��?가 ?�답?�서 ?�을 ???�도�??�더 ?�출
+                        // 브라우저가 응답에서 읽을 수 있도록 헤더 노출
                         configuration.setExposedHeaders(Collections.singletonList("Set-Cookie"));
                         configuration.setExposedHeaders(Collections.singletonList("Authorization"));
 
@@ -67,11 +66,11 @@ public class SecurityConfig {
                 .formLogin((auth) -> auth.disable())
                 .httpBasic((auth) -> auth.disable());
 
-        // 3. JwtFilter 추�? (UsernamePasswordAuthenticationFilter ?�전???�행)
+        // 3. JwtFilter 추가 (UsernamePasswordAuthenticationFilter 이전에 실행)
         http
                 .addFilterBefore(new JwtFilter(jwtUtil, memberRepository), UsernamePasswordAuthenticationFilter.class);
 
-        // 4. OAuth2 로그???�정
+        // 4. OAuth2 로그인 설정
         http
                 .oauth2Login((oauth2) -> oauth2
                         .authorizationEndpoint(authorization -> authorization
@@ -81,7 +80,7 @@ public class SecurityConfig {
                         .successHandler(customSuccessHandler)
                 );
 
-        // 5. 경로�??��? ?�업
+        // 5. 경로별 권한 설정
         http
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers(
@@ -93,14 +92,14 @@ public class SecurityConfig {
                         ).permitAll()
                         .anyRequest().authenticated());
 
-        // 6. 로그?�웃 ?�정
+        // 6. 로그아웃 설정
         http
                 .logout((logout) -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/")
                         .deleteCookies("Authorization"));
 
-        // 7. ?�션 ?�정 : STATELESS (JWT ?�용 ?�수 ?�정)
+        // 7. 세션 설정 : STATELESS (JWT 사용 시 필수 설정)
         http
                 .sessionManagement((session) -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));

@@ -2,8 +2,8 @@ package com.example.dahaeng.auth.service;
 
 import com.example.dahaeng.auth.dto.CustomOAuth2User;
 import com.example.dahaeng.auth.dto.GoogleResponse;
-import com.example.dahaeng.member.dto.MemberDto;
 import com.example.dahaeng.auth.dto.OAuth2Response;
+import com.example.dahaeng.member.dto.MemberDto;
 import com.example.dahaeng.member.entity.Member;
 import com.example.dahaeng.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +41,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             throw new OAuth2AuthenticationException("Unsupported provider: " + registrationId);
         }
 
-        // 구�? ?�큰 ?�보 추출
+        // 구글 액세스 토큰/만료 정보 추출
         String googleAccessToken = userRequest.getAccessToken().getTokenValue();
         Instant expiresAtInstant = userRequest.getAccessToken().getExpiresAt();
         LocalDateTime expiresAt = LocalDateTime.ofInstant(
@@ -64,14 +64,14 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                     .profileImageUrl(profileImageUrl)
                     .role("ROLE_USER")
                     .build();
-            log.info("[CustomOAuth2UserService] ?�규 ?�원 ?�성: socialId={}", socialId);
+            log.info("[CustomOAuth2UserService] 신규 회원 생성: socialId={}", socialId);
         } else {
-            // 로그???�마??최신 ?�로?�로 ?�기??
+            // 기존 회원 프로필 갱신
             member.updateProfile(nickname, profileImageUrl);
-            log.info("[CustomOAuth2UserService] 기존 ?�원 ?�로??갱신: socialId={}", socialId);
+            log.info("[CustomOAuth2UserService] 기존 회원 프로필 갱신: socialId={}", socialId);
         }
 
-        // 구�? ?�큰 ?�데?�트 (refresh_token?� SuccessHandler??별도 처리가 ?�요?????�음)
+        // 구글 토큰 갱신 (refresh_token은 SuccessHandler에서 별도 처리 필요)
         member.updateGoogleTokens(googleAccessToken, null, expiresAt);
         memberRepository.save(member);
 

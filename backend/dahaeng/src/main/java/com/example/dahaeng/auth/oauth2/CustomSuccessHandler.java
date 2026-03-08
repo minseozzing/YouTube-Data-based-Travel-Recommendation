@@ -1,7 +1,7 @@
 package com.example.dahaeng.auth.oauth2;
 
 import com.example.dahaeng.auth.dto.CustomOAuth2User;
-import com.example.dahaeng.youtube.service.OAuthCodeService;
+import com.example.dahaeng.auth.service.OAuthCodeService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -18,7 +18,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     private final OAuthCodeService oAuthCodeService;
 
-    // ?�론??콜백 URL (?�경변???�로?�티�?빼는 �?추천)
+    // 프론트 콜백 URL (환경변수/프로퍼티로 분리 권장)
     private static final String FRONT_CALLBACK_URL = "http://localhost:3000/oauth/callback";
 
     @Override
@@ -29,10 +29,10 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         CustomOAuth2User principal = (CustomOAuth2User) authentication.getPrincipal();
 
-        // 1?�용 code 발급 (30~60�?만료 권장)
+        // 1회용 code 발급 (30~60초 만료 권장)
         String code = oAuthCodeService.issueCode(principal);
 
-        // ?�론?�로 redirect (?�큰???�니??code�??�달)
+        // 프론트로 redirect (토큰이 아니라 code 전달)
         response.sendRedirect(FRONT_CALLBACK_URL + "?code=" + code);
     }
 }

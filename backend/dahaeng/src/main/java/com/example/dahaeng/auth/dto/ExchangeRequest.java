@@ -1,4 +1,4 @@
-package com.example.dahaeng.youtube.dto;
+package com.example.dahaeng.auth.dto;
 
 import lombok.*;
 

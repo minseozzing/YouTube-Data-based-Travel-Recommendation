@@ -9,5 +9,5 @@ import lombok.*;
 @AllArgsConstructor
 public class YouTubeSubscriptionDto {
     private String id;
-    private String title; // 구독??채널�?
+    private String title; // 구독 채널명
 }

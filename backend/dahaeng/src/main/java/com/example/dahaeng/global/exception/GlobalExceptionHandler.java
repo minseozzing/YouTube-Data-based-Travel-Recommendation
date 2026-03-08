@@ -15,7 +15,7 @@ public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    // 비즈?�스 ?�외
+    // 비즈니스 예외
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<ErrorResponse> handleCustom(CustomException e, HttpServletRequest request) {
         ErrorCode code = e.getErrorCode();
@@ -49,7 +49,7 @@ public class GlobalExceptionHandler {
                 ));
     }
 
-    // @Valid 검�??�패
+    // @Valid 검증 실패
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidation(
             MethodArgumentNotValidException e,
@@ -74,7 +74,7 @@ public class GlobalExceptionHandler {
                 ));
     }
 
-    // �???모든 ?�외
+    // 그 외 모든 예외
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(
             Exception e,

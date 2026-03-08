@@ -1,6 +1,7 @@
 package com.example.dahaeng.youtube.dto;
 
 import lombok.*;
+
 import java.util.List;
 
 @Getter
@@ -11,5 +12,5 @@ import java.util.List;
 public class YouTubePlaylistDto {
     private String id;
     private String title;
-    private List<YouTubeVideoDto> videos; // ?�생목록 ???�상 목록
+    private List<YouTubeVideoDto> videos; // 재생목록 내 동영상 목록
 }

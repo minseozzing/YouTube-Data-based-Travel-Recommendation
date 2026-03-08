@@ -1,4 +1,4 @@
-package com.example.dahaeng.youtube.service;
+package com.example.dahaeng.auth.service;
 
 import com.example.dahaeng.auth.dto.CustomOAuth2User;
 import com.example.dahaeng.global.exception.CustomException;
@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class OAuthCodeService {
 
-    private static final long TTL_SECONDS = 60; // 1�?
+    private static final long TTL_SECONDS = 60; // 1분
     private final Map<String, Entry> store = new ConcurrentHashMap<>();
 
     public String issueCode(CustomOAuth2User user) {
@@ -28,10 +28,10 @@ public class OAuthCodeService {
         return code;
     }
 
-    /** 1?�용: ?�용?�면 ??��. ?�효?��? ?�으�?CustomException 발생 */
+    /** 1회용: 사용하면 삭제. 유효하지 않으면 CustomException 발생 */
     public Entry consume(String code) {
         if (code == null || code.isBlank()) {
-            throw new CustomException(ErrorCode.INVALID_PARAMETER, "?�증 코드???�수?�니??");
+            throw new CustomException(ErrorCode.INVALID_PARAMETER, "인증 코드는 필수입니다.");
         }
 
         Entry entry = store.remove(code);
