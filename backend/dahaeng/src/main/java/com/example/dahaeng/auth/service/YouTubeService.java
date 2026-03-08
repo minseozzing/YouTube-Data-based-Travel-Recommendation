@@ -40,12 +40,12 @@ public class YouTubeService {
     }
 
     /**
-     * 재생목록 조회 (영상 제목, 태그 포함)
+     * 재생목록 조회 (영상 제목, 카테고리, 채널 포함)
      */
     public List<YouTubePlaylistDto> getPlaylists(Long memberId) {
         String token = getAccessToken(memberId);
-        // 1. 재생목록 목록 조회 (내 소유)
-        String playlistUrl = YOUTUBE_API_BASE_URL + "/playlists?part=snippet&mine=true&maxResults=10";
+        // 1. 재생목록 목록 조회 (내 소유) - 최대 5개
+        String playlistUrl = YOUTUBE_API_BASE_URL + "/playlists?part=snippet&mine=true&maxResults=5";
         ResponseEntity<Map> playlistResponse = callYouTubeApi(playlistUrl, token);
         List<Map<String, Object>> playlists = (List<Map<String, Object>>) playlistResponse.getBody().get("items");
 
@@ -55,20 +55,18 @@ public class YouTubeService {
                 String playlistId = (String) playlist.get("id");
                 String playlistTitle = (String) ((Map<String, Object>) playlist.get("snippet")).get("title");
 
-                // 2. 해당 재생목록 안의 영상 목록(playlistItems) 조회
-                String itemsUrl = YOUTUBE_API_BASE_URL + "/playlistItems?part=snippet,contentDetails&playlistId=" + playlistId + "&maxResults=10";
+                // 2. 해당 재생목록 안의 영상 목록(playlistItems) 조회 - 최대 8개
+                String itemsUrl = YOUTUBE_API_BASE_URL + "/playlistItems?part=snippet,contentDetails&playlistId=" + playlistId + "&maxResults=8";
                 ResponseEntity<Map> itemsResponse = callYouTubeApi(itemsUrl, token);
                 List<Map<String, Object>> items = (List<Map<String, Object>>) itemsResponse.getBody().get("items");
 
                 List<YouTubeVideoDto> videosInPlaylist = new ArrayList<>();
                 if (items != null) {
                     for (Map<String, Object> item : items) {
-                        Map<String, Object> snippet = (Map<String, Object>) item.get("snippet");
                         Map<String, Object> contentDetails = (Map<String, Object>) item.get("contentDetails");
                         String videoId = (String) contentDetails.get("videoId");
 
-                        // 3. 개별 영상의 태그 정보를 가져오기 위해 videos API 호출
-                        // (playlistItems의 snippet에는 태그가 없습니다.)
+                        // 3. 개별 영상의 상세 정보를 가져오기 위해 videos API 호출
                         videosInPlaylist.add(getVideoDetails(videoId, token));
                     }
                 }
@@ -84,7 +82,7 @@ public class YouTubeService {
     }
 
     /**
-     * 영상 상세 정보 조회 (제목, 태그)
+     * 영상 상세 정보 조회 (제목, 채널명, 카테고리ID)
      */
     private YouTubeVideoDto getVideoDetails(String videoId, String token) {
         String url = YOUTUBE_API_BASE_URL + "/videos?part=snippet&id=" + videoId;
@@ -96,18 +94,20 @@ public class YouTubeService {
             return YouTubeVideoDto.builder()
                     .id(videoId)
                     .title((String) snippet.get("title"))
-                    .tags((List<String>) snippet.get("tags"))
+                    .channelTitle((String) snippet.get("channelTitle"))
+                    .categoryId((String) snippet.get("categoryId"))
+                    .tags((List<String>) snippet.get("tags")) // 태그 추가
                     .build();
         }
         return YouTubeVideoDto.builder().id(videoId).title("알 수 없음").build();
     }
 
     /**
-     * 구독목록 조회
+     * 구독목록 조회 (최대 10개)
      */
     public List<YouTubeSubscriptionDto> getSubscriptions(Long memberId) {
         String token = getAccessToken(memberId);
-        String url = YOUTUBE_API_BASE_URL + "/subscriptions?part=snippet&mine=true";
+        String url = YOUTUBE_API_BASE_URL + "/subscriptions?part=snippet&mine=true&maxResults=10";
 
         ResponseEntity<Map> response = callYouTubeApi(url, token);
         List<Map<String, Object>> items = (List<Map<String, Object>>) response.getBody().get("items");
@@ -126,12 +126,11 @@ public class YouTubeService {
     }
 
     /**
-     * 좋아요한 동영상 조회
+     * 좋아요한 동영상 조회 (최대 10개)
      */
     public List<YouTubeVideoDto> getLikedVideos(Long memberId) {
         String token = getAccessToken(memberId);
-        // myRating=like 필터 사용
-        String url = YOUTUBE_API_BASE_URL + "/videos?part=snippet&myRating=like";
+        String url = YOUTUBE_API_BASE_URL + "/videos?part=snippet&myRating=like&maxResults=10";
 
         ResponseEntity<Map> response = callYouTubeApi(url, token);
         List<Map<String, Object>> items = (List<Map<String, Object>>) response.getBody().get("items");
@@ -143,7 +142,9 @@ public class YouTubeService {
                 result.add(YouTubeVideoDto.builder()
                         .id((String) item.get("id"))
                         .title((String) snippet.get("title"))
-                        .tags((List<String>) snippet.get("tags"))
+                        .channelTitle((String) snippet.get("channelTitle"))
+                        .categoryId((String) snippet.get("categoryId"))
+                        .tags((List<String>) snippet.get("tags")) // 태그 추가
                         .build());
             }
         }
