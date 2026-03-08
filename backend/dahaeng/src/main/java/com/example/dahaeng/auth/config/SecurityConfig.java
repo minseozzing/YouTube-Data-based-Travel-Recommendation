@@ -1,12 +1,11 @@
 package com.example.dahaeng.auth.config;
 
-
 import com.example.dahaeng.auth.jwt.JwtFilter;
 import com.example.dahaeng.auth.jwt.JwtProperties;
 import com.example.dahaeng.auth.jwt.JwtUtil;
 import com.example.dahaeng.auth.oauth2.CustomSuccessHandler;
-import com.example.dahaeng.auth.repository.MemberRepository;
 import com.example.dahaeng.auth.service.CustomOAuth2UserService;
+import com.example.dahaeng.member.repository.MemberRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -38,9 +37,9 @@ public class SecurityConfig {
     private final ClientRegistrationRepository clientRegistrationRepository;
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-        // 1. CORS 설정 (하나의 filterChain 안에 통합)
+        // 1. CORS 설정 (filterChain 안에 통합)
         http
                 .cors(corsCustomizer -> corsCustomizer.configurationSource(new CorsConfigurationSource() {
                     @Override
@@ -81,7 +80,7 @@ public class SecurityConfig {
                         .successHandler(customSuccessHandler)
                 );
 
-        // 5. 경로별 인가 작업
+        // 5. 경로별 권한 설정
         http
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers(
@@ -100,7 +99,7 @@ public class SecurityConfig {
                         .logoutSuccessUrl("/")
                         .deleteCookies("Authorization"));
 
-        // 7. 세션 설정 : STATELESS (JWT 사용 필수 설정)
+        // 7. 세션 설정 : STATELESS (JWT 사용 시 필수 설정)
         http
                 .sessionManagement((session) -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));

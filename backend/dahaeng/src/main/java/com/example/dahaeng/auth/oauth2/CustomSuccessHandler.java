@@ -18,7 +18,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     private final OAuthCodeService oAuthCodeService;
 
-    // 프론트 콜백 URL (환경변수/프로퍼티로 빼는 걸 추천)
+    // 프론트 콜백 URL (환경변수/프로퍼티로 분리 권장)
     private static final String FRONT_CALLBACK_URL = "http://localhost:3000/oauth/callback";
 
     @Override
@@ -32,7 +32,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         // 1회용 code 발급 (30~60초 만료 권장)
         String code = oAuthCodeService.issueCode(principal);
 
-        // 프론트로 redirect (토큰이 아니라 code만 전달)
+        // 프론트로 redirect (토큰이 아니라 code 전달)
         response.sendRedirect(FRONT_CALLBACK_URL + "?code=" + code);
     }
 }
