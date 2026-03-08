@@ -1,4 +1,4 @@
-package com.example.dahaeng.auth.dto;
+package com.example.dahaeng.member.dto;
 
 import lombok.Builder;
 import lombok.Getter;

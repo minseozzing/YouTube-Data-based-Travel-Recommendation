@@ -1,10 +1,10 @@
-package com.example.dahaeng.auth.service;
+package com.example.dahaeng.member.service;
 
 import com.example.dahaeng.auth.dto.UserResponse;
-import com.example.dahaeng.auth.entity.Member;
-import com.example.dahaeng.auth.repository.MemberRepository;
 import com.example.dahaeng.global.exception.CustomException;
 import com.example.dahaeng.global.exception.ErrorCode;
+import com.example.dahaeng.member.entity.Member;
+import com.example.dahaeng.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,7 +17,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
 
     /**
-     * 유저 정보 조회 (UserResponse 변환)
+     * 사용자 정보 조회 (UserResponse 변환)
      */
     public UserResponse getMemberResponse(Long memberId) {
         Member member = memberRepository.findById(memberId)

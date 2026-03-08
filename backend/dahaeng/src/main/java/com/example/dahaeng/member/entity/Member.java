@@ -1,4 +1,4 @@
-package com.example.dahaeng.auth.entity;
+package com.example.dahaeng.member.entity;
 
 import com.example.dahaeng.global.entity.BaseEntity;
 import jakarta.persistence.*;
@@ -65,6 +65,6 @@ public class Member extends BaseEntity {
      * 회원 탈퇴 (Soft Delete)
      */
     public void withdraw() {
-        this.deletedAt = java.time.LocalDateTime.now();
+        this.deletedAt = LocalDateTime.now();
     }
 }
