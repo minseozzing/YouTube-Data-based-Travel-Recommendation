@@ -1,112 +1,170 @@
-———
+# YouTube Latest-State Sync Update
 
-# API Design
+Add the following rules to `desc.md`.
 
-모든 API는 Bearer JWT 인증이 필요합니다.
-Authorization: Bearer <accessToken>
+---
 
-———
+## Sync Data Strategy
 
-## POST /api/youtube/sync
+The current sync implementation must **not keep accumulating old data** on every sync request.
 
-유튜브 데이터 동기화 실행 (YouTube API 호출 → DB 저장 → snapshot 저장)
+The database should represent the **latest synchronized state** of the user's YouTube data.
 
-Request
+This means the sync process must use **UPSERT + REPLACE** strategies instead of append-only inserts.
 
-- Body 없음
+Use the following exact rules:
 
-Response
+### 1. `youtube_video`
 
-{
-"message": "youtube sync completed"
-}
+* Strategy: **UPSERT**
+* Key: `youtube_video_id`
+* Behavior:
 
-Errors
+    * if the video already exists, update `title`, `channel_title`, `category_id`
+    * if it does not exist, insert it
 
-- 401: 로그인 필요
-- 500: 동기화 실패
+### 2. `youtube_playlist`
 
-———
+* Strategy: **UPSERT**
+* Key: `youtube_playlist_id`
+* Behavior:
 
-## GET /api/youtube/sync-status
+    * if the playlist already exists, update metadata
+    * if it does not exist, insert it
 
-동기화 상태 조회
+### 3. `youtube_playlist_video`
 
-Response
+* Strategy: **REPLACE per playlist**
+* Behavior:
 
-{
-"connected": true,
-"syncStatus": "SYNCED",
-"lastSyncedAt": "2026-03-08T15:30:00"
-}
+    * before inserting the latest playlist-video mappings, delete all existing mappings for that playlist
+    * then insert the latest mappings again
+* Important:
 
-설명
+    * this table must not keep old playlist-video mappings from previous syncs
 
-- connected: 연동 계정 존재 여부
-- syncStatus: PENDING | SYNCED | FAILED
-- lastSyncedAt: 마지막 동기화 시각 (없으면 null)
+### 4. `youtube_liked_video`
 
-———
+* Strategy: **REPLACE per account**
+* Behavior:
 
-## GET /api/youtube/playlists
+    * before inserting the latest liked videos, delete all existing liked-video rows for that account
+    * then insert the latest liked-video mappings again
+* Important:
 
-DB에서 재생목록 조회
+    * if the user unliked a video, it must disappear from DB after the next sync
 
-Response
+### 5. `youtube_subscription`
 
-{
-"playlists": [
-{
-"id": "PLxxxx",
-"title": "재생목록 제목",
-"videos": [
-{
-"id": "videoId",
-"title": "영상 제목",
-"channelTitle": "채널명",
-"categoryId": "10",
-"tags": ["tag1", "tag2"]
-}
-]
-}
-]
-}
+* Strategy: **REPLACE per account**
+* Behavior:
 
-———
+    * before inserting the latest subscriptions, delete all existing subscription rows for that account
+    * then insert the latest subscriptions again
 
-## GET /api/youtube/subscriptions
+### 6. `youtube_video_tag`
 
-DB에서 구독 채널 조회
+* Strategy: **REPLACE per video**
+* Behavior:
 
-Response
+    * before inserting the latest tags for a video, delete all existing tags of that video
+    * then insert the latest tags again
+* Important:
 
-{
-"subscriptions": [
-{
-"id": "UCxxxx",
-"title": "채널명"
-}
-]
-}
+    * old tags must not remain after sync
 
-———
+### 7. `youtube_sync_snapshot`
 
-## GET /api/youtube/liked-videos
+* Strategy: **do not allow infinite growth**
+* Behavior:
 
-DB에서 좋아요 영상 조회
+    * either skip snapshot storage for now
+    * or keep only the latest snapshot per `account_id + snapshot_type`
+* Important:
 
-Response
+    * this table must not grow indefinitely on every sync request
 
-{
-"likedVideos": [
-{
-"id": "videoId",
-"title": "영상 제목",
-"channelTitle": "채널명",
-"categoryId": "10",
-"tags": ["tag1", "tag2"]
-}
-]
-}
+---
 
-———
+## Required Repository Methods
+
+To support latest-state sync, repositories should provide delete methods for replacement.
+
+Examples:
+
+* `YouTubePlaylistVideoRepository`
+
+    * `deleteByPlaylistId(Long playlistId)`
+
+* `YouTubeLikedVideoRepository`
+
+    * `deleteByAccountId(Long accountId)`
+
+* `YouTubeSubscriptionRepository`
+
+    * `deleteByAccountId(Long accountId)`
+
+* `YouTubeVideoTagRepository`
+
+    * `deleteByVideoId(Long videoId)`
+
+* `YouTubeSyncSnapshotRepository`
+
+    * `deleteByAccountIdAndSnapshotType(Long accountId, SnapshotType snapshotType)`
+
+---
+
+## Required SaveService Changes
+
+The current issue is that methods named like `insertPlaylistVideo`, `insertLikedVideo`, and `insertVideoTags` can lead to append-only behavior.
+
+`YouTubeSaveService` must be changed so that it uses replacement logic.
+
+Recommended method responsibilities:
+
+* `upsertVideo(...)`
+* `upsertPlaylist(...)`
+* `replacePlaylistVideos(...)`
+* `replaceLikedVideos(...)`
+* `replaceSubscriptions(...)`
+* `replaceVideoTags(...)`
+* `replaceSnapshot(...)` or snapshot skip
+* `updateSyncStatus(...)`
+
+---
+
+## Required SyncService Rule
+
+`YouTubeSyncService` must orchestrate sync using latest-state logic.
+
+Expected flow:
+
+1. find member
+2. find or create youtube_account
+3. fetch playlists
+4. fetch playlist items
+5. fetch subscriptions
+6. fetch liked videos
+7. fetch video details if needed
+8. save/update videos
+9. save/update playlists
+10. replace playlist-video mappings
+11. replace liked-video mappings
+12. replace subscriptions
+13. replace video tags
+14. save or replace snapshot
+15. update sync status and last synced time
+
+---
+
+## Important Rule
+
+The sync process must keep the database as the **latest state**, not as an append-only history.
+
+This is required to prevent:
+
+* stale playlist-video mappings
+* stale liked videos
+* stale subscriptions
+* stale tags
+* uncontrolled snapshot growth

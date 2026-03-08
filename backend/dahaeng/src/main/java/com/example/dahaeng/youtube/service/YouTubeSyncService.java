@@ -55,13 +55,17 @@ public class YouTubeSyncService {
             saveService.updateSyncStatus(account, SyncStatus.PENDING, account.getLastSyncedAt());
 
             YouTubeApiResponse playlistsResp = fetchService.fetchPlaylists(accessToken);
-            saveService.insertSnapshot(account, SnapshotType.PLAYLISTS, playlistsResp.rawJson(), now);
+            saveService.replaceSnapshot(account, SnapshotType.PLAYLISTS, playlistsResp.rawJson(), now);
 
             List<Map<String, Object>> playlists = getItems(playlistsResp.body());
             Map<String, YouTubePlaylist> playlistMap = new HashMap<>();
+            Set<String> latestPlaylistIds = new HashSet<>();
 
             for (Map<String, Object> pl : playlists) {
                 String playlistId = (String) pl.get("id");
+                if (playlistId == null) {
+                    continue;
+                }
                 Map<String, Object> snippet = getMap(pl.get("snippet"));
                 Map<String, Object> status = getMap(pl.get("status"));
 
@@ -76,16 +80,20 @@ public class YouTubeSyncService {
                         now
                 );
                 playlistMap.put(playlistId, saved);
+                latestPlaylistIds.add(playlistId);
             }
 
+            saveService.deleteStalePlaylists(account, latestPlaylistIds);
+
+            Map<String, List<RawPlaylistItem>> playlistItemsByPlaylist = new HashMap<>();
             Set<String> videoIds = new HashSet<>();
-            Map<String, Integer> playlistPosition = new HashMap<>();
 
             for (String playlistId : playlistMap.keySet()) {
                 YouTubeApiResponse itemsResp = fetchService.fetchPlaylistItems(accessToken, playlistId);
-                saveService.insertSnapshot(account, SnapshotType.PLAYLIST_ITEMS, itemsResp.rawJson(), now);
+                saveService.replaceSnapshot(account, SnapshotType.PLAYLIST_ITEMS, itemsResp.rawJson(), now);
 
                 List<Map<String, Object>> items = getItems(itemsResp.body());
+                List<RawPlaylistItem> rawItems = new ArrayList<>();
                 for (Map<String, Object> item : items) {
                     Map<String, Object> contentDetails = getMap(item.get("contentDetails"));
                     Map<String, Object> snippet = getMap(item.get("snippet"));
@@ -94,14 +102,16 @@ public class YouTubeSyncService {
                         continue;
                     }
                     Integer position = snippet.get("position") instanceof Number ? ((Number) snippet.get("position")).intValue() : null;
-                    playlistPosition.put(playlistId + ":" + videoId, position);
+                    rawItems.add(new RawPlaylistItem(videoId, position));
                     videoIds.add(videoId);
                 }
+                playlistItemsByPlaylist.put(playlistId, rawItems);
             }
 
             YouTubeApiResponse subscriptionsResp = fetchService.fetchSubscriptions(accessToken);
-            saveService.insertSnapshot(account, SnapshotType.SUBSCRIPTIONS, subscriptionsResp.rawJson(), now);
+            saveService.replaceSnapshot(account, SnapshotType.SUBSCRIPTIONS, subscriptionsResp.rawJson(), now);
             List<Map<String, Object>> subscriptions = getItems(subscriptionsResp.body());
+            List<YouTubeSaveService.SubscriptionInput> subscriptionInputs = new ArrayList<>();
             for (Map<String, Object> sub : subscriptions) {
                 Map<String, Object> snippet = getMap(sub.get("snippet"));
                 Map<String, Object> resourceId = getMap(snippet.get("resourceId"));
@@ -112,12 +122,12 @@ public class YouTubeSyncService {
                 LocalDateTime subscribedAt = parseDateTime(snippet.get("publishedAt"));
 
                 if (channelId != null) {
-                    saveService.upsertSubscription(account, channelId, title, description, subscribedAt, now);
+                    subscriptionInputs.add(new YouTubeSaveService.SubscriptionInput(channelId, title, description, subscribedAt));
                 }
             }
 
             YouTubeApiResponse likedResp = fetchService.fetchLikedVideos(accessToken);
-            saveService.insertSnapshot(account, SnapshotType.LIKED_VIDEOS, likedResp.rawJson(), now);
+            saveService.replaceSnapshot(account, SnapshotType.LIKED_VIDEOS, likedResp.rawJson(), now);
             List<Map<String, Object>> likedVideos = getItems(likedResp.body());
             for (Map<String, Object> item : likedVideos) {
                 String videoId = (String) item.get("id");
@@ -129,7 +139,7 @@ public class YouTubeSyncService {
             Map<String, YouTubeVideo> videoMap = new HashMap<>();
             for (String videoId : videoIds) {
                 YouTubeApiResponse videoResp = fetchService.fetchVideoDetails(accessToken, videoId);
-                saveService.insertSnapshot(account, SnapshotType.VIDEO_DETAILS, videoResp.rawJson(), now);
+                saveService.replaceSnapshot(account, SnapshotType.VIDEO_DETAILS, videoResp.rawJson(), now);
 
                 List<Map<String, Object>> items = getItems(videoResp.body());
                 if (items.isEmpty()) {
@@ -143,21 +153,28 @@ public class YouTubeSyncService {
                 List<String> tags = (List<String>) snippet.get("tags");
 
                 YouTubeVideo saved = saveService.upsertVideo(videoId, title, channelTitle, categoryId);
-                saveService.insertVideoTags(saved, tags);
+                saveService.replaceVideoTags(saved, tags);
                 videoMap.put(videoId, saved);
             }
 
-            for (String key : playlistPosition.keySet()) {
-                String[] parts = key.split(":", 2);
-                String playlistId = parts[0];
-                String videoId = parts[1];
+            for (Map.Entry<String, List<RawPlaylistItem>> entry : playlistItemsByPlaylist.entrySet()) {
+                String playlistId = entry.getKey();
                 YouTubePlaylist playlist = playlistMap.get(playlistId);
-                YouTubeVideo video = videoMap.get(videoId);
-                if (playlist != null && video != null) {
-                    saveService.insertPlaylistVideo(playlist, video, playlistPosition.get(key), now);
+                if (playlist == null) {
+                    continue;
                 }
+                List<YouTubeSaveService.PlaylistVideoInput> inputs = new ArrayList<>();
+                for (RawPlaylistItem item : entry.getValue()) {
+                    YouTubeVideo video = videoMap.get(item.videoId());
+                    if (video == null) {
+                        continue;
+                    }
+                    inputs.add(new YouTubeSaveService.PlaylistVideoInput(video, item.position()));
+                }
+                saveService.replacePlaylistVideos(playlist, inputs, now);
             }
 
+            List<YouTubeVideo> likedVideoEntities = new ArrayList<>();
             for (Map<String, Object> item : likedVideos) {
                 String videoId = (String) item.get("id");
                 if (videoId == null) {
@@ -165,11 +182,13 @@ public class YouTubeSyncService {
                 }
                 YouTubeVideo video = videoMap.get(videoId);
                 if (video != null) {
-                    saveService.insertLikedVideo(account, video, null, now);
+                    likedVideoEntities.add(video);
                 }
             }
+            saveService.replaceLikedVideos(account, likedVideoEntities, now);
 
-            saveService.insertSnapshot(account, SnapshotType.FULL_SYNC, "{\"status\":\"ok\"}", now);
+            saveService.replaceSubscriptions(account, subscriptionInputs, now);
+            saveService.replaceSnapshot(account, SnapshotType.FULL_SYNC, "{\"status\":\"ok\"}", now);
             saveService.updateSyncStatus(account, SyncStatus.SYNCED, now);
 
         } catch (Exception e) {
@@ -225,4 +244,6 @@ public class YouTubeSyncService {
             return null;
         }
     }
+
+    private record RawPlaylistItem(String videoId, Integer position) {}
 }

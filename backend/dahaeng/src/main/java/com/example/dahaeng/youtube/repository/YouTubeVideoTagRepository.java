@@ -8,8 +8,8 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface YouTubeVideoTagRepository extends JpaRepository<YouTubeVideoTag, Long> {
-    boolean existsByVideoIdAndTagName(Long videoId, String tagName);
-
     @Query("select t.tagName from YouTubeVideoTag t where t.video.id = :videoId")
     List<String> findTagNamesByVideoId(@Param("videoId") Long videoId);
+
+    void deleteByVideoId(Long videoId);
 }

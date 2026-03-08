@@ -11,8 +11,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -57,6 +59,16 @@ public class YouTubeSaveService {
         return accountRepository.save(account);
     }
 
+    public void deleteStalePlaylists(YouTubeAccount account, Set<String> latestPlaylistIds) {
+        List<YouTubePlaylist> existing = playlistRepository.findByAccountId(account.getId());
+        for (YouTubePlaylist playlist : existing) {
+            if (!latestPlaylistIds.contains(playlist.getYoutubePlaylistId())) {
+                playlistVideoRepository.deleteByPlaylistId(playlist.getId());
+                playlistRepository.deleteById(playlist.getId());
+            }
+        }
+    }
+
     public YouTubePlaylist upsertPlaylist(YouTubeAccount account, String youtubePlaylistId, String title, PrivacyStatus privacyStatus, LocalDateTime collectedAt) {
         Optional<YouTubePlaylist> existing = playlistRepository.findByYoutubePlaylistId(youtubePlaylistId);
         YouTubePlaylist playlist = existing.orElseGet(() -> YouTubePlaylist.builder()
@@ -93,72 +105,94 @@ public class YouTubeSaveService {
         return videoRepository.save(video);
     }
 
-    public void insertPlaylistVideo(YouTubePlaylist playlist, YouTubeVideo video, Integer position, LocalDateTime collectedAt) {
-        if (playlistVideoRepository.existsByPlaylistIdAndVideoId(playlist.getId(), video.getId())) {
+    public void replacePlaylistVideos(YouTubePlaylist playlist, List<PlaylistVideoInput> items, LocalDateTime collectedAt) {
+        playlistVideoRepository.deleteByPlaylistId(playlist.getId());
+        if (items == null || items.isEmpty()) {
             return;
         }
-        YouTubePlaylistVideo pv = YouTubePlaylistVideo.builder()
-                .playlist(playlist)
-                .video(video)
-                .position(position)
-                .collectedAt(collectedAt)
-                .build();
-        playlistVideoRepository.save(pv);
+        List<YouTubePlaylistVideo> batch = new ArrayList<>();
+        for (PlaylistVideoInput item : items) {
+            YouTubePlaylistVideo pv = YouTubePlaylistVideo.builder()
+                    .playlist(playlist)
+                    .video(item.video())
+                    .position(item.position())
+                    .collectedAt(collectedAt)
+                    .build();
+            batch.add(pv);
+        }
+        playlistVideoRepository.saveAll(batch);
     }
 
-    public void insertLikedVideo(YouTubeAccount account, YouTubeVideo video, LocalDateTime likedAt, LocalDateTime collectedAt) {
-        if (likedVideoRepository.existsByAccountIdAndVideoId(account.getId(), video.getId())) {
+    public void replaceLikedVideos(YouTubeAccount account, List<YouTubeVideo> videos, LocalDateTime collectedAt) {
+        likedVideoRepository.deleteByAccountId(account.getId());
+        if (videos == null || videos.isEmpty()) {
             return;
         }
-        YouTubeLikedVideo lv = YouTubeLikedVideo.builder()
-                .account(account)
-                .video(video)
-                .likedAt(likedAt)
-                .collectedAt(collectedAt)
-                .build();
-        likedVideoRepository.save(lv);
+        List<YouTubeLikedVideo> batch = new ArrayList<>();
+        for (YouTubeVideo video : videos) {
+            YouTubeLikedVideo lv = YouTubeLikedVideo.builder()
+                    .account(account)
+                    .video(video)
+                    .likedAt(null)
+                    .collectedAt(collectedAt)
+                    .build();
+            batch.add(lv);
+        }
+        likedVideoRepository.saveAll(batch);
     }
 
-    public YouTubeSubscription upsertSubscription(YouTubeAccount account, String youtubeChannelId, String title, String description, LocalDateTime subscribedAt, LocalDateTime collectedAt) {
-        Optional<YouTubeSubscription> existing = subscriptionRepository.findByAccountIdAndYoutubeChannelId(account.getId(), youtubeChannelId);
-        YouTubeSubscription sub = existing.orElseGet(() -> YouTubeSubscription.builder()
-                .account(account)
-                .youtubeChannelId(youtubeChannelId)
-                .build());
-
-        sub = YouTubeSubscription.builder()
-                .id(sub.getId())
-                .account(account)
-                .youtubeChannelId(youtubeChannelId)
-                .title(title)
-                .description(description)
-                .subscribedAt(subscribedAt)
-                .collectedAt(collectedAt)
-                .build();
-
-        return subscriptionRepository.save(sub);
+    public void replaceSubscriptions(YouTubeAccount account, List<SubscriptionInput> inputs, LocalDateTime collectedAt) {
+        subscriptionRepository.deleteByAccountId(account.getId());
+        if (inputs == null || inputs.isEmpty()) {
+            return;
+        }
+        List<YouTubeSubscription> batch = new ArrayList<>();
+        for (SubscriptionInput input : inputs) {
+            YouTubeSubscription sub = YouTubeSubscription.builder()
+                    .account(account)
+                    .youtubeChannelId(input.youtubeChannelId())
+                    .title(input.title())
+                    .description(input.description())
+                    .subscribedAt(input.subscribedAt())
+                    .collectedAt(collectedAt)
+                    .build();
+            batch.add(sub);
+        }
+        subscriptionRepository.saveAll(batch);
     }
 
-    public void insertVideoTags(YouTubeVideo video, List<String> tags) {
+    public void replaceVideoTags(YouTubeVideo video, List<String> tags) {
+        videoTagRepository.deleteByVideoId(video.getId());
         if (tags == null || tags.isEmpty()) {
             return;
         }
+        List<YouTubeVideoTag> batch = new ArrayList<>();
+        java.util.LinkedHashMap<String, String> uniqueTags = new java.util.LinkedHashMap<>();
         for (String tag : tags) {
-            if (tag == null || tag.isBlank()) {
+            if (tag == null) {
                 continue;
             }
-            if (videoTagRepository.existsByVideoIdAndTagName(video.getId(), tag)) {
+            String normalized = tag.trim();
+            if (normalized.isEmpty()) {
                 continue;
             }
+            String key = normalized.toLowerCase(java.util.Locale.ROOT);
+            uniqueTags.putIfAbsent(key, normalized);
+        }
+        for (String tag : uniqueTags.values()) {
             YouTubeVideoTag t = YouTubeVideoTag.builder()
                     .video(video)
                     .tagName(tag)
                     .build();
-            videoTagRepository.save(t);
+            batch.add(t);
+        }
+        if (!batch.isEmpty()) {
+            videoTagRepository.saveAll(batch);
         }
     }
 
-    public void insertSnapshot(YouTubeAccount account, SnapshotType type, String rawJson, LocalDateTime collectedAt) {
+    public void replaceSnapshot(YouTubeAccount account, SnapshotType type, String rawJson, LocalDateTime collectedAt) {
+        snapshotRepository.deleteByAccountIdAndSnapshotType(account.getId(), type);
         YouTubeSyncSnapshot snapshot = YouTubeSyncSnapshot.builder()
                 .account(account)
                 .snapshotType(type)
@@ -181,4 +215,7 @@ public class YouTubeSaveService {
                 .build();
         accountRepository.save(updated);
     }
+
+    public record PlaylistVideoInput(YouTubeVideo video, Integer position) {}
+    public record SubscriptionInput(String youtubeChannelId, String title, String description, LocalDateTime subscribedAt) {}
 }
