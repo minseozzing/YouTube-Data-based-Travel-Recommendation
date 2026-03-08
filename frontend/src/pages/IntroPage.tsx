@@ -138,7 +138,7 @@ const FeatureCard = ({ icon: Icon, title, description, accentColor, glowColor, t
         {/* 텍스트 */}
         <div className="flex flex-col gap-2 flex-1">
           <h3 className="text-lg font-bold text-white">{title}</h3>
-          <p className="text-sm text-slate-400 leading-relaxed">{description}</p>
+          <p className="text-sm text-white leading-relaxed">{description}</p>
         </div>
 
         {/* 하단 화살표 */}
@@ -158,7 +158,7 @@ const IntroPage = () => {
 
   const handleGoToLogin = () => {
     setIsLeaving(true);
-    setTimeout(() => navigate({ to: '/login' }), 1600);
+    setTimeout(() => navigate({ to: '/login' }), 700);
   };
 
   return (
@@ -178,7 +178,7 @@ const IntroPage = () => {
         className="absolute top-0 left-0 pointer-events-none"
         style={{ zIndex: -1 }}
         animate={isLeaving ? { x: 770, y: -640, scale: 1.5 } : { x: 0, y: 0, scale: 1 }}
-        transition={{ duration: 1.3, ease: [0.2, 0, 1, 0.8] }}
+        transition={{ duration: 0.65, ease: [0.2, 0, 1, 0.8] }}
         alt=""
         aria-hidden="true"
       />
@@ -229,8 +229,8 @@ const IntroPage = () => {
                       className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold"
                       style={{
                         background: 'rgba(59,130,246,0.12)',
-                        border: '1px solid rgba(59,130,246,0.35)',
-                        color: '#60a5fa',
+                        border: '1px solid rgba(255,255,255,0.6)',
+                        color: '#ffffff',
                         backdropFilter: 'blur(12px)',
                         WebkitBackdropFilter: 'blur(12px)',
                       }}

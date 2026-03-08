@@ -18,6 +18,7 @@ import { Route as AuthenticatedMypageRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedMainRouteImport } from './routes/_authenticated/main'
 import { Route as AuthenticatedCostRouteImport } from './routes/_authenticated/cost'
 import { Route as AuthenticatedBookmarksRouteImport } from './routes/_authenticated/bookmarks'
+import { Route as AuthV1RouteImport } from './routes/_auth.v1'
 import { Route as AuthLoginRouteImport } from './routes/_auth/login'
 import { Route as AuthenticatedCostCountryIdRouteImport } from './routes/_authenticated/cost.$countryId'
 import { Route as AuthenticatedBookmarksIdRouteImport } from './routes/_authenticated/bookmarks.$id'
@@ -65,6 +66,11 @@ const AuthenticatedBookmarksRoute = AuthenticatedBookmarksRouteImport.update({
   path: '/bookmarks',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthV1Route = AuthV1RouteImport.update({
+  id: '/v1',
+  path: '/v1',
+  getParentRoute: () => AuthRoute,
+} as any)
 const AuthLoginRoute = AuthLoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -87,6 +93,7 @@ export interface FileRoutesByFullPath {
   '/': typeof AuthIndexRoute
   '/preference': typeof PreferenceRoute
   '/login': typeof AuthLoginRoute
+  '/v1': typeof AuthV1Route
   '/bookmarks': typeof AuthenticatedBookmarksRouteWithChildren
   '/cost': typeof AuthenticatedCostRouteWithChildren
   '/main': typeof AuthenticatedMainRoute
@@ -99,6 +106,7 @@ export interface FileRoutesByTo {
   '/': typeof AuthIndexRoute
   '/preference': typeof PreferenceRoute
   '/login': typeof AuthLoginRoute
+  '/v1': typeof AuthV1Route
   '/bookmarks': typeof AuthenticatedBookmarksRouteWithChildren
   '/cost': typeof AuthenticatedCostRouteWithChildren
   '/main': typeof AuthenticatedMainRoute
@@ -113,6 +121,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/preference': typeof PreferenceRoute
   '/_auth/login': typeof AuthLoginRoute
+  '/_auth/v1': typeof AuthV1Route
   '/_authenticated/bookmarks': typeof AuthenticatedBookmarksRouteWithChildren
   '/_authenticated/cost': typeof AuthenticatedCostRouteWithChildren
   '/_authenticated/main': typeof AuthenticatedMainRoute
@@ -128,6 +137,7 @@ export interface FileRouteTypes {
     | '/'
     | '/preference'
     | '/login'
+    | '/v1'
     | '/bookmarks'
     | '/cost'
     | '/main'
@@ -140,6 +150,7 @@ export interface FileRouteTypes {
     | '/'
     | '/preference'
     | '/login'
+    | '/v1'
     | '/bookmarks'
     | '/cost'
     | '/main'
@@ -153,6 +164,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/preference'
     | '/_auth/login'
+    | '/_auth/v1'
     | '/_authenticated/bookmarks'
     | '/_authenticated/cost'
     | '/_authenticated/main'
@@ -235,6 +247,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedBookmarksRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_auth/v1': {
+      id: '/_auth/v1'
+      path: '/v1'
+      fullPath: '/v1'
+      preLoaderRoute: typeof AuthV1RouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/_auth/login': {
       id: '/_auth/login'
       path: '/login'
@@ -261,11 +280,13 @@ declare module '@tanstack/react-router' {
 
 interface AuthRouteChildren {
   AuthLoginRoute: typeof AuthLoginRoute
+  AuthV1Route: typeof AuthV1Route
   AuthIndexRoute: typeof AuthIndexRoute
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
   AuthLoginRoute: AuthLoginRoute,
+  AuthV1Route: AuthV1Route,
   AuthIndexRoute: AuthIndexRoute,
 }
 

@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, useNavigate, useLocation } from '@tanstack/react-router';
 import { useState, useEffect } from 'react';
-import { motion, type Variants } from 'framer-motion';
+import { motion, useAnimation, type Variants } from 'framer-motion';
 import {
   type LucideIcon,
   Globe, TrendingDown, Plane, ArrowRight, Sparkles, Star, Zap, Loader2, Bot, FlaskConical,
@@ -10,8 +10,8 @@ import Footer from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
 import { useGoogleLogin } from '@/hooks/auth/useGoogleLogin';
 import { useAuthStore } from '@/stores/authStore';
-import introBg from '@/assets/treesky.jpg';
-import nukiImg from '@/assets/nuki.png';
+import introBg from '@/assets/treesky2.jpg';
+import nukiImg from '@/assets/AIDrawing_260308_d2d848f3-0f64-44a7-acfa-d2cf92266ef6_0_MiriCanvas.png';
 import maldiveImg from '@/assets/Maldive_beach_1.jpg';
 
 // ─── Types ────────────────────────────────────────────────────────
@@ -39,7 +39,7 @@ const INTRO_FEATURES = [
     icon: Globe,
     title: 'AI 여행 추천',
     description: '취향과 예산에 맞는 여행지를 AI가 분석해 3D 글로브로 시각화합니다.',
-    accentColor: '#3b82f6',
+    accentColor: '#ffe8e8',
     glowColor: 'rgba(59,130,246,0.3)',
     tag: 'AI 기반',
   },
@@ -47,7 +47,7 @@ const INTRO_FEATURES = [
     icon: TrendingDown,
     title: '실시간 물가 비교',
     description: '세계 주요 도시의 생활 물가를 실시간으로 비교해 여행 예산을 정확히 수립하세요.',
-    accentColor: '#10b981',
+    accentColor: '#fff5e6',
     glowColor: 'rgba(16,185,129,0.3)',
     tag: '실시간',
   },
@@ -55,7 +55,7 @@ const INTRO_FEATURES = [
     icon: Plane,
     title: '항공권 최저가',
     description: '출발일과 목적지를 선택하면 최저가 항공권을 즉시 비교해 드립니다.',
-    accentColor: '#8b5cf6',
+    accentColor: '#fdffe3',
     glowColor: 'rgba(139,92,246,0.3)',
     tag: '최저가 보장',
   },
@@ -150,7 +150,7 @@ const IntroFeatureCard = ({ icon: Icon, title, description, accentColor, glowCol
         </div>
         <div className="flex flex-col gap-2 flex-1">
           <h3 className="text-lg font-bold text-white">{title}</h3>
-          <p className="text-sm text-slate-400 leading-relaxed">{description}</p>
+          <p className="text-sm text-white leading-relaxed">{description}</p>
         </div>
         <div className="flex items-center gap-2 text-xs font-medium opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-0 group-hover:translate-x-1">
           <span style={{ color: accentColor }}>자세히 보기</span>
@@ -321,10 +321,12 @@ const LoginCardContent = () => {
             및{' '}
             <a href="#" className="underline hover:text-gray-600 transition-colors">개인정보처리방침</a>
             에 동의하게 됩니다.
+            <br />
+            &copy; 2026 다행. All rights reserved.
           </p>
         </div>
 
-        <p className="mt-auto pt-4 text-xs text-gray-400">&copy; 2026 다행. All rights reserved.</p>
+        
       </div>
 
       {/* 우측 패널 */}
@@ -344,14 +346,40 @@ const AuthLayout = () => {
     location.pathname === '/login' ? 'login' : 'intro'
   );
 
+  const NUKI_INTRO_LEFT = -280;
+
+  const [{ cardOffscreenX, nukiFlyX, nukiPhase1X }] = useState(() => {
+    const vw = typeof window !== 'undefined' ? window.innerWidth : 1920;
+    const cardHalfWidth = Math.min((vw - 32) / 2, 700);
+    const cardRightEdge = vw / 2 + cardHalfWidth;
+    const offscreen = NUKI_INTRO_LEFT - cardRightEdge;
+    return { cardOffscreenX: offscreen, nukiFlyX: vw + 2000, nukiPhase1X: -offscreen };
+  });
+
+  const nukiControls = useAnimation();
+  const [nukiVisible, setNukiVisible] = useState(phase !== 'login');
+
   // 브라우저 뒤로가기 등 URL 변경 시 phase 동기화
   useEffect(() => {
     if (location.pathname === '/' && phase !== 'intro') {
       setPhase('intro');
+      nukiControls.set({ x: 0 });
+      setNukiVisible(true);
     } else if (location.pathname === '/login' && phase === 'intro') {
       setPhase('login');
     }
   }, [location.pathname]);
+
+  // 두 단계 nuki: 1) 카드와 함께 중앙까지 → 2) 계속 오른쪽으로 이탈
+  useEffect(() => {
+    if (phase !== 'leaving') return;
+    const run = async () => {
+      await nukiControls.start({ x: nukiPhase1X, transition: { duration: 1.5, ease: 'easeOut' } });
+      await nukiControls.start({ x: nukiFlyX, transition: { duration: 0.8, ease: 'easeIn' } });
+      setNukiVisible(false);
+    };
+    run();
+  }, [phase]);
 
   // login phase일 때 body 스크롤 차단
   useEffect(() => {
@@ -361,41 +389,39 @@ const AuthLayout = () => {
 
   const handleGoToLogin = () => {
     if (phase !== 'intro') return;
-    setPhase('leaving');
+    const scrollDelay = window.scrollY > 0 ? 500 : 0;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     setTimeout(() => {
-      setPhase('login');
-      navigate({ to: '/login' });
-    }, 1300);
+      setPhase('leaving');
+      setTimeout(() => {
+        setPhase('login');
+        navigate({ to: '/login' });
+      }, 1500);
+    }, scrollDelay);
   };
 
   const isIntro = phase === 'intro';
   const isLeaving = phase === 'leaving';
   const isLogin = phase === 'login';
 
-  // 카드 초기 위치: 직접 /login 접속 시 center, 그 외엔 off-screen
-  const cardInitial = isLogin ? { x: 0, y: 0, opacity: 1 } : { x: -770, y: 640, opacity: 0 };
 
   return (
     <div className="min-h-screen flex flex-col relative w-full bg-transparent overflow-hidden" style={{ zIndex: 0 }}>
-      {/* Background */}
+      {/* Background — position:fixed 별도 div로 background-attachment:fixed 대체.
+          fixed bg는 브라우저가 합성 레이어 분리를 못해 CSS transform 애니메이션이
+          메인 스레드 repaint를 유발하므로 제거함. */}
       <div
-        className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: `url(${introBg})`, zIndex: -2 }}
         aria-hidden="true"
+        style={{
+          position: 'fixed',
+          inset: 0,
+          backgroundImage: `url(${introBg})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          zIndex: -2,
+        }}
       />
 
-      {/* Nuki — login phase에서는 숨김 */}
-      {!isLogin && (
-        <motion.img
-          src={nukiImg}
-          className="fixed top-0 left-0 pointer-events-none"
-          style={{ zIndex: isLeaving ? 30 : 5 }}
-          animate={isLeaving ? { x: 2200, y: -1800, scale: 1.5 } : { x: 0, y: 0, scale: 1 }}
-          transition={{ duration: 1.6, ease: [0.2, 0, 1, 0.8] }}
-          alt=""
-          aria-hidden="true"
-        />
-      )}
 
       <div className="relative z-10 flex flex-col min-h-screen">
         <TopNavBar />
@@ -403,8 +429,8 @@ const AuthLayout = () => {
         {/* ── Intro 콘텐츠 ── */}
         <motion.main
           className="flex-1 w-full"
-          animate={!isIntro ? { opacity: 0, y: -16 } : { opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, ease: 'easeIn' }}
+          animate={!isIntro ? { opacity: 0 } : { opacity: 1 }}
+          transition={!isIntro ? { duration: 0 } : { duration: 0.3, ease: 'easeOut' }}
           style={{ pointerEvents: !isIntro ? 'none' : 'auto' }}
         >
           {/* Hero 섹션 */}
@@ -427,9 +453,9 @@ const AuthLayout = () => {
 
             <div className="relative w-full px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 pt-20 pb-12 sm:pt-24 sm:pb-16 lg:pt-28 lg:pb-20">
               <div className="grid grid-cols-12 gap-4 items-center">
-                {/* 좌측 콘텐츠 */}
+                {/* 우측 콘텐츠 */}
                 <motion.div
-                  className="col-span-12 lg:col-span-7 flex flex-col gap-8"
+                  className="col-span-12 lg:col-span-7 lg:col-start-6 flex flex-col gap-8 items-end text-right"
                   variants={staggerContainer}
                   initial="hidden"
                   animate="visible"
@@ -439,8 +465,8 @@ const AuthLayout = () => {
                       className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold"
                       style={{
                         background: 'rgba(59,130,246,0.12)',
-                        border: '1px solid rgba(59,130,246,0.35)',
-                        color: '#60a5fa',
+                        border: '1px solid rgba(255,255,255,0.6)',
+                        color: '#ffffff',
                         backdropFilter: 'blur(12px)',
                         WebkitBackdropFilter: 'blur(12px)',
                       }}
@@ -494,7 +520,7 @@ const AuthLayout = () => {
 
                   <motion.div
                     variants={fadeInUp}
-                    className="flex flex-col sm:flex-row items-start sm:items-center gap-4 pt-2"
+                    className="flex flex-col sm:flex-row items-end sm:items-center gap-4 pt-2"
                   >
                     <button
                       type="button"
@@ -546,112 +572,16 @@ const AuthLayout = () => {
                     </a>
                   </motion.div>
 
-                  <motion.div variants={fadeInUp} className="flex items-center gap-8 pt-2">
+                  <motion.div variants={fadeInUp} className="flex items-center justify-end gap-8 pt-2">
                     {STATS.map((stat) => (
                       <div key={stat.label} className="flex flex-col gap-0.5">
                         <span className="text-2xl font-black text-white tracking-tight">{stat.value}</span>
-                        <span className="text-xs text-slate-500 font-medium uppercase tracking-wider">{stat.label}</span>
+                        <span className="text-xs text-white font-medium uppercase tracking-wider">{stat.label}</span>
                       </div>
                     ))}
                   </motion.div>
                 </motion.div>
 
-                {/* 우측 장식 카드 */}
-                <motion.div
-                  className="col-span-12 lg:col-span-5 flex items-center justify-center lg:justify-end"
-                  initial={{ opacity: 0, x: 40 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.8, delay: 0.4, ease: 'easeOut' }}
-                >
-                  <div className="relative w-full max-w-sm lg:max-w-md">
-                    <div
-                      className="absolute inset-0 rounded-[2rem]"
-                      style={{
-                        background: 'radial-gradient(ellipse at 50% 50%, rgba(59,130,246,0.25) 0%, transparent 70%)',
-                        filter: 'blur(30px)',
-                        transform: 'scale(1.2)',
-                      }}
-                      aria-hidden="true"
-                    />
-                    <div
-                      className="relative rounded-[2rem] p-6 sm:p-8"
-                      style={{
-                        background: 'rgba(15, 23, 42, 0.55)',
-                        backdropFilter: 'blur(40px) saturate(200%) brightness(1.1)',
-                        WebkitBackdropFilter: 'blur(40px) saturate(200%) brightness(1.1)',
-                        border: '1px solid rgba(255,255,255,0.12)',
-                        boxShadow: '0 32px 64px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05), inset 0 1px 0 rgba(255,255,255,0.15), inset 0 -1px 0 rgba(0,0,0,0.2)',
-                      }}
-                    >
-                      <div
-                        className="absolute top-0 left-1/2 -translate-x-1/2 rounded-b-full"
-                        style={{ width: '60%', height: '1px', background: 'linear-gradient(90deg, transparent, rgba(99,163,250,0.8), transparent)' }}
-                        aria-hidden="true"
-                      />
-                      <div className="flex flex-col gap-4">
-                        <div className="flex items-center gap-3 mb-2">
-                          <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: 'rgba(59,130,246,0.2)' }}>
-                            <Globe className="size-4 text-blue-400" aria-hidden="true" />
-                          </div>
-                          <div>
-                            <div className="text-white font-semibold text-sm">AI 여행 분석 중</div>
-                            <div className="text-slate-500 text-xs">도쿄 · 파리 · 발리 비교</div>
-                          </div>
-                        </div>
-                        {[
-                          { label: '도쿄', value: 88, color: '#3b82f6' },
-                          { label: '파리', value: 72, color: '#8b5cf6' },
-                          { label: '발리', value: 95, color: '#10b981' },
-                        ].map((item) => (
-                          <div key={item.label} className="flex flex-col gap-1.5">
-                            <div className="flex justify-between">
-                              <span className="text-slate-400 text-xs">{item.label}</span>
-                              <span className="text-white text-xs font-bold">{item.value}점</span>
-                            </div>
-                            <div className="h-2 w-full rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.08)' }}>
-                              <motion.div
-                                className="h-full rounded-full"
-                                style={{ background: `linear-gradient(90deg, ${item.color}, ${item.color}80)` }}
-                                initial={{ width: 0 }}
-                                animate={{ width: `${item.value}%` }}
-                                transition={{ duration: 1, delay: 0.8, ease: 'easeOut' }}
-                              />
-                            </div>
-                          </div>
-                        ))}
-                        <div className="my-1" style={{ height: '1px', background: 'rgba(255,255,255,0.07)' }} aria-hidden="true" />
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <Plane className="size-4 text-blue-400" aria-hidden="true" />
-                            <span className="text-slate-400 text-xs">최저가 항공</span>
-                          </div>
-                          <div className="text-right">
-                            <span className="text-emerald-400 font-black text-lg">₩319,000</span>
-                            <div className="text-slate-600 text-xs line-through">₩485,000</div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <motion.div
-                      className="absolute -bottom-4 -left-4 rounded-2xl px-4 py-3"
-                      style={{ background: 'rgba(16,185,129,0.15)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(16,185,129,0.25)', boxShadow: '0 8px 24px rgba(0,0,0,0.3)' }}
-                      animate={{ y: [0, -6, 0] }}
-                      transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-                    >
-                      <div className="text-emerald-400 font-black text-sm">34% 절약</div>
-                      <div className="text-slate-400 text-xs">AI 추천 플랜 기준</div>
-                    </motion.div>
-                    <motion.div
-                      className="absolute -top-4 -right-2 rounded-2xl px-4 py-3"
-                      style={{ background: 'rgba(99,102,241,0.15)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(99,102,241,0.25)', boxShadow: '0 8px 24px rgba(0,0,0,0.3)' }}
-                      animate={{ y: [0, 6, 0] }}
-                      transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
-                    >
-                      <div className="text-violet-400 font-black text-sm">1,240개</div>
-                      <div className="text-slate-400 text-xs">연결 항공편</div>
-                    </motion.div>
-                  </div>
-                </motion.div>
               </div>
             </div>
           </section>
@@ -680,7 +610,7 @@ const AuthLayout = () => {
                 >
                   <span
                     className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-widest self-center"
-                    style={{ background: 'rgba(99,102,241,0.12)', border: '1px solid rgba(99,102,241,0.3)', color: '#818cf8' }}
+                    style={{ background: 'rgba(255, 255, 255, 0.12)', border: '1px solid rgba(255, 255, 255, 0.3)', color: '#ffffff' }}
                   >
                     <Sparkles className="size-3" aria-hidden="true" />
                     핵심 기능
@@ -791,7 +721,7 @@ const AuthLayout = () => {
 
         <motion.div
           animate={!isIntro ? { opacity: 0 } : { opacity: 1 }}
-          transition={{ duration: 0.3, ease: 'easeIn' }}
+          transition={!isIntro ? { duration: 0 } : { duration: 0.3, ease: 'easeOut' }}
           style={{ pointerEvents: !isIntro ? 'none' : 'auto' }}
         >
           <Footer />
@@ -800,26 +730,84 @@ const AuthLayout = () => {
         <Outlet />
       </div>
 
-      {/* ── Login 카드 — 항상 마운트, GPU 레이어 ── */}
-      <div
-        className="fixed left-0 right-0 bottom-0 flex items-start justify-center px-4 py-6"
-        style={{
-          top: '64px',
-          zIndex: !isIntro ? 20 : 2,
-          pointerEvents: !isIntro ? 'auto' : 'none',
-          overflow: 'hidden',
-        }}
-      >
-        <motion.div
-          className="w-full max-w-[1400px] mx-auto bg-white rounded-[2.5rem] shadow-2xl border border-slate-100 overflow-hidden flex flex-col lg:flex-row"
-          initial={cardInitial}
-          animate={!isIntro ? { x: 0, y: 0, opacity: 1 } : { x: -770, y: 640, opacity: 0 }}
-          transition={!isIntro ? { duration: 1.4, ease: [0, 0.2, 0.8, 1] } : { duration: 0 }}
-          style={{ willChange: 'transform', maxHeight: 'calc(100vh - 148px)' }}
+      {/* Nuki — intro 대기. leaving 시 두 단계: 카드와 함께 중앙까지 → 계속 오른쪽 이탈 */}
+      {nukiVisible && (
+        <motion.img
+          src={nukiImg}
+          className="pointer-events-none"
+          style={{
+            position: 'fixed',
+            top: '-100px',
+            left: `${NUKI_INTRO_LEFT}px`,
+            zIndex: 30,
+            willChange: 'transform',
+          }}
+          animate={nukiControls}
+          alt=""
+          aria-hidden="true"
+        />
+      )}
+
+      {/* ── 날아가는 카드 (leaving 전용): 왼쪽에서 중앙까지 nuki와 함께 이동 후 정지 ── */}
+      {isLeaving && (
+        <div
+          style={{
+            position: 'fixed',
+            top: '64px',
+            left: 0,
+            right: 0,
+            bottom: 0,
+            display: 'flex',
+            alignItems: 'flex-start',
+            justifyContent: 'center',
+            padding: '24px 16px',
+            zIndex: 19,
+            pointerEvents: 'none',
+          }}
         >
-          <LoginCardContent />
-        </motion.div>
-      </div>
+          <motion.div
+            style={{
+              position: 'relative',
+              width: '100%',
+              maxWidth: '1400px',
+              marginLeft: 'auto',
+              marginRight: 'auto',
+              willChange: 'transform',
+            }}
+            initial={{ x: cardOffscreenX }}
+            animate={{ x: 0 }}
+            transition={{ duration: 1.5, ease: 'easeOut' }}
+          >
+            <div className="bg-white rounded-[2.5rem] shadow-2xl border border-slate-100 overflow-hidden flex flex-col lg:flex-row" style={{ maxHeight: 'calc(100vh - 148px)' }}>
+              <LoginCardContent />
+            </div>
+          </motion.div>
+        </div>
+      )}
+
+      {/* ── 로그인 카드 (login 전용): 카드가 중앙에 멈춘 시점에 즉시 등장 ── */}
+      {isLogin && (
+        <div
+          style={{
+            position: 'fixed',
+            top: '64px',
+            left: 0,
+            right: 0,
+            bottom: 0,
+            display: 'flex',
+            alignItems: 'flex-start',
+            justifyContent: 'center',
+            padding: '24px 16px',
+            zIndex: 20,
+          }}
+        >
+          <div className="relative w-full max-w-[1400px] mx-auto">
+            <div className="bg-white rounded-[2.5rem] shadow-2xl border border-slate-100 overflow-hidden flex flex-col lg:flex-row" style={{ maxHeight: 'calc(100vh - 148px)' }}>
+              <LoginCardContent />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

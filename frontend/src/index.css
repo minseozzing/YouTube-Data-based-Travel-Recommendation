@@ -2,6 +2,11 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
+/* 스크롤바가 없어질 때 레이아웃 이동 방지 */
+html {
+  scrollbar-gutter: stable;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 :root {
