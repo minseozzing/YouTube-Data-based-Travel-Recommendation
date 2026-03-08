@@ -104,6 +104,54 @@
         ]
     },
     {
+        "city_code": "HAWAII",
+        "city_name_kr": "하와이",
+        "country_kr": "미국",
+        "routes": [
+            {
+                "trip_city": "hnl",
+                "airport": "HNL",
+                "trip_airport": "hnl"
+            }
+        ]
+    },
+    {
+        "city_code": "GUAM",
+        "city_name_kr": "괌",
+        "country_kr": "미국",
+        "routes": [
+            {
+                "trip_city": "gum",
+                "airport": "GUM",
+                "trip_airport": "gum"
+            }
+        ]
+    },
+    {
+        "city_code": "SAIPAN",
+        "city_name_kr": "사이판",
+        "country_kr": "미국",
+        "routes": [
+            {
+                "trip_city": "spn",
+                "airport": "SPN",
+                "trip_airport": "spn"
+            }
+        ]
+    },
+    {
+        "city_code": "SEATTLE",
+        "city_name_kr": "시애틀",
+        "country_kr": "미국",
+        "routes": [
+            {
+                "trip_city": "sea",
+                "airport": "SEA",
+                "trip_airport": "sea"
+            }
+        ]
+    },
+    {
         "city_code": "DANANG",
         "city_name_kr": "다낭",
         "country_kr": "베트남",
@@ -169,14 +217,14 @@
         "country_kr": "베트남",
         "routes": [
             {
+                "trip_city": "vdo",
+                "airport": "VDO",
+                "trip_airport": "vdo"
+            },
+            {
                 "trip_city": "hph",
                 "airport": "HPH",
                 "trip_airport": "hph"
-            },
-            {
-                "trip_city": "han",
-                "airport": "HAN",
-                "trip_airport": "han"
             }
         ]
     },
@@ -187,13 +235,13 @@
         "routes": [
             {
                 "trip_city": "tyo",
-                "airport": "NRT",
-                "trip_airport": "nrt"
+                "airport": "HND",
+                "trip_airport": "hnd"
             },
             {
                 "trip_city": "tyo",
-                "airport": "HND",
-                "trip_airport": "hnd"
+                "airport": "NRT",
+                "trip_airport": "nrt"
             }
         ]
     },
@@ -223,6 +271,11 @@
                 "trip_city": "osa",
                 "airport": "KIX",
                 "trip_airport": "kix"
+            },
+            {
+                "trip_city": "osa",
+                "airport": "ITM",
+                "trip_airport": "itm"
             }
         ]
     },
@@ -365,6 +418,18 @@
                 "trip_city": "hkg",
                 "airport": "HKG",
                 "trip_airport": "hkg"
+            }
+        ]
+    },
+    {
+        "city_code": "MACAU",
+        "city_name_kr": "마카오",
+        "country_kr": "중국",
+        "routes": [
+            {
+                "trip_city": "mfm",
+                "airport": "MFM",
+                "trip_airport": "mfm"
             }
         ]
     },
@@ -524,6 +589,18 @@
                 "trip_city": "mnl",
                 "airport": "MNL",
                 "trip_airport": "mnl"
+            }
+        ]
+    },
+    {
+        "city_code": "BOHOL",
+        "city_name_kr": "보홀",
+        "country_kr": "필리핀",
+        "routes": [
+            {
+                "trip_city": "tag",
+                "airport": "TAG",
+                "trip_airport": "tag"
             }
         ]
     },
@@ -971,7 +1048,7 @@
         ]
     },
     {
-        "city_code": "ZURICH",
+        "city_code": "ZRH",
         "city_name_kr": "취리히",
         "country_kr": "스위스",
         "routes": [
@@ -1196,6 +1273,11 @@
         "city_name_kr": "불간",
         "country_kr": "몽골",
         "routes": [
+            {
+                "trip_city": "uln",
+                "airport": "UGA",
+                "trip_airport": "uga"
+            },
             {
                 "trip_city": "uln",
                 "airport": "UBN",
@@ -1437,7 +1519,7 @@
         ]
     },
     {
-        "city_code": "DEBRECEN",
+        "city_code": "DEB",
         "city_name_kr": "데브레첸",
         "country_kr": "헝가리",
         "routes": [
@@ -1534,6 +1616,438 @@
                 "trip_city": "dur",
                 "airport": "DUR",
                 "trip_airport": "dur"
+            }
+        ]
+    },
+    {
+        "city_code": "BALI",
+        "city_name_kr": "발리",
+        "country_kr": "인도네시아",
+        "routes": [
+            {
+                "trip_city": "dps",
+                "airport": "DPS",
+                "trip_airport": "dps"
+            }
+        ]
+    },
+    {
+        "city_code": "JAKARTA",
+        "city_name_kr": "자카르타",
+        "country_kr": "인도네시아",
+        "routes": [
+            {
+                "trip_city": "jkt",
+                "airport": "CGK",
+                "trip_airport": "cgk"
+            }
+        ]
+    },
+    {
+        "city_code": "DENPASAR",
+        "city_name_kr": "덴파사르",
+        "country_kr": "인도네시아",
+        "routes": [
+            {
+                "trip_city": "dps",
+                "airport": "DPS",
+                "trip_airport": "dps"
+            }
+        ]
+    },
+    {
+        "city_code": "YOGYAKARTA",
+        "city_name_kr": "족자카르타",
+        "country_kr": "인도네시아",
+        "routes": [
+            {
+                "trip_city": "jog",
+                "airport": "YIA",
+                "trip_airport": "yia"
+            }
+        ]
+    },
+    {
+        "city_code": "BATAM",
+        "city_name_kr": "바탐",
+        "country_kr": "인도네시아",
+        "routes": [
+            {
+                "trip_city": "bth",
+                "airport": "BTH",
+                "trip_airport": "bth"
+            }
+        ]
+    },
+    {
+        "city_code": "VIENTIANE",
+        "city_name_kr": "비엔티안",
+        "country_kr": "라오스",
+        "routes": [
+            {
+                "trip_city": "vte",
+                "airport": "VTE",
+                "trip_airport": "vte"
+            }
+        ]
+    },
+    {
+        "city_code": "LUANG_PRABANG",
+        "city_name_kr": "루앙프라방",
+        "country_kr": "라오스",
+        "routes": [
+            {
+                "trip_city": "lpq",
+                "airport": "LPQ",
+                "trip_airport": "lpq"
+            }
+        ]
+    },
+    {
+        "city_code": "PRAGUE",
+        "city_name_kr": "프라하",
+        "country_kr": "체코",
+        "routes": [
+            {
+                "trip_city": "prg",
+                "airport": "PRG",
+                "trip_airport": "prg"
+            }
+        ]
+    },
+    {
+        "city_code": "VIENNA",
+        "city_name_kr": "빈",
+        "country_kr": "오스트리아",
+        "routes": [
+            {
+                "trip_city": "vie",
+                "airport": "VIE",
+                "trip_airport": "vie"
+            }
+        ]
+    },
+    {
+        "city_code": "ZAGREB",
+        "city_name_kr": "자그레브",
+        "country_kr": "크로아티아",
+        "routes": [
+            {
+                "trip_city": "zag",
+                "airport": "ZAG",
+                "trip_airport": "zag"
+            }
+        ]
+    },
+    {
+        "city_code": "DUBAI",
+        "city_name_kr": "두바이",
+        "country_kr": "아랍에미리트",
+        "routes": [
+            {
+                "trip_city": "dxb",
+                "airport": "DXB",
+                "trip_airport": "dxb"
+            }
+        ]
+    },
+    {
+        "city_code": "MALE",
+        "city_name_kr": "말레",
+        "country_kr": "몰디브",
+        "routes": [
+            {
+                "trip_city": "mle",
+                "airport": "MLE",
+                "trip_airport": "mle"
+            }
+        ]
+    },
+    {
+        "city_code": "LISBON",
+        "city_name_kr": "리스본",
+        "country_kr": "포르투갈",
+        "routes": [
+            {
+                "trip_city": "lis",
+                "airport": "LIS",
+                "trip_airport": "lis"
+            }
+        ]
+    },
+    {
+        "city_code": "PORTO",
+        "city_name_kr": "포르투",
+        "country_kr": "포르투갈",
+        "routes": [
+            {
+                "trip_city": "opo",
+                "airport": "OPO",
+                "trip_airport": "opo"
+            }
+        ]
+    },
+    {
+        "city_code": "DOHA",
+        "city_name_kr": "도하",
+        "country_kr": "카타르",
+        "routes": [
+            {
+                "trip_city": "doh",
+                "airport": "DOH",
+                "trip_airport": "doh"
+            }
+        ]
+    },
+    {
+        "city_code": "ATHENS",
+        "city_name_kr": "아테네",
+        "country_kr": "그리스",
+        "routes": [
+            {
+                "trip_city": "ath",
+                "airport": "ATH",
+                "trip_airport": "ath"
+            }
+        ]
+    },
+    {
+        "city_code": "WARSAW",
+        "city_name_kr": "바르샤바",
+        "country_kr": "폴란드",
+        "routes": [
+            {
+                "trip_city": "waw",
+                "airport": "WAW",
+                "trip_airport": "waw"
+            }
+        ]
+    },
+    {
+        "city_code": "STOCKHOLM",
+        "city_name_kr": "스톡홀름",
+        "country_kr": "스웨덴",
+        "routes": [
+            {
+                "trip_city": "sto",
+                "airport": "ARN",
+                "trip_airport": "arn"
+            }
+        ]
+    },
+    {
+        "city_code": "OSLO",
+        "city_name_kr": "오슬로",
+        "country_kr": "노르웨이",
+        "routes": [
+            {
+                "trip_city": "osl",
+                "airport": "OSL",
+                "trip_airport": "osl"
+            }
+        ]
+    },
+    {
+        "city_code": "LIMA",
+        "city_name_kr": "리마",
+        "country_kr": "페루",
+        "routes": [
+            {
+                "trip_city": "lim",
+                "airport": "LIM",
+                "trip_airport": "lim"
+            }
+        ]
+    },
+    {
+        "city_code": "CAIRO",
+        "city_name_kr": "카이로",
+        "country_kr": "이집트",
+        "routes": [
+            {
+                "trip_city": "cai",
+                "airport": "CAI",
+                "trip_airport": "cai"
+            }
+        ]
+    },
+    {
+        "city_code": "PORT_LOUIS",
+        "city_name_kr": "포트루이스",
+        "country_kr": "모리셔스",
+        "routes": [
+            {
+                "trip_city": "mru",
+                "airport": "MRU",
+                "trip_airport": "mru"
+            }
+        ]
+    },
+    {
+        "city_code": "REYKJAVIK",
+        "city_name_kr": "레이캬비크",
+        "country_kr": "아이슬란드",
+        "routes": [
+            {
+                "trip_city": "rek",
+                "airport": "KEF",
+                "trip_airport": "kef"
+            }
+        ]
+    },
+    {
+        "city_code": "COPENHAGEN",
+        "city_name_kr": "코펜하겐",
+        "country_kr": "덴마크",
+        "routes": [
+            {
+                "trip_city": "cph",
+                "airport": "CPH",
+                "trip_airport": "cph"
+            }
+        ]
+    },
+    {
+        "city_code": "BRUSSELS",
+        "city_name_kr": "브뤼셀",
+        "country_kr": "벨기에",
+        "routes": [
+            {
+                "trip_city": "bru",
+                "airport": "BRU",
+                "trip_airport": "bru"
+            }
+        ]
+    },
+    {
+        "city_code": "LA_PAZ",
+        "city_name_kr": "라파스",
+        "country_kr": "볼리비아",
+        "routes": [
+            {
+                "trip_city": "lpb",
+                "airport": "LPB",
+                "trip_airport": "lpb"
+            }
+        ]
+    },
+    {
+        "city_code": "UYUNI",
+        "city_name_kr": "우유니",
+        "country_kr": "볼리비아",
+        "routes": [
+            {
+                "trip_city": "uyu",
+                "airport": "UYU",
+                "trip_airport": "uyu"
+            }
+        ]
+    },
+    {
+        "city_code": "BUENOS_AIRES",
+        "city_name_kr": "부에노스아이레스",
+        "country_kr": "아르헨티나",
+        "routes": [
+            {
+                "trip_city": "bue",
+                "airport": "EZE",
+                "trip_airport": "eze"
+            }
+        ]
+    },
+    {
+        "city_code": "SANTIAGO",
+        "city_name_kr": "산티아고",
+        "country_kr": "칠레",
+        "routes": [
+            {
+                "trip_city": "scl",
+                "airport": "SCL",
+                "trip_airport": "scl"
+            }
+        ]
+    },
+    {
+        "city_code": "KATHMANDU",
+        "city_name_kr": "카트만두",
+        "country_kr": "네팔",
+        "routes": [
+            {
+                "trip_city": "ktm",
+                "airport": "KTM",
+                "trip_airport": "ktm"
+            }
+        ]
+    },
+    {
+        "city_code": "KOROR",
+        "city_name_kr": "코로르",
+        "country_kr": "팔라우",
+        "routes": [
+            {
+                "trip_city": "ror",
+                "airport": "ROR",
+                "trip_airport": "ror"
+            }
+        ]
+    },
+    {
+        "city_code": "ALMATY",
+        "city_name_kr": "알마티",
+        "country_kr": "카자흐스탄",
+        "routes": [
+            {
+                "trip_city": "ala",
+                "airport": "ALA",
+                "trip_airport": "ala"
+            }
+        ]
+    },
+    {
+        "city_code": "CASABLANCA",
+        "city_name_kr": "카사블랑카",
+        "country_kr": "모로코",
+        "routes": [
+            {
+                "trip_city": "cmn",
+                "airport": "CMN",
+                "trip_airport": "cmn"
+            }
+        ]
+    },
+    {
+        "city_code": "MARRAKESH",
+        "city_name_kr": "마라케시",
+        "country_kr": "모로코",
+        "routes": [
+            {
+                "trip_city": "rak",
+                "airport": "RAK",
+                "trip_airport": "rak"
+            }
+        ]
+    },
+    {
+        "city_code": "HAVANA",
+        "city_name_kr": "아바나",
+        "country_kr": "쿠바",
+        "routes": [
+            {
+                "trip_city": "hav",
+                "airport": "HAV",
+                "trip_airport": "hav"
+            }
+        ]
+    },
+    {
+        "city_code": "NAIROBI",
+        "city_name_kr": "나이로비",
+        "country_kr": "케냐",
+        "routes": [
+            {
+                "trip_city": "nbo",
+                "airport": "NBO",
+                "trip_airport": "nbo"
             }
         ]
     }
