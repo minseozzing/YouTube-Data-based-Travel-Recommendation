@@ -26,7 +26,7 @@ export function CityDetailTabNav({ activeTab, onTabChange }: CityDetailTabNavPro
     <nav
       role="tablist"
       aria-label="도시 상세 탭"
-      className="flex border-b border-border shrink-0"
+      className="flex gap-2 px-5 py-3 shrink-0 overflow-x-auto"
     >
       {TABS.map((tab) => {
         const Icon = tab.icon;
@@ -40,19 +40,15 @@ export function CityDetailTabNav({ activeTab, onTabChange }: CityDetailTabNavPro
             aria-controls={`tab-panel-${tab.id}`}
             onClick={() => onTabChange(tab.id)}
             className={cn(
-              'flex items-center gap-1.5 px-4 py-3 text-sm font-medium transition-colors relative whitespace-nowrap',
-              'focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:ring-inset',
+              'flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap',
+              'focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/50',
               isActive
-                ? 'text-blue-600 dark:text-blue-400'
-                : 'text-muted-foreground hover:text-foreground',
+                ? 'bg-blue-50 text-blue-600 border border-blue-200'
+                : 'text-muted-foreground border border-border hover:text-foreground hover:bg-slate-50',
             )}
           >
             <Icon className="size-3.5" />
             {tab.label}
-            {/* Active underline */}
-            {isActive && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 dark:bg-blue-400 rounded-full" />
-            )}
           </button>
         );
       })}
