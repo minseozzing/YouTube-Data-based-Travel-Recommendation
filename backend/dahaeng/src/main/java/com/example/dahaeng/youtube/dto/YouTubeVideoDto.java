@@ -1,4 +1,4 @@
-package com.example.dahaeng.auth.dto;
+package com.example.dahaeng.youtube.dto;
 
 import lombok.*;
 import java.util.List;
@@ -11,7 +11,7 @@ import java.util.List;
 public class YouTubeVideoDto {
     private String id;
     private String title;
-    private String channelTitle; // 채널명
+    private String channelTitle; // 채널�?
     private String categoryId;   // 카테고리 ID
-    private List<String> tags;   // 영상 태그 리스트
+    private List<String> tags;   // ?�상 ?�그 리스??
 }

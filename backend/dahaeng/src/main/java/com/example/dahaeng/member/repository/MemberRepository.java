@@ -1,6 +1,6 @@
-package com.example.dahaeng.auth.repository;
+package com.example.dahaeng.member.repository;
 
-import com.example.dahaeng.auth.entity.Member;
+import com.example.dahaeng.member.entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {

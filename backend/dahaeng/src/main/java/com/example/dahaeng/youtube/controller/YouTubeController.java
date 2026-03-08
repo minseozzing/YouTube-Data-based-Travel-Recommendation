@@ -1,10 +1,10 @@
-package com.example.dahaeng.auth.controller;
+package com.example.dahaeng.youtube.controller;
 
 import com.example.dahaeng.auth.dto.CustomOAuth2User;
-import com.example.dahaeng.auth.dto.YouTubePlaylistDto;
-import com.example.dahaeng.auth.dto.YouTubeSubscriptionDto;
-import com.example.dahaeng.auth.dto.YouTubeVideoDto;
-import com.example.dahaeng.auth.service.YouTubeService;
+import com.example.dahaeng.youtube.dto.YouTubePlaylistDto;
+import com.example.dahaeng.youtube.dto.YouTubeSubscriptionDto;
+import com.example.dahaeng.youtube.dto.YouTubeVideoDto;
+import com.example.dahaeng.youtube.service.YouTubeService;
 import com.example.dahaeng.global.exception.CustomException;
 import com.example.dahaeng.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;

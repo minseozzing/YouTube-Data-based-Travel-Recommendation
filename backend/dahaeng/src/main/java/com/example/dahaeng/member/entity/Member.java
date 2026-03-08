@@ -1,4 +1,4 @@
-package com.example.dahaeng.auth.entity;
+package com.example.dahaeng.member.entity;
 
 import com.example.dahaeng.global.entity.BaseEntity;
 import jakarta.persistence.*;
@@ -51,7 +51,7 @@ public class Member extends BaseEntity {
     }
 
     /**
-     * 구글 토큰 정보 업데이트
+     * 구�? ?�큰 ?�보 ?�데?�트
      */
     public void updateGoogleTokens(String accessToken, String refreshToken, LocalDateTime expiresAt) {
         this.googleAccessToken = accessToken;
@@ -62,7 +62,7 @@ public class Member extends BaseEntity {
     }
 
     /**
-     * 회원 탈퇴 (Soft Delete)
+     * ?�원 ?�퇴 (Soft Delete)
      */
     public void withdraw() {
         this.deletedAt = java.time.LocalDateTime.now();

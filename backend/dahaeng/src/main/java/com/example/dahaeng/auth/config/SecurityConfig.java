@@ -5,7 +5,7 @@ import com.example.dahaeng.auth.jwt.JwtFilter;
 import com.example.dahaeng.auth.jwt.JwtProperties;
 import com.example.dahaeng.auth.jwt.JwtUtil;
 import com.example.dahaeng.auth.oauth2.CustomSuccessHandler;
-import com.example.dahaeng.auth.repository.MemberRepository;
+import com.example.dahaeng.member.repository.MemberRepository;
 import com.example.dahaeng.auth.service.CustomOAuth2UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +40,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
 
-        // 1. CORS 설정 (하나의 filterChain 안에 통합)
+        // 1. CORS ?�정 (?�나??filterChain ?�에 ?�합)
         http
                 .cors(corsCustomizer -> corsCustomizer.configurationSource(new CorsConfigurationSource() {
                     @Override
@@ -53,7 +53,7 @@ public class SecurityConfig {
                         configuration.setAllowedHeaders(Collections.singletonList("*"));
                         configuration.setMaxAge(3600L);
 
-                        // 브라우저가 응답에서 읽을 수 있도록 헤더 노출
+                        // 브라?��?가 ?�답?�서 ?�을 ???�도�??�더 ?�출
                         configuration.setExposedHeaders(Collections.singletonList("Set-Cookie"));
                         configuration.setExposedHeaders(Collections.singletonList("Authorization"));
 
@@ -67,11 +67,11 @@ public class SecurityConfig {
                 .formLogin((auth) -> auth.disable())
                 .httpBasic((auth) -> auth.disable());
 
-        // 3. JwtFilter 추가 (UsernamePasswordAuthenticationFilter 이전에 실행)
+        // 3. JwtFilter 추�? (UsernamePasswordAuthenticationFilter ?�전???�행)
         http
                 .addFilterBefore(new JwtFilter(jwtUtil, memberRepository), UsernamePasswordAuthenticationFilter.class);
 
-        // 4. OAuth2 로그인 설정
+        // 4. OAuth2 로그???�정
         http
                 .oauth2Login((oauth2) -> oauth2
                         .authorizationEndpoint(authorization -> authorization
@@ -81,7 +81,7 @@ public class SecurityConfig {
                         .successHandler(customSuccessHandler)
                 );
 
-        // 5. 경로별 인가 작업
+        // 5. 경로�??��? ?�업
         http
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers(
@@ -93,14 +93,14 @@ public class SecurityConfig {
                         ).permitAll()
                         .anyRequest().authenticated());
 
-        // 6. 로그아웃 설정
+        // 6. 로그?�웃 ?�정
         http
                 .logout((logout) -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/")
                         .deleteCookies("Authorization"));
 
-        // 7. 세션 설정 : STATELESS (JWT 사용 필수 설정)
+        // 7. ?�션 ?�정 : STATELESS (JWT ?�용 ?�수 ?�정)
         http
                 .sessionManagement((session) -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));

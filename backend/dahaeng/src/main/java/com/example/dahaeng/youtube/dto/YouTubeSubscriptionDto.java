@@ -1,4 +1,4 @@
-package com.example.dahaeng.auth.dto;
+package com.example.dahaeng.youtube.dto;
 
 import lombok.*;
 
@@ -9,5 +9,5 @@ import lombok.*;
 @AllArgsConstructor
 public class YouTubeSubscriptionDto {
     private String id;
-    private String title; // 구독한 채널명
+    private String title; // 구독??채널�?
 }
