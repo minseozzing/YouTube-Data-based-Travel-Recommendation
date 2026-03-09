@@ -15,6 +15,7 @@ import {
   CartesianGrid,
   Tooltip,
   ReferenceLine,
+  LabelList,
 } from 'recharts';
 import type { CostCompare } from '@/schemas/cost.schema';
 
@@ -54,6 +55,7 @@ export function SeoulCompareSection({ data, isLoading }: SeoulCompareSectionProp
     data?.item_comparison.items.map((item) => ({
       name: item.item_name,
       차이: item.difference_percent,
+      금액차이: item.difference_krw,
     })) ?? [];
 
   return (
@@ -159,7 +161,7 @@ export function SeoulCompareSection({ data, isLoading }: SeoulCompareSectionProp
               <BarChart
                 data={barData}
                 layout="vertical"
-                margin={{ top: 0, right: 56, left: 4, bottom: 0 }}
+                margin={{ top: 0, right: 80, left: 4, bottom: 0 }}
               >
                 <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#e2e8f0" />
                 <XAxis
@@ -178,6 +180,35 @@ export function SeoulCompareSection({ data, isLoading }: SeoulCompareSectionProp
                   ]}
                 />
                 <Bar dataKey="차이" barSize={18} radius={[0, 4, 4, 0]}>
+                  <LabelList
+                    dataKey="금액차이"
+                    position="right"
+                    content={(props) => {
+                      const { x, y, width, height, value } = props as {
+                        x?: number;
+                        y?: number;
+                        width?: number;
+                        height?: number;
+                        value?: number;
+                      };
+                      const val = value ?? 0;
+                      const lx = (x ?? 0) + (width ?? 0) + 8;
+                      const ly = (y ?? 0) + (height ?? 0) / 2;
+                      const color = val >= 0 ? '#ef4444' : '#3b82f6';
+                      return (
+                        <text
+                          x={lx}
+                          y={ly}
+                          fill={color}
+                          fontSize={11}
+                          fontWeight={700}
+                          dominantBaseline="middle"
+                        >
+                          {val >= 0 ? '+' : ''}₩{Math.abs(val).toLocaleString()}
+                        </text>
+                      );
+                    }}
+                  />
                   {barData.map((entry) => (
                     <Cell
                       key={entry.name}
