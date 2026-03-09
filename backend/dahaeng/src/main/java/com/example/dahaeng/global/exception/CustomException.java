@@ -7,7 +7,7 @@ public class CustomException extends RuntimeException {
 
     private final ErrorCode errorCode;
 
-    // 프론트에 내려줄 메시지(= 개발자가 정한 문장)
+    // 클라이언트에 전달할 메시지(= 개발자가 정의한 문장)
     private final String clientMessage;
 
     // 서버 로그에만 남길 상세 메시지(민감/디버그 정보 포함 가능)
