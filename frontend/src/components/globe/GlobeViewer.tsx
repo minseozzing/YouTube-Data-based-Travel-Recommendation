@@ -48,6 +48,7 @@ type GeoFeature = {
 function getGeoBounds(geo: GeoFeature) {
   const coords: [number, number][] = [];
   const geom = geo.geometry;
+
   if (geom.type === "Polygon") {
     (geom.coordinates[0] as [number, number][]).forEach((c) => coords.push(c));
   } else if (geom.type === "MultiPolygon") {
@@ -55,14 +56,24 @@ function getGeoBounds(geo: GeoFeature) {
       poly[0].forEach((c) => coords.push(c)),
     );
   }
+
   if (!coords.length) return null;
+
   const lngs = coords.map((c) => c[0]);
   const lats = coords.map((c) => c[1]);
+
+  const minLng = Math.min(...lngs);
+  const maxLng = Math.max(...lngs);
+  const minLat = Math.min(...lats);
+  const maxLat = Math.max(...lats);
+
   return {
-    minLng: Math.min(...lngs),
-    maxLng: Math.max(...lngs),
-    minLat: Math.min(...lats),
-    maxLat: Math.max(...lats),
+    minLng,
+    maxLng,
+    minLat,
+    maxLat,
+    width: maxLng - minLng,
+    height: maxLat - minLat,
   };
 }
 
@@ -124,6 +135,7 @@ const BaseLayer = React.memo(
             <Geography
               key={geo.rsmKey}
               geography={geo}
+              tabIndex={-1}
               fill={isSelected ? "#d4d4d4" : "#F1F5F9"}
               stroke={showBorders && !isSelected ? "#626262" : "none"}
               strokeWidth={showBorders && !isSelected ? 0.5 : 0}
@@ -166,23 +178,33 @@ const ADMIN_STYLE = {
   },
   hover: { outline: "none" },
   pressed: { outline: "none" },
-};
+} as const;
 
 // react-simple-maps가 URL 기반 fetch를 내부적으로 캐시하므로
 // 재클릭 시 네트워크 요청 없이 즉시 렌더됨
 const AdminLayer = React.memo(({ iso }: { iso: string }) => (
   <Geographies geography={getAdminUrl(iso)}>
     {({ geographies }: { geographies: GeoFeature[] }) =>
-      geographies.map((geo) => (
-        <Geography
-          key={geo.rsmKey}
-          geography={geo}
-          fill="none"
-          stroke="#334155"
-          strokeWidth={0.8}
-          style={ADMIN_STYLE}
-        />
-      ))
+      geographies
+        .filter((geo) => {
+          const bounds = getGeoBounds(geo);
+          if (!bounds) return false;
+
+          // 지도 전체를 덮는 비정상 geometry 제거
+          if (bounds.width > 300 || bounds.height > 140) return false;
+
+          return true;
+        })
+        .map((geo) => (
+          <Geography
+            key={geo.rsmKey}
+            geography={geo}
+            fill="none"
+            stroke="#334155"
+            strokeWidth={0.8}
+            style={ADMIN_STYLE}
+          />
+        ))
     }
   </Geographies>
 ));
@@ -331,7 +353,7 @@ export function GlobeViewer({ width, height }: GlobeViewerProps) {
   ]);
 
   const worldWidth = (2 * Math.PI * width) / 7;
-  const OFFSETS = [0] as const;
+  const OFFSETS = [-1, 0, 1] as const;
 
   return (
     <>
@@ -340,7 +362,8 @@ export function GlobeViewer({ width, height }: GlobeViewerProps) {
         height={height}
         projection="geoMercator"
         projectionConfig={{ scale: width / 7 }}
-        style={{ width: "100%", height: "100%" }}
+        tabIndex={-1}
+        style={{ width: "100%", height: "100%", outline: "none" }}
       >
         <ZoomableGroup
           center={center}
