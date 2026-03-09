@@ -11,6 +11,11 @@ export const queryKeys = {
     city: (cityId: number) => ['cost', 'city', cityId] as const,
     summary: () => ['cost', 'summary'] as const,
     exchange: (base: string, target: string) => ['cost', 'exchange', base, target] as const,
+    // New keys (Costapi.md)
+    exchangeNew: (currency: string) => ['cost', 'exchange-new', currency] as const,
+    exchangeHistory: (currency: string, type: string) => ['cost', 'exchange-history', currency, type] as const,
+    costDetail: (targetType: string, targetId: number) => ['cost', 'detail', targetType, targetId] as const,
+    costCompare: (cityId: number) => ['cost', 'compare', cityId] as const,
   },
   flight: {
     all: ['flight'] as const,
