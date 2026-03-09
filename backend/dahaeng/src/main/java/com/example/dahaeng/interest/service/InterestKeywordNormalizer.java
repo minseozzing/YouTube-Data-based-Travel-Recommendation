@@ -2,6 +2,7 @@ package com.example.dahaeng.interest.service;
 
 import com.example.dahaeng.interest.dto.InterestKeywordCandidate;
 import com.example.dahaeng.interest.dto.TokenizedSignal;
+import com.example.dahaeng.interest.enums.InterestSourceType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,15 +22,14 @@ public class InterestKeywordNormalizer {
                 continue;
             }
             String trimmed = raw.trim();
-            String key = trimmed.toLowerCase(Locale.ROOT);
-            String normalized = synonymMap.getOrDefault(trimmed, synonymMap.getOrDefault(key, trimmed));
+            String normalized = synonymMap.getOrDefault(trimmed, trimmed);
 
-            // 키워드 정규화 및 후보 생성 (점수 및 상세 집계는 이후 ScoreCalculator에서 수행됨)
             result.add(InterestKeywordCandidate.builder()
                     .rawKeyword(trimmed)
                     .normalizedKeyword(normalized)
                     .sourceType(token.getSourceType())
                     .sourceTypes(Set.of(token.getSourceType()))
+                    .latestSignalTime(token.getSignalTime())
                     .totalScore(0.0)
                     .totalCount(1)
                     .distinctSourceCount(1)

@@ -27,7 +27,7 @@ public class YouTubeSyncSnapshot extends BaseEntity {
     @Column(name = "snapshot_type", nullable = false)
     private SnapshotType snapshotType;
 
-    @Column(name = "raw_json", columnDefinition = "json", nullable = false)
+    @Column(name = "raw_json", columnDefinition = "LONGTEXT")
     private String rawJson;
 
     @Column(name = "collected_at", nullable = false)

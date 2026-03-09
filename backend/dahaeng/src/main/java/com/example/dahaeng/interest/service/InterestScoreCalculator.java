@@ -2,10 +2,11 @@ package com.example.dahaeng.interest.service;
 
 import com.example.dahaeng.interest.dto.InterestKeywordCandidate;
 import com.example.dahaeng.interest.enums.InterestSourceType;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -33,10 +34,9 @@ public class InterestScoreCalculator {
         for (InterestKeywordCandidate candidate : normalizedCandidates) {
             String normKey = candidate.getNormalizedKeyword();
             String rawKey = candidate.getRawKeyword();
-            InterestSourceType source = candidate.getSourceType();
             
             KeywordScoreModel model = scoreModels.computeIfAbsent(normKey, k -> new KeywordScoreModel(normKey, rawKey));
-            model.addOccurrence(source);
+            model.addOccurrence(candidate.getSourceType(), candidate.getLatestSignalTime());
         }
 
         return scoreModels.values().stream()
@@ -67,10 +67,10 @@ public class InterestScoreCalculator {
 
         int distinctSources = model.getDistinctSourceCount();
         double diversityBonus = (distinctSources >= 2) ? (distinctSources - 1) * 0.2 : 0.0;
-        
-        double finalScore = dampedScoreSum * (1 + diversityBonus);
+        double recencyWeight = getRecencyWeight(model.latestSignalTime);
 
-        // 정규화된 키워드 기준으로 범용 단어 감점 (50%)
+        double finalScore = dampedScoreSum * (1 + diversityBonus) * recencyWeight;
+
         if (genericKeywords.contains(model.normalizedKeyword.toLowerCase(Locale.ROOT))) {
             finalScore *= 0.5;
         }
@@ -82,30 +82,42 @@ public class InterestScoreCalculator {
                 .sourceTypes(model.sourceCounts.keySet())
                 .totalCount(model.getTotalCount())
                 .distinctSourceCount(distinctSources)
+                .latestSignalTime(model.latestSignalTime)
                 .sourceType(representativeSource)
                 .build();
+    }
+
+    private double getRecencyWeight(LocalDateTime signalTime) {
+        if (signalTime == null) return 1.0;
+        long days = ChronoUnit.DAYS.between(signalTime, LocalDateTime.now());
+        if (days <= 7) return 1.3;
+        if (days <= 30) return 1.15;
+        if (days <= 90) return 1.0;
+        if (days <= 180) return 0.8;
+        return 0.6;
     }
 
     private static class KeywordScoreModel {
         private final String normalizedKeyword;
         private final String representativeRawKeyword;
         private final Map<InterestSourceType, Integer> sourceCounts = new HashMap<>();
+        private LocalDateTime latestSignalTime;
         
         public KeywordScoreModel(String normalizedKeyword, String rawKeyword) {
             this.normalizedKeyword = normalizedKeyword;
             this.representativeRawKeyword = rawKeyword;
         }
 
-        public void addOccurrence(InterestSourceType source) {
+        public void addOccurrence(InterestSourceType source, LocalDateTime signalTime) {
             sourceCounts.put(source, sourceCounts.getOrDefault(source, 0) + 1);
+            if (signalTime != null) {
+                if (latestSignalTime == null || signalTime.isAfter(latestSignalTime)) {
+                    latestSignalTime = signalTime;
+                }
+            }
         }
 
-        public int getDistinctSourceCount() {
-            return sourceCounts.size();
-        }
-
-        public int getTotalCount() {
-            return sourceCounts.values().stream().mapToInt(Integer::intValue).sum();
-        }
+        public int getDistinctSourceCount() { return sourceCounts.size(); }
+        public int getTotalCount() { return sourceCounts.values().stream().mapToInt(Integer::intValue).sum(); }
     }
 }
