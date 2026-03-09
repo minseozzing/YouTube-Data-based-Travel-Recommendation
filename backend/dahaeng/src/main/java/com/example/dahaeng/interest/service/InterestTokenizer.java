@@ -3,6 +3,7 @@ package com.example.dahaeng.interest.service;
 import com.example.dahaeng.interest.dto.RawInterestSignal;
 import com.example.dahaeng.interest.dto.TokenizedSignal;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -10,16 +11,18 @@ import java.util.List;
 import java.util.Set;
 
 @Service
-@RequiredArgsConstructor
 public class InterestTokenizer {
 
     private final Set<String> stopwords;
 
-    // 한국어 조사/어미 약식 트리밍 규칙 (소극적 적용)
-    private static final List<String> KOREAN_SUFFIXES = List.of(
-            "에서", "으로", "은", "는", "이", "가", "을", "를", "에", "의", "도", "와", "과"
-    );
+    public InterestTokenizer(@Qualifier("stopwords") Set<String> stopwords) {
+        this.stopwords = stopwords;
+    }
 
+    /**
+     * 정제된 텍스트를 단어(Token) 단위로 분리합니다.
+     * 언더스코어(_)를 유지하여 보호된 복합어를 하나의 토큰으로 취급합니다.
+     */
     public List<TokenizedSignal> tokenize(List<RawInterestSignal> signals) {
         List<TokenizedSignal> result = new ArrayList<>();
         
@@ -63,4 +66,9 @@ public class InterestTokenizer {
         }
         return token;
     }
+
+    // 한국어 조사/어미 약식 트리밍 규칙 (소극적 적용)
+    private static final List<String> KOREAN_SUFFIXES = List.of(
+            "에서", "으로", "은", "는", "이", "가", "을", "를", "에", "의", "도", "와", "과"
+    );
 }

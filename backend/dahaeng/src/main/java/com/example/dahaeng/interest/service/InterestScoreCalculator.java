@@ -3,19 +3,25 @@ package com.example.dahaeng.interest.service;
 import com.example.dahaeng.interest.dto.InterestKeywordCandidate;
 import com.example.dahaeng.interest.enums.InterestSourceType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class InterestScoreCalculator {
 
     private final Map<InterestSourceType, Double> sourceWeightMap;
-    private final Set<String> genericKeywords; // DictionaryConfig에서 주입받음
+    private final Set<String> genericKeywords;
     
     private static final double MIN_SCORE_THRESHOLD = 1.0;
+
+    public InterestScoreCalculator(Map<InterestSourceType, Double> sourceWeightMap,
+                                   @Qualifier("genericKeywords") Set<String> genericKeywords) {
+        this.sourceWeightMap = sourceWeightMap;
+        this.genericKeywords = genericKeywords;
+    }
 
     public List<InterestKeywordCandidate> score(List<InterestKeywordCandidate> normalizedCandidates) {
         if (normalizedCandidates == null || normalizedCandidates.isEmpty()) {

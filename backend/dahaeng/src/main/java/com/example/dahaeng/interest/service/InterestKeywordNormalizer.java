@@ -5,10 +5,7 @@ import com.example.dahaeng.interest.dto.TokenizedSignal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -27,12 +24,15 @@ public class InterestKeywordNormalizer {
             String key = trimmed.toLowerCase(Locale.ROOT);
             String normalized = synonymMap.getOrDefault(trimmed, synonymMap.getOrDefault(key, trimmed));
 
-            // 국가/도시/고유명사는 normalized keyword 레벨에서 관리
+            // 키워드 정규화 및 후보 생성 (점수 및 상세 집계는 이후 ScoreCalculator에서 수행됨)
             result.add(InterestKeywordCandidate.builder()
                     .rawKeyword(trimmed)
                     .normalizedKeyword(normalized)
                     .sourceType(token.getSourceType())
-                    .score(0.0)
+                    .sourceTypes(Set.of(token.getSourceType()))
+                    .totalScore(0.0)
+                    .totalCount(1)
+                    .distinctSourceCount(1)
                     .build());
         }
         return result;
