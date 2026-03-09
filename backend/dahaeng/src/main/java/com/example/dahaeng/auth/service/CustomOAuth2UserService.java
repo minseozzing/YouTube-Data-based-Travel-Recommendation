@@ -25,6 +25,7 @@ import java.time.ZoneId;
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private final MemberRepository memberRepository;
+    private final com.example.dahaeng.youtube.service.YouTubeSaveService youtubeSaveService;
 
     @Override
     @Transactional
@@ -71,9 +72,11 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             log.info("[CustomOAuth2UserService] 기존 회원 프로필 갱신: socialId={}", socialId);
         }
 
-        // 구글 토큰 갱신 (refresh_token은 SuccessHandler에서 별도 처리 필요)
-        member.updateGoogleTokens(googleAccessToken, null, expiresAt);
-        memberRepository.save(member);
+        member = memberRepository.save(member);
+
+        // YouTubeAccount에 토큰 정보 저장 (Source of Truth)
+        // channelId는 최초 연동 시 YouTubeSyncService에서 채우게 되므로 여기서는 null 유지 가능
+        youtubeSaveService.upsertAccount(member, null, email, googleAccessToken, null, expiresAt);
 
         MemberDto memberDto = MemberDto.builder()
                 .id(member.getId())

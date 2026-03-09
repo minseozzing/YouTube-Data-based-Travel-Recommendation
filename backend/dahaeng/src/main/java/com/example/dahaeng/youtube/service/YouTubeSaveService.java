@@ -30,33 +30,27 @@ public class YouTubeSaveService {
     private final YouTubeVideoTagRepository videoTagRepository;
     private final YouTubeSyncSnapshotRepository snapshotRepository;
 
-    public YouTubeAccount upsertAccount(Member member, String youtubeChannelId, String googleEmail, String accessToken, String refreshToken) {
+    public YouTubeAccount upsertAccount(Member member, String youtubeChannelId, String googleEmail, String accessToken, String refreshToken, LocalDateTime tokenExpiresAt) {
         Optional<YouTubeAccount> existing = accountRepository.findByMemberId(member.getId());
-        YouTubeAccount account = existing.orElseGet(() -> YouTubeAccount.builder()
+        
+        if (existing.isPresent()) {
+            YouTubeAccount account = existing.get();
+            account.updateChannelInfo(youtubeChannelId, googleEmail);
+            account.updateTokens(accessToken, refreshToken, tokenExpiresAt);
+            return accountRepository.save(account);
+        }
+
+        YouTubeAccount newAccount = YouTubeAccount.builder()
                 .member(member)
                 .youtubeChannelId(youtubeChannelId)
                 .googleEmail(googleEmail)
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
+                .tokenExpiresAt(tokenExpiresAt)
                 .syncStatus(SyncStatus.PENDING)
-                .build());
+                .build();
 
-        if (existing.isPresent()) {
-            YouTubeAccount prev = existing.get();
-            String channelId = youtubeChannelId != null ? youtubeChannelId : prev.getYoutubeChannelId();
-            account = YouTubeAccount.builder()
-                    .id(prev.getId())
-                    .member(prev.getMember())
-                    .youtubeChannelId(channelId)
-                    .googleEmail(googleEmail)
-                    .accessToken(accessToken)
-                    .refreshToken(refreshToken)
-                    .syncStatus(prev.getSyncStatus())
-                    .lastSyncedAt(prev.getLastSyncedAt())
-                    .build();
-        }
-
-        return accountRepository.save(account);
+        return accountRepository.save(newAccount);
     }
 
     public void deleteStalePlaylists(YouTubeAccount account, Set<String> latestPlaylistIds) {

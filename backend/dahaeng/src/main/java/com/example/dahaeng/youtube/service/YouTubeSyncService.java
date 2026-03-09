@@ -12,6 +12,7 @@ import com.example.dahaeng.youtube.entity.YouTubeVideo;
 import com.example.dahaeng.youtube.enums.PrivacyStatus;
 import com.example.dahaeng.youtube.enums.SnapshotType;
 import com.example.dahaeng.youtube.enums.SyncStatus;
+import com.example.dahaeng.youtube.repository.YouTubeAccountRepository;
 import com.example.dahaeng.youtube.service.YouTubeFetchService.YouTubeApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,16 +27,19 @@ import java.util.*;
 public class YouTubeSyncService {
 
     private final MemberRepository memberRepository;
+    private final YouTubeAccountRepository accountRepository;
     private final YouTubeFetchService fetchService;
     private final YouTubeSaveService saveService;
 
     @Transactional
     public void sync(CustomOAuth2User principal) {
         Member member = getAuthenticatedMember(principal);
-        String accessToken = getValidAccessToken(member);
+        YouTubeAccount account = getYouTubeAccount(member);
+        String accessToken = account.getAccessToken();
         LocalDateTime now = LocalDateTime.now();
 
-        YouTubeAccount account = setupAccount(member, accessToken);
+        // 채널 정보 업데이트
+        account = updateAccountInfo(account, accessToken);
 
         try {
             saveService.updateSyncStatus(account, SyncStatus.PENDING, account.getLastSyncedAt());
@@ -74,21 +78,31 @@ public class YouTubeSyncService {
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "사용자를 찾을 수 없습니다."));
     }
 
-    private String getValidAccessToken(Member member) {
-        String token = member.getGoogleAccessToken();
-        if (token == null || token.isBlank()) {
+    private YouTubeAccount getYouTubeAccount(Member member) {
+        YouTubeAccount account = accountRepository.findByMemberId(member.getId())
+                .orElseThrow(() -> new CustomException(ErrorCode.UNAUTHORIZED, "구글 연동 정보가 없습니다."));
+
+        if (account.getAccessToken() == null || account.getAccessToken().isBlank()) {
             throw new CustomException(ErrorCode.UNAUTHORIZED, "구글 연동 정보가 없습니다.");
         }
-        return token;
+        return account;
     }
 
-    private YouTubeAccount setupAccount(Member member, String accessToken) {
+    private YouTubeAccount updateAccountInfo(YouTubeAccount account, String accessToken) {
         YouTubeApiResponse<YouTubeChannelResponse> channelResp = fetchService.fetchMyChannel(accessToken);
         if (channelResp.getBody().getItems().isEmpty()) {
             throw new CustomException(ErrorCode.EXTERNAL_API_BAD_RESPONSE, "채널 정보를 찾을 수 없습니다.");
         }
         String channelId = channelResp.getBody().getItems().get(0).getId();
-        return saveService.upsertAccount(member, channelId, member.getEmail(), accessToken, member.getGoogleRefreshToken());
+
+        return saveService.upsertAccount(
+                account.getMember(),
+                channelId,
+                account.getMember().getEmail(), // member 이메일을 기본으로 사용
+                account.getAccessToken(),
+                account.getRefreshToken(),
+                account.getTokenExpiresAt()
+        );
     }
 
     private Map<String, YouTubePlaylist> syncPlaylists(YouTubeAccount account, String accessToken, LocalDateTime now) {
@@ -164,8 +178,6 @@ public class YouTubeSyncService {
         Map<String, YouTubeVideo> videoMap = new HashMap<>();
         for (String videoId : videoIds) {
             YouTubeApiResponse<YouTubeVideoResponse> videoResp = fetchService.fetchVideoDetails(accessToken, videoId);
-            // Snapshot 저장은 생략 가능하거나 필요시 유지 (현재는 유지)
-            // saveService.replaceSnapshot(account, SnapshotType.VIDEO_DETAILS, videoResp.getRawJson(), now);
 
             if (videoResp.getBody().getItems().isEmpty()) continue;
 
@@ -179,11 +191,11 @@ public class YouTubeSyncService {
         return videoMap;
     }
 
-    private void finalizeRelations(YouTubeAccount account, 
-                                   Map<String, YouTubePlaylist> playlistMap, 
-                                   Map<String, List<RawPlaylistItem>> playlistItemsMap, 
-                                   Map<String, YouTubeVideo> videoMap, 
-                                   List<String> likedVideoIds, 
+    private void finalizeRelations(YouTubeAccount account,
+                                   Map<String, YouTubePlaylist> playlistMap,
+                                   Map<String, List<RawPlaylistItem>> playlistItemsMap,
+                                   Map<String, YouTubeVideo> videoMap,
+                                   List<String> likedVideoIds,
                                    LocalDateTime now) {
         // 재생목록-비디오 연결
         for (Map.Entry<String, List<RawPlaylistItem>> entry : playlistItemsMap.entrySet()) {
