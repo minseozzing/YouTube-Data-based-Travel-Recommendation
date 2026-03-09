@@ -11,7 +11,7 @@ const TOP_N = 5;
 
 export function TopMatchingList() {
   const { data: citiesFromApi, isLoading } = useCityList();
-  const { globeBudgetFilter, globeRiskFilter, globeDuration, isRecommendActive } = useUiStore();
+  const { globeBudgetFilter, globeDuration, isRecommendActive } = useUiStore();
 
   const cities = citiesFromApi?.length ? citiesFromApi : DUMMY_CITIES;
 
@@ -22,14 +22,13 @@ export function TopMatchingList() {
           const withinBudget =
             adjustedBudget >= globeBudgetFilter[0] &&
             adjustedBudget <= globeBudgetFilter[1];
-          const withinRisk = city.riskLevel <= globeRiskFilter;
-          return withinBudget && withinRisk;
+          return withinBudget;
         })
       : cities;
     return [...base]
       .sort((a, b) => (b.matchingScore ?? 0) - (a.matchingScore ?? 0))
       .slice(0, TOP_N);
-  }, [cities, globeBudgetFilter, globeRiskFilter, globeDuration, isRecommendActive]);
+  }, [cities, globeBudgetFilter, globeDuration, isRecommendActive]);
 
   return (
     <section

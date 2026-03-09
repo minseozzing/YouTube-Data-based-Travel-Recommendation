@@ -1,86 +1,133 @@
-import { useState, useCallback, useRef, type ChangeEvent } from "react";
+import { useState, useCallback, type ChangeEvent } from "react";
 import { SlidersHorizontal, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useUiStore } from "@/stores/uiStore";
 import { useRecommend } from "@/hooks/city/useRecommend";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
-const RISK_LABELS: Record<number, string> = {
-  1: "매우 낮음",
-  2: "낮음",
-  3: "보통",
-  4: "높음",
-  5: "매우 높음",
-};
+const MONTHS = [
+  { value: 1, label: "1월" },
+  { value: 2, label: "2월" },
+  { value: 3, label: "3월" },
+  { value: 4, label: "4월" },
+  { value: 5, label: "5월" },
+  { value: 6, label: "6월" },
+  { value: 7, label: "7월" },
+  { value: 8, label: "8월" },
+  { value: 9, label: "9월" },
+  { value: 10, label: "10월" },
+  { value: 11, label: "11월" },
+  { value: 12, label: "12월" },
+];
+
+// 현재 연/월을 기준으로 선택 가능 범위를 제한한다.
+const now = new Date();
+const currentYear = now.getFullYear();
+const currentMonth = now.getMonth() + 1;
+console.log("currentYear:", currentYear, "currentMonth:", currentMonth);
+// 현재 연도부터 3개 연도만 보여준다.
+const YEARS = [currentYear, currentYear + 1, currentYear + 2];
 
 export function TripSettingsPanel() {
   const {
     setGlobeBudgetFilter,
-    setGlobeRiskFilter,
     setGlobeDuration,
+    setGlobeTravelMonth,
     setRecommendActive,
   } = useUiStore();
 
   const [budgetInput, setBudgetInput] = useState<string>("10,000,000");
   const [durationInput, setDurationInput] = useState<string>("2");
-  const [riskLevel, setRiskLevel] = useState<number>(5);
-  const [isDragging, setIsDragging] = useState(false);
-  const riskTrackRef = useRef<HTMLDivElement>(null);
-  const isDraggingRef = useRef(false);
-
-  // px-1.5(6px) 패딩 고려 — 썸 center 기준
-  const getRiskFromPointer = useCallback((clientX: number) => {
-    const el = riskTrackRef.current;
-    if (!el) return null;
-    const { left, width } = el.getBoundingClientRect();
-    const ratio = Math.max(0, Math.min(1, (clientX - left - 6) / (width - 12)));
-    return Math.round(ratio * 4) + 1;
-  }, []);
-
-  const handlePointerDown = useCallback(
-    (e: React.PointerEvent<HTMLDivElement>) => {
-      isDraggingRef.current = true;
-      setIsDragging(true);
-      e.currentTarget.setPointerCapture(e.pointerId);
-      const level = getRiskFromPointer(e.clientX);
-      if (level !== null) setRiskLevel(level);
-    },
-    [getRiskFromPointer],
+  const [selectedYear, setSelectedYear] = useState<number>(currentYear);
+  const [selectedMonth, setSelectedMonth] = useState<number>(
+    new Date().getMonth() + 1,
   );
-
-  const handlePointerMove = useCallback(
-    (e: React.PointerEvent<HTMLDivElement>) => {
-      if (!isDraggingRef.current) return;
-      const level = getRiskFromPointer(e.clientX);
-      if (level !== null) setRiskLevel(level);
-    },
-    [getRiskFromPointer],
-  );
-
-  const handlePointerUp = useCallback(() => {
-    isDraggingRef.current = false;
-    setIsDragging(false);
-  }, []);
 
   const { mutate: recommend, isPending } = useRecommend();
 
+  // 선택한 연/월이 현재 시점보다 과거인지 검사한다.
+  const isPastMonth = useCallback((year: number, month: number) => {
+    if (year < currentYear) return true;
+    if (year === currentYear && month < currentMonth) return true;
+    return false;
+  }, []);
+
+  // 연도 변경 시, 현재 선택된 월과 조합해서 과거가 되면 변경하지 않는다.
+  const handleYearChange = useCallback(
+    (value: string) => {
+      const nextYear = Number(value);
+
+      if (isPastMonth(nextYear, selectedMonth)) {
+        toast.error("과거는 선택할 수 없습니다.");
+        return;
+      }
+
+      setSelectedYear(nextYear);
+    },
+    [isPastMonth, selectedMonth],
+  );
+
+  // 월 변경 시, 현재 선택된 연도와 조합해서 과거가 되면 변경하지 않는다.
+  const handleMonthChange = useCallback(
+    (value: string) => {
+      const nextMonth = Number(value);
+
+      console.log({
+        selectedYear,
+        nextMonth,
+        currentYear,
+        currentMonth,
+        isPast: isPastMonth(selectedYear, nextMonth),
+      });
+
+      if (isPastMonth(selectedYear, nextMonth)) {
+        console.log("toast called");
+        toast.error("과거는 선택할 수 없습니다.");
+        return;
+      }
+
+      setSelectedMonth(nextMonth);
+    },
+    [isPastMonth, selectedYear],
+  );
+
+  // 초기화 시 현재 연/월로 되돌리고 추천 상태도 해제한다.
   const handleReset = useCallback(() => {
+    const now = new Date();
+
     setBudgetInput("10,000,000");
     setDurationInput("2");
-    setRiskLevel(5);
-    setGlobeBudgetFilter([0, 5_000_000]);
-    setGlobeRiskFilter(5);
-    setGlobeDuration(2);
-    setRecommendActive(false);
-  }, [setGlobeBudgetFilter, setGlobeRiskFilter, setRecommendActive]);
+    setSelectedYear(now.getFullYear());
+    setSelectedMonth(now.getMonth() + 1);
 
+    setGlobeBudgetFilter([0, 5_000_000]);
+    setGlobeDuration(2);
+    setGlobeTravelMonth(now.getFullYear(), now.getMonth() + 1);
+    setRecommendActive(false);
+  }, [
+    setGlobeBudgetFilter,
+    setGlobeDuration,
+    setGlobeTravelMonth,
+    setRecommendActive,
+  ]);
+
+  // 예산 입력은 숫자만 허용하고 천 단위 콤마를 붙인다.
   const handleBudgetChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     const digits = e.target.value.replace(/[^0-9]/g, "");
     const formatted = digits.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     setBudgetInput(formatted);
   }, []);
 
+  // 여행 기간 입력은 숫자만 허용한다.
   const handleDurationChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
       const raw = e.target.value.replace(/[^0-9]/g, "");
@@ -89,23 +136,26 @@ export function TripSettingsPanel() {
     [],
   );
 
+  // 현재 입력값이 유효할 때만 전역 상태와 추천 요청을 갱신한다.
   const handleUpdateRecommendations = useCallback(() => {
     const budget = parseInt(budgetInput.replace(/,/g, ""), 10);
     const duration = parseInt(durationInput, 10);
+
     if (!isNaN(budget) && budget > 0 && !isNaN(duration) && duration > 0) {
       setGlobeBudgetFilter([0, budget]);
-      setGlobeRiskFilter(riskLevel);
       setGlobeDuration(duration);
+      setGlobeTravelMonth(selectedYear, selectedMonth);
       setRecommendActive(true);
       recommend({ budget, duration });
     }
   }, [
     budgetInput,
     durationInput,
-    riskLevel,
+    selectedYear,
+    selectedMonth,
     setGlobeBudgetFilter,
-    setGlobeRiskFilter,
     setGlobeDuration,
+    setGlobeTravelMonth,
     setRecommendActive,
     recommend,
   ]);
@@ -136,7 +186,45 @@ export function TripSettingsPanel() {
           초기화
         </button>
       </div>
+      <Button onClick={() => toast.error("테스트 토스트")}>
+        토스트 테스트
+      </Button>
+      {/* 여행 월 */}
+      <div className="flex flex-col gap-1.5">
+        <label className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
+          여행 월
+        </label>
+        <div className="flex gap-2">
+          <Select value={String(selectedYear)} onValueChange={handleYearChange}>
+            <SelectTrigger className="flex-1 text-sm bg-white/70 border-slate-200 focus:ring-blue-300">
+              <SelectValue placeholder="년도" />
+            </SelectTrigger>
+            <SelectContent>
+              {YEARS.map((year) => (
+                <SelectItem key={year} value={String(year)}>
+                  {year}년
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
+          <Select
+            value={String(selectedMonth)}
+            onValueChange={handleMonthChange}
+          >
+            <SelectTrigger className="flex-1 text-sm bg-white/70 border-slate-200 focus:ring-blue-300">
+              <SelectValue placeholder="월" />
+            </SelectTrigger>
+            <SelectContent>
+              {MONTHS.map(({ value, label }) => (
+                <SelectItem key={value} value={String(value)}>
+                  {label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
       {/* 예산 */}
       <div className="flex flex-col gap-1.5">
         <label
@@ -160,7 +248,6 @@ export function TripSettingsPanel() {
           />
         </div>
       </div>
-
       {/* 여행 기간 */}
       <div className="flex flex-col gap-1.5">
         <label
@@ -179,57 +266,6 @@ export function TripSettingsPanel() {
           placeholder="-"
         />
       </div>
-
-      {/* 위험도 슬라이더 */}
-      <div className="flex flex-col gap-1.5">
-        <div className="flex items-center justify-between">
-          <label
-            htmlFor="risk-slider"
-            className="text-xs font-semibold text-slate-500 uppercase tracking-wide"
-          >
-            위험도 허용 수준
-          </label>
-          <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">
-            {RISK_LABELS[riskLevel] ?? "보통"}
-          </span>
-        </div>
-        {/* 커스텀 슬라이더 */}
-        <div
-          ref={riskTrackRef}
-          className="relative py-3 px-0 mx-4 cursor-pointer select-none"
-          onPointerDown={handlePointerDown}
-          onPointerMove={handlePointerMove}
-          onPointerUp={handlePointerUp}
-        >
-          {/* 트랙 */}
-          <div className="h-[2px] bg-slate-200" />
-          {/* 눈금 점 + 썸: 모두 left % + translateX(-50%)로 정렬 */}
-          {[1, 2, 3, 4, 5].map((i) => (
-            <div
-              key={i}
-              className="absolute top-1/2 w-1 h-1 rounded-full bg-slate-300 pointer-events-none"
-              style={{
-                left: `${(i - 1) * 25}%`,
-                transform: "translate(-50%, -50%)",
-              }}
-            />
-          ))}
-          {/* 썸 */}
-          <div
-            className="absolute top-1/2 w-3 h-3 bg-blue-500 rounded-full ring-2 ring-blue-200 shadow-sm pointer-events-none"
-            style={{
-              left: `${(riskLevel - 1) * 25}%`,
-              transform: "translate(-50%, -50%)",
-              transition: isDragging ? "none" : "left 0.18s ease",
-            }}
-          />
-        </div>
-        <div className="flex justify-between text-[10px] text-slate-400 px-1">
-          <span>안전</span>
-          <span>모험적</span>
-        </div>
-      </div>
-
       {/* 추천 업데이트 버튼 */}
       <Button
         onClick={handleUpdateRecommendations}
