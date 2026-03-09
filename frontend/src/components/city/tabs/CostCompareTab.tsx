@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertCircle, Loader2 } from 'lucide-react';
-import { ExchangeRateDashboard } from '@/components/cost/ExchangeRateDashboard';
-import { ExchangeRateChart } from '@/components/cost/ExchangeRateChart';
+import { ExchangeRateCombinedSection } from '@/components/cost/ExchangeRateCombinedSection';
 import { CostDetailTable } from '@/components/cost/CostDetailTable';
 import { SeoulCompareSection } from '@/components/cost/SeoulCompareSection';
 import { useCityPriceTab } from '@/hooks/cost/useCityPriceTab';
@@ -68,23 +67,21 @@ export function CostCompareTab({ city }: CostCompareTabProps) {
         exit="exit"
         className="flex flex-col gap-5 p-4 bg-slate-50/30 dark:bg-slate-900/10 min-h-full"
       >
-        {/* A. 실시간 환율 정보 */}
-        <ExchangeRateDashboard
-          data={exchangeRate.data}
+        {/* A. 환율 정보 (현재 환율 2 : 환율 추이 8) */}
+        <ExchangeRateCombinedSection
+          currency={currency}
+          exchangeRateData={exchangeRate.data}
           isLoading={exchangeRate.isLoading}
         />
 
-        {/* B. 환율 추이 차트 */}
-        <ExchangeRateChart currency={currency} />
-
-        {/* C. 항목별 전체 물가표 (월급, 인구 정보 포함) */}
+        {/* B. 항목별 전체 물가표 (월급, 인구 정보 포함) */}
         <CostDetailTable
           data={costDetail.data}
           isLoading={costDetail.isLoading}
           seoulLivingCost={seoulDetail.data?.living_cost}
         />
 
-        {/* D. 서울 vs 도시 물가 요약 및 비교 지표 (항목별 차이 차트 포함) */}
+        {/* C. 서울 vs 도시 물가 요약 및 비교 지표 (항목별 차이 차트 포함) */}
         <SeoulCompareSection
           data={costCompare.data}
           isLoading={costCompare.isLoading}
