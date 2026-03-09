@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls c:/Users/SSAFY/Desktop/inho/Dahaeng/S14P21D206/frontend/public/geo/*.json)"
+    ]
+  }
+}

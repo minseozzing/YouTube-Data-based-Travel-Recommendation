@@ -1,22 +1,130 @@
-import { useState } from 'react';
-import { Landmark, ArrowLeft } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { SaveButton } from '@/components/city/SaveButton';
-import { useUiStore } from '@/stores/uiStore';
-import { cn } from '@/lib/utils';
-import type { CityDetail } from '@/schemas/city.schema';
+import { useState } from "react";
+import {
+  ArrowLeft,
+  Heart,
+  Loader2,
+  Utensils,
+  Landmark,
+  Trees,
+  ShoppingBag,
+  Compass,
+  BookOpen,
+  Tag,
+  type LucideIcon,
+} from "lucide-react";
+import { useUiStore } from "@/stores/uiStore";
+import { useCreateBookmark } from "@/hooks/bookmark/useCreateBookmark";
+import { cn } from "@/lib/utils";
+import type { CityDetail } from "@/schemas/city.schema";
 
 interface DestinationHeroCardProps {
   city: CityDetail;
   className?: string;
 }
 
-export function DestinationHeroCard({ city, className }: DestinationHeroCardProps) {
+const KEYWORD_ICON_MAP: Array<{ patterns: string[]; icon: LucideIcon }> = [
+  { patterns: ["미식", "음식", "foodie", "food"], icon: Utensils },
+  { patterns: ["문화", "예술", "culture", "art"], icon: Landmark },
+  { patterns: ["자연", "nature"], icon: Trees },
+  { patterns: ["쇼핑", "shopping"], icon: ShoppingBag },
+  { patterns: ["낭만", "로맨틱", "romantic", "romance"], icon: Heart },
+  { patterns: ["역사", "history", "historical"], icon: BookOpen },
+  { patterns: ["모험", "액티비티", "adventure", "activity"], icon: Compass },
+];
+
+function getKeywordIcon(keyword: string): LucideIcon {
+  const lower = keyword.toLowerCase();
+  for (const { patterns, icon } of KEYWORD_ICON_MAP) {
+    if (patterns.some((p) => lower.includes(p))) return icon;
+  }
+  return Tag;
+}
+
+interface MatchCardProps {
+  score: number;
+  city: CityDetail;
+}
+
+function MatchCard({ score, city }: MatchCardProps) {
+  const { mutate: createBookmark, isPending } = useCreateBookmark();
+
+  const handleSave = () => {
+    createBookmark({
+      country: city.countryName,
+      city: city.cityName,
+      json: JSON.stringify(city),
+    });
+  };
+
+  return (
+    <div className="backdrop-blur-md bg-white/10 border border-white/20 rounded-xl p-3.5 flex items-center justify-between gap-3">
+      <div className="flex flex-col gap-0.5">
+        <span className="text-xs text-slate-300 uppercase tracking-wider font-medium">
+          Your Match
+        </span>
+        <span className="text-3xl font-bold text-white leading-none">
+          {score}%
+        </span>
+      </div>
+      <button
+        onClick={handleSave}
+        disabled={isPending}
+        aria-label="저장하기"
+        className={cn(
+          "w-14 h-14 rounded-full border-[3px] border-blue-400/80 bg-blue-500/20",
+          "flex items-center justify-center shrink-0",
+          "hover:bg-blue-500/40 active:scale-95 transition-all duration-150",
+          "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300/60",
+          isPending && "opacity-70 cursor-not-allowed",
+        )}
+      >
+        {isPending ? (
+          <Loader2 className="size-5 text-white animate-spin" />
+        ) : (
+          <Heart className="size-5 text-white" />
+        )}
+      </button>
+    </div>
+  );
+}
+
+interface KeywordTagsProps {
+  keywords: string[];
+}
+
+function KeywordTags({ keywords }: KeywordTagsProps) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      {keywords.map((keyword) => {
+        const Icon = getKeywordIcon(keyword);
+        return (
+          <span
+            key={keyword}
+            className="flex items-center gap-1.5 backdrop-blur-md bg-white/10 border border-white/20 rounded-full px-3 py-1.5"
+          >
+            <Icon className="size-4 text-white/80 shrink-0" />
+            <span className="text-sm font-medium text-white">#{keyword}</span>
+          </span>
+        );
+      })}
+    </div>
+  );
+}
+
+export function DestinationHeroCard({
+  city,
+  className,
+}: DestinationHeroCardProps) {
   const [imgError, setImgError] = useState(false);
   const { closeCityModal } = useUiStore();
 
   return (
-    <div className={cn('relative flex flex-col w-72 shrink-0 overflow-hidden rounded-l-2xl', className)}>
+    <div
+      className={cn(
+        "relative flex flex-col w-48 sm:w-72 lg:w-90 shrink-0 overflow-hidden rounded-l-2xl",
+        className,
+      )}
+    >
       {/* Background image */}
       {!imgError ? (
         <img
@@ -31,18 +139,18 @@ export function DestinationHeroCard({ city, className }: DestinationHeroCardProp
         </div>
       )}
 
-      {/* Gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+      {/* Gradient overlay — stronger at bottom for readability */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-black/10" />
 
-      {/* Back button top-left */}
+      {/* Back button */}
       <div className="relative z-10 flex items-start p-4">
         <button
           onClick={closeCityModal}
           aria-label="뒤로 가기"
           className={cn(
-            'flex items-center gap-1.5 text-xs text-white/80 hover:text-white',
-            'bg-black/20 hover:bg-black/40 rounded-lg px-2.5 py-1.5',
-            'transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50',
+            "flex items-center gap-1.5 text-xs text-white/80 hover:text-white",
+            "backdrop-blur-md bg-black/20 hover:bg-black/40 border border-white/10 rounded-lg px-2.5 py-1.5",
+            "transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50",
           )}
         >
           <ArrowLeft className="size-3" />
@@ -50,30 +158,28 @@ export function DestinationHeroCard({ city, className }: DestinationHeroCardProp
         </button>
       </div>
 
-      {/* Spacer to push content down */}
+      {/* Spacer */}
       <div className="flex-1" />
 
       {/* Bottom content */}
-      <div className="relative z-10 p-5 flex flex-col gap-3">
-        {/* Matching score badge */}
-        {city.matchingScore !== undefined && (
-          <div>
-            <Badge className="bg-blue-500/90 text-white border-transparent text-xs font-semibold px-2.5 py-0.5 rounded-full">
-              매칭 {city.matchingScore}%
-            </Badge>
-          </div>
-        )}
-
-        {/* City and country name */}
+      <div className="relative z-10 p-6 flex flex-col gap-5">
+        {/* City name + subtext */}
         <div>
           <h2 className="text-2xl font-bold text-white leading-tight drop-shadow-md">
             {city.cityName}
           </h2>
-          <p className="text-sm text-white/80 mt-0.5">{city.countryName}</p>
+          <p className="text-sm text-white/70 mt-1">{city.countryName}</p>
         </div>
 
-        {/* Save button */}
-        <SaveButton city={city} />
+        {/* Glassmorphism matching score card */}
+        {city.matchingScore !== undefined && (
+          <MatchCard score={city.matchingScore} city={city} />
+        )}
+
+        {/* Glassmorphism keyword tags */}
+        {city.keywords && city.keywords.length > 0 && (
+          <KeywordTags keywords={city.keywords} />
+        )}
       </div>
     </div>
   );

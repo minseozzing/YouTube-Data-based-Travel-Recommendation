@@ -4,7 +4,8 @@
       "Bash(pnpm add react-simple-maps world-atlas topojson-client)",
       "Bash(pnpm add -D @types/topojson-client @types/world-atlas)",
       "Bash(pnpm add -D @types/topojson-client)",
-      "Bash(node -e \":*)"
+      "Bash(node -e \":*)",
+      "Bash(node -e \"const d=require\\(''./public/geo/KOR.json''\\); console.log\\(''features:'', d.features.length\\); console.log\\(''properties:'', JSON.stringify\\(d.features[0].properties\\)\\)\")"
     ]
   }
 }

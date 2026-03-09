@@ -53,6 +53,7 @@
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
     "globals": "^16.5.0",
+    "mapshaper": "^0.6.113",
     "postcss": "^8.5.8",
     "shadcn": "^3.8.5",
     "tailwindcss": "^4.2.1",
