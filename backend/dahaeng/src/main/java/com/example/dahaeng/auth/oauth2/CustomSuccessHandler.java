@@ -6,6 +6,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -18,8 +19,8 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     private final OAuthCodeService oAuthCodeService;
 
-    // 프론트 콜백 URL (환경변수/프로퍼티로 분리 권장)
-    private static final String FRONT_CALLBACK_URL = "http://localhost:3000/oauth/callback";
+    @Value("${app.front-callback-url}")
+    private String frontCallbackUrl;
 
     @Override
     public void onAuthenticationSuccess(
@@ -32,7 +33,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         // 1회용 code 발급 (30~60초 만료 권장)
         String code = oAuthCodeService.issueCode(principal);
 
-        // 프론트로 redirect (토큰이 아니라 code 전달)
-        response.sendRedirect(FRONT_CALLBACK_URL + "?code=" + code);
+        // 프론트(또는 현재 설정된 URL)로 redirect (토큰이 아니라 code 전달)
+        response.sendRedirect(frontCallbackUrl + "?code=" + code);
     }
 }
