@@ -1,5 +1,7 @@
 package com.example.dahaeng.domain.bookmark.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.example.dahaeng.domain.bookmark.dto.request.BookMarkCreateRequest;
 import com.example.dahaeng.domain.bookmark.dto.response.BookmarkCreateResponse;
 import com.example.dahaeng.domain.bookmark.dto.response.BookmarkDetailResponse;
+import com.example.dahaeng.domain.bookmark.dto.response.BookmarkSummaryResponse;
 import com.example.dahaeng.domain.bookmark.entity.Bookmark;
 import com.example.dahaeng.domain.bookmark.repository.BookmarkRepository;
 import com.example.dahaeng.domain.city.entity.City;
@@ -66,6 +69,15 @@ public class BookmarkService {
 			.build();
 
 		return new BookmarkCreateResponse("북마크 생성 완료", bookmarkRepository.save(bookmark).getId());
+	}
+
+	public List<BookmarkSummaryResponse> summaries(String keyword, Long memberId) {
+		Member member = validMember(memberId);
+
+		List<Bookmark> bookmarks = bookmarkRepository.findAllByKeywordAndMember(keyword, member);
+		return bookmarks.stream()
+			.map(BookmarkSummaryResponse::from)
+			.toList();
 	}
 
 	private Member validMember(Long memberId) {
