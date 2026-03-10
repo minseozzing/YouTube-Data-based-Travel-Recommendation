@@ -1,6 +1,6 @@
 package com.example.dahaeng.domain.city.entity;
 
-import com.example.dahaeng.domain.location.country.entity.Country;
+import com.example.dahaeng.domain.country.entity.Country;
 import com.example.dahaeng.global.entity.BaseEntity;
 
 import jakarta.persistence.*;
