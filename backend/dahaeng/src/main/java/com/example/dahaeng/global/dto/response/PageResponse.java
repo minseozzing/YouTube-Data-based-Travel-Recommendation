@@ -1,4 +1,4 @@
-package com.example.dahaeng.global.dto.page.response;
+package com.example.dahaeng.global.dto.response;
 
 import java.util.List;
 

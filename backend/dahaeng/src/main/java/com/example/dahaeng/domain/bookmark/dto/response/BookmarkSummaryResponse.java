@@ -6,7 +6,8 @@ import java.time.OffsetDateTime;
 import com.example.dahaeng.domain.bookmark.entity.Bookmark;
 
 public record BookmarkSummaryResponse(
-	Long city,
+	Long id,
+	Long cityId,
 	String cityName,
 	String countryName,
 	String imgUrl,
@@ -14,6 +15,7 @@ public record BookmarkSummaryResponse(
 ) {
 	public static BookmarkSummaryResponse from(Bookmark bookmark) {
 		return new BookmarkSummaryResponse(
+			bookmark.getId(),
 			bookmark.getCity().getId(),
 			bookmark.getCity().getCityName(),
 			bookmark.getCity().getCountry().getCountryName(),

@@ -4,6 +4,7 @@ import com.example.dahaeng.domain.exchange.dto.response.current.ExchangeRateResp
 import com.fasterxml.jackson.databind.JsonNode;
 
 public record BookmarkDetailResponse(
+	Long id,
 	JsonNode json,
 	ExchangeRateResponse currentExchange
 ) {

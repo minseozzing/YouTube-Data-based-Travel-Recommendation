@@ -25,4 +25,8 @@ public abstract class BaseEntity {
 
     @Column(name = "is_deleted")
     private boolean isDeleted = false;
+
+    public void delete() {
+        this.isDeleted = true;
+    }
 }

@@ -1,15 +1,12 @@
 package com.example.dahaeng.domain.bookmark.controller;
 
-import java.util.List;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,7 +20,8 @@ import com.example.dahaeng.domain.bookmark.dto.request.BookMarkCreateRequest;
 import com.example.dahaeng.domain.bookmark.dto.response.BookmarkDetailResponse;
 import com.example.dahaeng.domain.bookmark.dto.response.BookmarkSummaryResponse;
 import com.example.dahaeng.domain.bookmark.service.BookmarkService;
-import com.example.dahaeng.global.dto.page.response.PageResponse;
+import com.example.dahaeng.global.dto.response.NoContentResponse;
+import com.example.dahaeng.global.dto.response.PageResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import jakarta.annotation.Nullable;
@@ -57,7 +55,7 @@ public class BookmarkController {
 	}
 
 	@PostMapping
-	public ResponseEntity<?> save(
+	public ResponseEntity<NoContentResponse> save(
 		@RequestBody @Valid BookMarkCreateRequest request,
 		@AuthenticationPrincipal CustomOAuth2User user
 	) throws JsonProcessingException {
@@ -65,5 +63,13 @@ public class BookmarkController {
 			bookmarkService.save(request, user.getId()),
 			HttpStatus.CREATED
 		);
+	}
+
+	@DeleteMapping("/{bookmarkId}")
+	public ResponseEntity<NoContentResponse> delete(
+		@PathVariable("bookmarkId") Long id,
+		@AuthenticationPrincipal CustomOAuth2User user
+	) {
+		return ResponseEntity.ok(bookmarkService.delete(id, user.getId()));
 	}
 }
