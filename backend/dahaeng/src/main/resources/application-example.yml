@@ -14,6 +14,9 @@
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     generate-ddl: true
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb://localhost:27017/dahaeng}
 
   jwt:
     secret: your-jwt-secret-base64
