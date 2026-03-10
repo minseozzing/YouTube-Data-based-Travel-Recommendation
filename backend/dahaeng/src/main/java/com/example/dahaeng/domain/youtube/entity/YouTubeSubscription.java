@@ -11,12 +11,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(
-        name = "youtube_subscription",
-        uniqueConstraints = {
-                @UniqueConstraint(name = "uk_account_channel", columnNames = {"account_id", "youtube_channel_id"})
-        }
-)
+@Table(name = "youtube_subscription")
 public class YouTubeSubscription extends BaseEntity {
 
     @Id
@@ -30,10 +25,10 @@ public class YouTubeSubscription extends BaseEntity {
     @Column(name = "youtube_channel_id", length = 100, nullable = false)
     private String youtubeChannelId;
 
-    @Column(name = "title", length = 255)
+    @Column(length = 255)
     private String title;
 
-    @Column(name = "description", columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     @Column(name = "subscribed_at")

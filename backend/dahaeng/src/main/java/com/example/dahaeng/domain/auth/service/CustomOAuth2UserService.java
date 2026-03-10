@@ -6,6 +6,7 @@ import com.example.dahaeng.auth.dto.OAuth2Response;
 import com.example.dahaeng.member.dto.MemberDto;
 import com.example.dahaeng.member.entity.Member;
 import com.example.dahaeng.member.repository.MemberRepository;
+import com.example.dahaeng.youtube.service.YouTubeSaveService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -25,7 +26,7 @@ import java.time.ZoneId;
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private final MemberRepository memberRepository;
-    private final com.example.dahaeng.youtube.service.YouTubeSaveService youtubeSaveService;
+    private final YouTubeSaveService youtubeSaveService;
 
     @Override
     @Transactional
@@ -42,7 +43,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             throw new OAuth2AuthenticationException("Unsupported provider: " + registrationId);
         }
 
-        // 구글 액세스 토큰/만료 정보 추출
         String googleAccessToken = userRequest.getAccessToken().getTokenValue();
         Instant expiresAtInstant = userRequest.getAccessToken().getExpiresAt();
         LocalDateTime expiresAt = LocalDateTime.ofInstant(
@@ -67,15 +67,11 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                     .build();
             log.info("[CustomOAuth2UserService] 신규 회원 생성: socialId={}", socialId);
         } else {
-            // 기존 회원 프로필 갱신
             member.updateProfile(nickname, profileImageUrl);
             log.info("[CustomOAuth2UserService] 기존 회원 프로필 갱신: socialId={}", socialId);
         }
 
         member = memberRepository.save(member);
-
-        // YouTubeAccount에 토큰 정보 저장 (Source of Truth)
-        // channelId는 최초 연동 시 YouTubeSyncService에서 채우게 되므로 여기서는 null 유지 가능
         youtubeSaveService.upsertAccount(member, null, email, googleAccessToken, null, expiresAt);
 
         MemberDto memberDto = MemberDto.builder()

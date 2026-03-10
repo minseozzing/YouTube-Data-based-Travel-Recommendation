@@ -11,12 +11,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(
-        name = "youtube_playlist_video",
-        uniqueConstraints = {
-                @UniqueConstraint(name = "uk_playlist_video", columnNames = {"playlist_id", "video_id"})
-        }
-)
+@Table(name = "youtube_playlist_video")
 public class YouTubePlaylistVideo extends BaseEntity {
 
     @Id
@@ -31,7 +26,6 @@ public class YouTubePlaylistVideo extends BaseEntity {
     @JoinColumn(name = "video_id", nullable = false)
     private YouTubeVideo video;
 
-    @Column(name = "position")
     private Integer position;
 
     @Column(name = "collected_at", nullable = false)

@@ -7,7 +7,8 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Setter
+@NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Entity
@@ -41,9 +42,6 @@ public class Member extends BaseEntity {
         this.profileImageUrl = profileImageUrl;
     }
 
-    /**
-     * 회원 탈퇴 (Soft Delete)
-     */
     public void withdraw() {
         this.deletedAt = LocalDateTime.now();
     }

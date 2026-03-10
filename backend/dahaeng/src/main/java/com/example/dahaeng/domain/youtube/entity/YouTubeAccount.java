@@ -9,7 +9,8 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Setter
+@NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Entity
@@ -46,9 +47,6 @@ public class YouTubeAccount extends BaseEntity {
     @Column(name = "last_synced_at")
     private LocalDateTime lastSyncedAt;
 
-    /**
-     * 토큰 정보 업데이트
-     */
     public void updateTokens(String accessToken, String refreshToken, LocalDateTime expiresAt) {
         this.accessToken = accessToken;
         if (refreshToken != null && !refreshToken.isBlank()) {
@@ -57,9 +55,6 @@ public class YouTubeAccount extends BaseEntity {
         this.tokenExpiresAt = expiresAt;
     }
 
-    /**
-     * 채널 정보 업데이트
-     */
     public void updateChannelInfo(String youtubeChannelId, String googleEmail) {
         if (youtubeChannelId != null && !youtubeChannelId.isBlank()) {
             this.youtubeChannelId = youtubeChannelId;
@@ -69,9 +64,6 @@ public class YouTubeAccount extends BaseEntity {
         }
     }
 
-    /**
-     * 동기화 상태 업데이트
-     */
     public void updateSyncStatus(SyncStatus status, LocalDateTime syncedAt) {
         this.syncStatus = status;
         if (status == SyncStatus.SYNCED) {

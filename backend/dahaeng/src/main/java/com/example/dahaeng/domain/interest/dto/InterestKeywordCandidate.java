@@ -1,14 +1,27 @@
 package com.example.dahaeng.interest.dto;
 
 import com.example.dahaeng.interest.enums.InterestSourceType;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
+
+import java.time.LocalDateTime;
+import java.util.Set;
 
 @Getter
+@Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class InterestKeywordCandidate {
-    private final String rawKeyword;
-    private final String normalizedKeyword;
-    private final InterestSourceType sourceType;
-    private final double score;
+    private String rawKeyword;
+    private String normalizedKeyword;
+    private double totalScore;
+    private Set<InterestSourceType> sourceTypes;
+    private int totalCount;
+    private int distinctSourceCount;
+    private LocalDateTime latestSignalTime;
+    private InterestSourceType sourceType;
+
+    public double getScore() {
+        return totalScore;
+    }
 }
