@@ -35,11 +35,14 @@ public class YouTubeController {
     public ResponseEntity<?> getSyncStatus(@AuthenticationPrincipal CustomOAuth2User principal) {
         if (principal == null) throw new CustomException(ErrorCode.LOGIN_REQUIRED);
         var status = queryService.getSyncStatus(principal.getId());
-        return ResponseEntity.ok(Map.of(
-                "connected", status.connected(),
-                "syncStatus", status.syncStatus(),
-                "lastSyncedAt", status.lastSyncedAt()
-        ));
+        
+        // Map.of는 null 값을 허용하지 않으므로 HashMap을 사용하거나 null 체크를 해야 함
+        java.util.Map<String, Object> response = new java.util.HashMap<>();
+        response.put("connected", status.connected());
+        response.put("syncStatus", status.syncStatus() != null ? status.syncStatus() : "NOT_CONNECTED");
+        response.put("lastSyncedAt", status.lastSyncedAt());
+        
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/playlists")
