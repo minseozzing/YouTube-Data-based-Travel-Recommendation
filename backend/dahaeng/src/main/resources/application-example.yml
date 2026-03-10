@@ -2,15 +2,27 @@
   application:
     name: dahaeng
 
+  # AI 설정 (OpenAI)
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}
+      chat:
+        options:
+          model: gpt-4o-mini
+          temperature: 0.2
+
+  # 데이터베이스 설정
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/dahaeng
-    username: your-db-username
-    password: your-db-password
+    url: ${DB_URL:jdbc:mysql://localhost:3306/dahaeng}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD}
 
+  # JPA / Hibernate 설정
   jpa:
     hibernate:
-      ddl-auto: none
+      # 로컬 개발 시에는 update가 편리하지만, 운영 단계에서는 none 또는 validate를 권장합니다.
+      ddl-auto: ${DDL_AUTO:update}
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     generate-ddl: true
@@ -18,21 +30,27 @@
   #   mongodb:
   #     uri: ${MONGODB_URI:mongodb://localhost:27017/dahaeng}
 
+  # JWT 보안 설정
   jwt:
-    secret: your-jwt-secret-base64
-    access-expiration: 360000000
-    refresh-expiration: 604800000
+    secret: ${JWT_SECRET:your-jwt-secret-base64-default-for-local}
+    access-expiration: ${JWT_ACCESS_EXPIRATION:360000000}
+    refresh-expiration: ${JWT_REFRESH_EXPIRATION:604800000}
 
+  # OAuth2 설정 (Google)
   security:
     oauth2:
       client:
         registration:
           google:
-            client-id: your-google-client-id
-            client-secret: your-google-client-secret
-            scope: profile,email,https://www.googleapis.com/auth/youtube.readonly
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            scope:
+              - profile
+              - email
+              - https://www.googleapis.com/auth/youtube.readonly
             authorization-grant-type: authorization_code
-            redirect-uri: http://localhost:8080/login/oauth2/code/google
+            redirect-uri: ${GOOGLE_REDIRECT_URI:http://localhost:8080/login/oauth2/code/google}
 
+# 앱 커스텀 설정
 app:
-  front-callback-url: http://localhost:8080/
+  front-callback-url: ${FRONT_CALLBACK_URL:http://localhost:8080/}
