@@ -2,6 +2,7 @@ package com.example.dahaeng.domain.interest.service;
 
 import com.example.dahaeng.domain.interest.dto.InterestAnalysisResult;
 import com.example.dahaeng.domain.interest.dto.InterestKeywordCandidate;
+import com.example.dahaeng.domain.interest.dto.TravelTagScore;
 import com.example.dahaeng.domain.interest.enums.InterestCategory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,42 +22,47 @@ public class InterestAnalysisService {
     private final InterestKeywordNormalizer normalizer;
     private final InterestScoreCalculator scoreCalculator;
     private final InterestCategoryMapper categoryMapper;
+    private final TravelPreferenceTagService travelPreferenceTagService;
     private final InterestResultSaver saver;
 
     /**
      * 전체 관심사 분석 파이프라인 실행
-     * 수집 -> 정제 -> 복합어 보호 -> 토큰화 -> 키워드 정규화 -> 점수 계산(최근성 포함) -> 카테고리 매핑 -> 저장
+     * 수집 -> 정제 -> 복합어 보호 -> 토큰화 -> 키워드 정규화 -> 점수 계산(최근성 포함) -> 카테고리 매핑 -> 여행 취향 추론 -> 저장
      */
     @Transactional
     public InterestAnalysisResult analyze(Long accountId) {
-        // 1. 데이터 수집 (시점 정보 포함)
+        // 1. 데이터 수집
         var raw = collector.collect(accountId);
         
-        // 2. 텍스트 정제 (URL, 이모지 등 제거)
+        // 2. 텍스트 정제
         var cleaned = cleaner.clean(raw);
         
-        // 3. 복합어 보호 (백엔드_개발 등)
+        // 3. 복합어 보호
         var phrased = phraseNormalizer.normalizePhrases(cleaned);
         
-        // 4. 토큰화 및 조사 트리밍
+        // 4. 토큰화
         var tokens = tokenizer.tokenize(phrased);
         
-        // 5. 키워드 정규화 (유의어 통합)
+        // 5. 키워드 정규화
         var normalized = normalizer.normalize(tokens);
         
-        // 6. 점수 계산 (Frequency Damping, Diversity Bonus, Recency Weight, Generic Penalty)
+        // 6. 점수 계산
         List<InterestKeywordCandidate> keywordScores = scoreCalculator.score(normalized);
         
-        // 7. 카테고리 매핑
+        // 7. 카테고리 매핑 (기존 방식 유지)
         Map<InterestCategory, Double> categoryScores = categoryMapper.map(keywordScores);
+
+        // 8. 여행 취향 태그 추론 (Spring AI + LLM)
+        List<TravelTagScore> travelTags = travelPreferenceTagService.inferTravelTags(keywordScores);
         
-        // 8. 결과 저장
-        saver.save(accountId, keywordScores, categoryScores);
+        // 9. 결과 저장 ( travelTags 포함)
+        saver.save(accountId, keywordScores, categoryScores, travelTags);
         
         return InterestAnalysisResult.builder()
                 .accountId(accountId)
                 .keywords(keywordScores)
                 .categories(categoryScores)
+                .travelTags(travelTags)
                 .build();
     }
 }
