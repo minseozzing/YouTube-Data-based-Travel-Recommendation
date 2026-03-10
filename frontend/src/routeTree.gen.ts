@@ -20,6 +20,7 @@ import { Route as AuthenticatedCostRouteImport } from './routes/_authenticated/c
 import { Route as AuthenticatedBookmarksRouteImport } from './routes/_authenticated/bookmarks'
 import { Route as AuthV1RouteImport } from './routes/_auth.v1'
 import { Route as AuthLoginRouteImport } from './routes/_auth/login'
+import { Route as AuthenticatedBookmarksIndexRouteImport } from './routes/_authenticated/bookmarks.index'
 import { Route as AuthenticatedCostCountryIdRouteImport } from './routes/_authenticated/cost.$countryId'
 import { Route as AuthenticatedBookmarksIdRouteImport } from './routes/_authenticated/bookmarks.$id'
 
@@ -76,6 +77,12 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
   path: '/login',
   getParentRoute: () => AuthRoute,
 } as any)
+const AuthenticatedBookmarksIndexRoute =
+  AuthenticatedBookmarksIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedBookmarksRoute,
+  } as any)
 const AuthenticatedCostCountryIdRoute =
   AuthenticatedCostCountryIdRouteImport.update({
     id: '/$countryId',
@@ -101,19 +108,20 @@ export interface FileRoutesByFullPath {
   '/auth/callback': typeof AuthCallbackRoute
   '/bookmarks/$id': typeof AuthenticatedBookmarksIdRoute
   '/cost/$countryId': typeof AuthenticatedCostCountryIdRoute
+  '/bookmarks/': typeof AuthenticatedBookmarksIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof AuthIndexRoute
   '/preference': typeof PreferenceRoute
   '/login': typeof AuthLoginRoute
   '/v1': typeof AuthV1Route
-  '/bookmarks': typeof AuthenticatedBookmarksRouteWithChildren
   '/cost': typeof AuthenticatedCostRouteWithChildren
   '/main': typeof AuthenticatedMainRoute
   '/mypage': typeof AuthenticatedMypageRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/bookmarks/$id': typeof AuthenticatedBookmarksIdRoute
   '/cost/$countryId': typeof AuthenticatedCostCountryIdRoute
+  '/bookmarks': typeof AuthenticatedBookmarksIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -130,6 +138,7 @@ export interface FileRoutesById {
   '/_auth/': typeof AuthIndexRoute
   '/_authenticated/bookmarks/$id': typeof AuthenticatedBookmarksIdRoute
   '/_authenticated/cost/$countryId': typeof AuthenticatedCostCountryIdRoute
+  '/_authenticated/bookmarks/': typeof AuthenticatedBookmarksIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -145,19 +154,20 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/bookmarks/$id'
     | '/cost/$countryId'
+    | '/bookmarks/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/preference'
     | '/login'
     | '/v1'
-    | '/bookmarks'
     | '/cost'
     | '/main'
     | '/mypage'
     | '/auth/callback'
     | '/bookmarks/$id'
     | '/cost/$countryId'
+    | '/bookmarks'
   id:
     | '__root__'
     | '/_auth'
@@ -173,6 +183,7 @@ export interface FileRouteTypes {
     | '/_auth/'
     | '/_authenticated/bookmarks/$id'
     | '/_authenticated/cost/$countryId'
+    | '/_authenticated/bookmarks/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -261,6 +272,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLoginRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_authenticated/bookmarks/': {
+      id: '/_authenticated/bookmarks/'
+      path: '/'
+      fullPath: '/bookmarks/'
+      preLoaderRoute: typeof AuthenticatedBookmarksIndexRouteImport
+      parentRoute: typeof AuthenticatedBookmarksRoute
+    }
     '/_authenticated/cost/$countryId': {
       id: '/_authenticated/cost/$countryId'
       path: '/$countryId'
@@ -294,11 +312,13 @@ const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
 interface AuthenticatedBookmarksRouteChildren {
   AuthenticatedBookmarksIdRoute: typeof AuthenticatedBookmarksIdRoute
+  AuthenticatedBookmarksIndexRoute: typeof AuthenticatedBookmarksIndexRoute
 }
 
 const AuthenticatedBookmarksRouteChildren: AuthenticatedBookmarksRouteChildren =
   {
     AuthenticatedBookmarksIdRoute: AuthenticatedBookmarksIdRoute,
+    AuthenticatedBookmarksIndexRoute: AuthenticatedBookmarksIndexRoute,
   }
 
 const AuthenticatedBookmarksRouteWithChildren =

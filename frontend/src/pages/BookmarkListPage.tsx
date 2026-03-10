@@ -177,7 +177,7 @@ const cardVariants: Variants = {
 
 // ─── BookmarkListPage ─────────────────────────────────────────────────────────
 const BookmarkListPage = () => {
-  const { keyword } = useSearch({ from: "/_authenticated/bookmarks" });
+  const { keyword } = useSearch({ from: "/_authenticated/bookmarks/" });
   const { data, isLoading, isError, error, refetch } = useBookmarkList(keyword);
   const { mutate: deleteBookmark } = useDeleteBookmark();
 
