@@ -1,0 +1,83 @@
+import { useState } from 'react';
+import { useNavigate } from '@tanstack/react-router';
+import { MapPin, Landmark } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
+
+interface DestinationCardProps {
+  countryId: number;
+  name: string;
+  city: string;
+  imgUrl: string;
+  avgCost: string;
+  rank?: number;
+}
+
+export function DestinationCard({
+  countryId,
+  name,
+  city,
+  imgUrl,
+  avgCost,
+  rank,
+}: DestinationCardProps) {
+  const navigate = useNavigate();
+  const [imgError, setImgError] = useState(false);
+
+  const handleClick = () => {
+    void navigate({ to: '/cost/$countryId', params: { countryId } });
+  };
+
+  return (
+    <motion.article
+      whileHover={{ y: -4, boxShadow: '0 20px 40px rgba(0,0,0,0.15)' }}
+      transition={{ duration: 0.2 }}
+      className={cn(
+        'relative overflow-hidden rounded-2xl cursor-pointer h-72',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+      )}
+      onClick={handleClick}
+      tabIndex={0}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleClick(); }}
+      role="button"
+      aria-label={`${name} ${city} 물가 상세 보기`}
+    >
+      {/* 배경 이미지 */}
+      {imgError ? (
+        <div className="absolute inset-0 bg-slate-200 flex items-center justify-center">
+          <Landmark className="size-12 text-slate-400" aria-hidden="true" />
+        </div>
+      ) : (
+        <img
+          src={imgUrl}
+          alt={`${name} ${city}`}
+          className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          onError={() => setImgError(true)}
+        />
+      )}
+
+      {/* 하단 그라디언트 오버레이 */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
+
+      {/* BEST 배지 */}
+      {rank !== undefined && (
+        <div className="absolute top-3 left-3">
+          <Badge className="bg-amber-400 text-amber-900 border-transparent font-bold text-xs px-2.5">
+            BEST {rank}
+          </Badge>
+        </div>
+      )}
+
+      {/* 하단 텍스트 */}
+      <div className="absolute bottom-0 left-0 right-0 p-5">
+        <div className="flex items-center gap-1.5 mb-1">
+          <MapPin className="size-3.5 text-white/80" aria-hidden="true" />
+          <span className="text-white/80 text-sm">{city}</span>
+        </div>
+        <h3 className="text-white text-2xl font-bold leading-tight">{name}</h3>
+        <p className="text-white/70 text-sm mt-1">{avgCost}</p>
+      </div>
+    </motion.article>
+  );
+}

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>여행 취향 분석 - 온보딩</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#3b82f6",
+                        "background-light": "#f8fafc",
+                        "background-dark": "#0f172a",
+                    },
+                    fontFamily: {
+                        display: ["Pretendard", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "1rem",
+                    },
+                },
+            },
+        };
+    </script>
+<style>
+        body {
+            font-family: 'Pretendard', sans-serif;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .dark .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex items-center justify-center transition-colors duration-300">
+<div class="max-w-4xl w-full px-6 py-12 text-center">
+<div class="mb-16 space-y-4">
+<h1 class="text-3xl md:text-4xl font-bold tracking-tight">
+                당신에게 딱 맞는 여행지를 추천해드릴게요 ✨
+            </h1>
+<p class="text-xl text-slate-600 dark:text-slate-400 font-medium">
+                취향을 자동으로 분석할까요?
+            </p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto">
+<button class="group relative flex flex-col items-center justify-center p-8 h-64 rounded-3xl glass-card hover:ring-2 hover:ring-primary transition-all duration-300 hover:scale-[1.02] shadow-xl shadow-slate-200/50 dark:shadow-none" onclick="openModal()">
+<div class="w-20 h-20 mb-6 bg-red-50 dark:bg-red-900/20 rounded-2xl flex items-center justify-center group-hover:bg-red-500 transition-colors duration-300">
+<svg class="w-12 h-12 text-red-600 group-hover:text-white transition-colors duration-300" fill="currentColor" viewBox="0 0 24 24">
+<path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"></path>
+</svg>
+</div>
+<div class="space-y-2">
+<span class="block text-xl font-bold">YouTube로 빠르게 분석하기</span>
+<span class="block text-sm text-slate-500 dark:text-slate-400">영상 시청 기록을 기반으로 취향 파악</span>
+</div>
+<div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full">
+                    가장 빠름 ⚡️
+                </div>
+</button>
+<button class="group flex flex-col items-center justify-center p-8 h-64 rounded-3xl glass-card hover:ring-2 hover:ring-slate-400 dark:hover:ring-slate-500 transition-all duration-300 hover:scale-[1.02] shadow-xl shadow-slate-200/50 dark:shadow-none">
+<div class="w-20 h-20 mb-6 bg-slate-100 dark:bg-slate-800 rounded-2xl flex items-center justify-center group-hover:bg-slate-900 dark:group-hover:bg-white transition-colors duration-300">
+<span class="material-symbols-outlined text-4xl text-slate-600 group-hover:text-white dark:group-hover:text-slate-900 transition-colors duration-300">
+                        checklist
+                    </span>
+</div>
+<div class="space-y-2">
+<span class="block text-xl font-bold">직접 선택하기</span>
+<span class="block text-sm text-slate-500 dark:text-slate-400">원하는 키워드를 직접 골라보세요</span>
+</div>
+</button>
+</div>
+<p class="mt-12 text-sm text-slate-400 dark:text-slate-500">
+            분석 정보는 추천 결과 산출을 위해서만 사용되며 별도로 저장되지 않습니다.
+        </p>
+</div>
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300" id="youtubeModal">
+<div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="closeModal()"></div>
+<div class="relative w-full max-w-md bg-white dark:bg-slate-800 rounded-3xl shadow-2xl p-8 transform scale-95 transition-transform duration-300" id="modalBox">
+<div class="text-center space-y-6">
+<div class="mx-auto w-16 h-16 bg-red-100 dark:bg-red-900/30 flex items-center justify-center rounded-full">
+<span class="material-symbols-outlined text-red-600 text-3xl">privacy_tip</span>
+</div>
+<div class="space-y-2">
+<h3 class="text-2xl font-bold">YouTube 좋아요/저장 영상을 분석합니다.</h3>
+<div class="text-slate-600 dark:text-slate-400 space-y-1 py-4">
+<p class="flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">check_circle</span>
+                            영상 제목과 키워드만 사용합니다
+                        </p>
+<p class="flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">check_circle</span>
+                            개인정보는 저장하지 않습니다
+                        </p>
+<p class="flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">check_circle</span>
+                            언제든지 해제할 수 있습니다
+                        </p>
+</div>
+</div>
+<div class="flex flex-col gap-3">
+<button class="w-full py-4 bg-primary text-white font-bold rounded-2xl hover:brightness-110 transition-all">
+                        동의하고 분석하기
+                    </button>
+<button class="w-full py-4 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold rounded-2xl hover:bg-slate-200 dark:hover:bg-slate-600 transition-all" onclick="closeModal()">
+                        취소
+                    </button>
+</div>
+</div>
+</div>
+</div>
+<button class="fixed bottom-6 right-6 p-4 rounded-full bg-white dark:bg-slate-800 shadow-lg border border-slate-200 dark:border-slate-700 hover:scale-110 transition-transform" onclick="document.documentElement.classList.toggle('dark')">
+<span class="material-symbols-outlined dark:hidden">dark_mode</span>
+<span class="material-symbols-outlined hidden dark:block">light_mode</span>
+</button>
+<script>
+        function openModal() {
+            const modal = document.getElementById('youtubeModal');
+            const box = document.getElementById('modalBox');
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            box.classList.remove('scale-95');
+            box.classList.add('scale-100');
+        }
+        function closeModal() {
+            const modal = document.getElementById('youtubeModal');
+            const box = document.getElementById('modalBox');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            box.classList.remove('scale-100');
+            box.classList.add('scale-95');
+        }
+    </script>
+
+</body></html>

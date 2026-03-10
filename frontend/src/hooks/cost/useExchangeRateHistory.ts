@@ -1,0 +1,19 @@
+import { useQuery } from '@tanstack/react-query';
+import { costApi } from '@/api/cost.api';
+import { queryKeys } from '@/utils/queryKeys';
+
+/**
+ * 환율 추이 조회
+ * GET /api/exchange-rate/history?target_currency=XXX&type=d|w|m
+ * staleTime: 30분
+ */
+export const useExchangeRateHistory = (
+  targetCurrency: string,
+  type: 'd' | 'w' | 'm' = 'd',
+) =>
+  useQuery({
+    queryKey: queryKeys.cost.exchangeHistory(targetCurrency, type),
+    queryFn: () => costApi.getExchangeRateHistory(targetCurrency, type),
+    enabled: !!targetCurrency,
+    staleTime: 30 * 60 * 1000,
+  });

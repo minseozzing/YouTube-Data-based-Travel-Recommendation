@@ -14,7 +14,7 @@ public enum ErrorCode {
     NOT_FOUND(HttpStatus.NOT_FOUND, "대상을 찾을 수 없습니다."),
     METHOD_NOT_ALLOWED(HttpStatus.METHOD_NOT_ALLOWED, "지원하지 않는 HTTP 메서드입니다."),
     INTERNAL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 오류가 발생했습니다."),
-    SERVICE_UNAVAILABLE(HttpStatus.SERVICE_UNAVAILABLE, "일시적으로 서비스를 이용할 수 없습니다."),
+    SERVICE_UNAVAILABLE(HttpStatus.SERVICE_UNAVAILABLE, "일시적으로 서비스를 사용할 수 없습니다."),
 
     /* =========================
      *  Validation
@@ -31,12 +31,14 @@ public enum ErrorCode {
     EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "토큰이 만료되었습니다."),
     UNSUPPORTED_TOKEN(HttpStatus.UNAUTHORIZED, "지원하지 않는 토큰입니다."),
     INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "아이디 또는 비밀번호가 올바르지 않습니다."),
+    OAUTH_CODE_INVALID(HttpStatus.UNAUTHORIZED, "유효하지 않거나 만료된 인증 코드입니다."),
+    LOGIN_REQUIRED(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다."),
 
     /* =========================
      *  Authorization
      * ========================= */
     FORBIDDEN(HttpStatus.FORBIDDEN, "접근 권한이 없습니다."),
-    ACCESS_DENIED(HttpStatus.FORBIDDEN, "해당 리소스에 대한 접근이 거부되었습니다."),
+    ACCESS_DENIED(HttpStatus.FORBIDDEN, "해당 리소스에 접근할 권한이 없습니다."),
 
     /* =========================
      *  Business Logic
@@ -56,9 +58,9 @@ public enum ErrorCode {
     /* =========================
      *  External API
      * ========================= */
-    EXTERNAL_API_ERROR(HttpStatus.BAD_GATEWAY, "외부 서비스 호출 중 오류가 발생했습니다."),
-    EXTERNAL_API_TIMEOUT(HttpStatus.GATEWAY_TIMEOUT, "외부 서비스 응답 시간이 초과되었습니다."),
-    EXTERNAL_API_BAD_RESPONSE(HttpStatus.BAD_GATEWAY, "외부 서비스의 응답이 올바르지 않습니다."),
+    EXTERNAL_API_ERROR(HttpStatus.BAD_GATEWAY, "외부 API 호출 중 오류가 발생했습니다."),
+    EXTERNAL_API_TIMEOUT(HttpStatus.GATEWAY_TIMEOUT, "외부 API 응답 시간이 초과되었습니다."),
+    EXTERNAL_API_BAD_RESPONSE(HttpStatus.BAD_GATEWAY, "외부 API 응답이 올바르지 않습니다."),
 
     /* =========================
      *  File / Storage
