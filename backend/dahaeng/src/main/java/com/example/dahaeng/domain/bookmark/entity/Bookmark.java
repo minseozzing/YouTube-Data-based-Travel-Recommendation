@@ -29,5 +29,5 @@ public class Bookmark extends BaseEntity {
 	private City city;
 
 	@Column(columnDefinition = "TEXT")
-	private String content;
+	private String json;
 }

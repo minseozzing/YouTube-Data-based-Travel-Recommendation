@@ -25,7 +25,7 @@ public class YouTubeAccount extends BaseEntity {
     @JoinColumn(name = "member_id", nullable = false, unique = true)
     private Member member;
 
-    @Column(name = "youtube_channel_id", length = 100, unique = true)
+    @Column(name = "youtube_channel_id", length = 100, unique = true, nullable = true)
     private String youtubeChannelId;
 
     @Column(name = "google_email", length = 100)
