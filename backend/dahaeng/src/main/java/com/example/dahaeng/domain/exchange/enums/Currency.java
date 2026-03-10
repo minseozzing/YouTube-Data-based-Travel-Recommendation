@@ -1,4 +1,4 @@
-package com.example.dahaeng.domain.location.exchange.enums;
+package com.example.dahaeng.domain.exchange.enums;
 
 public enum Currency {
 	USD, VND, JPY, CNY, HKD, MOP, THB, PHP, EUR, RUB,

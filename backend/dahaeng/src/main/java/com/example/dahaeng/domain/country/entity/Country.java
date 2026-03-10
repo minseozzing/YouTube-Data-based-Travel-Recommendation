@@ -1,4 +1,4 @@
-package com.example.dahaeng.domain.location.country.entity;
+package com.example.dahaeng.domain.country.entity;
 
 import com.example.dahaeng.domain.location.country.enums.Continent;
 import com.example.dahaeng.domain.location.exchange.enums.Currency;

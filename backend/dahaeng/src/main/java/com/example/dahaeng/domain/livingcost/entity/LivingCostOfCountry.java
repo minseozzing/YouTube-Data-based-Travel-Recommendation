@@ -1,5 +1,5 @@
-package com.example.dahaeng.domain.location.livingcost.entity;
-import com.example.dahaeng.domain.location.country.entity.Country;
+package com.example.dahaeng.domain.livingcost.entity;
+import com.example.dahaeng.domain.country.entity.Country;
 import com.example.dahaeng.global.entity.BaseEntity;
 
 import jakarta.persistence.*;

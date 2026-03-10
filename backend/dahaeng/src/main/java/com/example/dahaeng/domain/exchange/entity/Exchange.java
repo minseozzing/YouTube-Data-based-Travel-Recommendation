@@ -1,4 +1,4 @@
-package com.example.dahaeng.domain.location.exchange.entity;
+package com.example.dahaeng.domain.exchange.entity;
 
 
 import jakarta.persistence.*;

@@ -1,4 +1,4 @@
-package com.example.dahaeng.domain.location.city.entity;
+package com.example.dahaeng.domain.city.entity;
 
 import com.example.dahaeng.domain.location.country.entity.Country;
 import com.example.dahaeng.global.entity.BaseEntity;
