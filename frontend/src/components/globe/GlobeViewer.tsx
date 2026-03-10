@@ -450,12 +450,19 @@ export function GlobeViewer({ width, height }: GlobeViewerProps) {
       return withinBudget;
     });
     return new Set(matched.map((c) => c.cityId));
-  }, [
-    cities,
-    globeBudgetFilter,
-    globeDuration,
-    isRecommendActive,
-  ]);
+  }, [cities, globeBudgetFilter, globeDuration, isRecommendActive]);
+
+  // 추천 활성 시 상위 3개 도시 → cityId: rank(1|2|3) 매핑
+  const medalRankMap = useMemo<Map<number, 1 | 2 | 3>>(() => {
+    if (!isRecommendActive) return new Map();
+    const sorted = [...cities]
+      .filter((c) => matchedCityIds.has(c.cityId))
+      .sort((a, b) => (b.matchingScore ?? 0) - (a.matchingScore ?? 0))
+      .slice(0, 3);
+    const map = new Map<number, 1 | 2 | 3>();
+    sorted.forEach((c, i) => map.set(c.cityId, (i + 1) as 1 | 2 | 3));
+    return map;
+  }, [cities, matchedCityIds, isRecommendActive]);
 
   const worldWidth = (2 * Math.PI * width) / 7;
   const OFFSETS = [-1, 0, 1] as const;
@@ -546,6 +553,9 @@ export function GlobeViewer({ width, height }: GlobeViewerProps) {
               {cities.map((city) => {
                 const isMatched =
                   !isRecommendActive || matchedCityIds.has(city.cityId);
+                const medalRank = medalRankMap.get(city.cityId);
+                const r = 5 / zoom;
+                const medalSize = 30 / zoom;
                 return (
                   <Marker
                     key={`${city.cityId}-${slotIndex}`}
@@ -558,14 +568,14 @@ export function GlobeViewer({ width, height }: GlobeViewerProps) {
                     }
                   >
                     <circle
-                      r={5 / zoom}
+                      r={r}
                       fill={
                         isMatched
                           ? getMarkerColor(city.matchingScore)
                           : "#CBD5E1"
                       }
                       stroke="#fff"
-                      strokeWidth={0.2}
+                      strokeWidth={1 / zoom}
                       style={{ cursor: "pointer" }}
                       onMouseEnter={(e) =>
                         setTooltip({
@@ -577,6 +587,16 @@ export function GlobeViewer({ width, height }: GlobeViewerProps) {
                       onMouseMove={(e) => handleTooltipMove(city.cityName, e)}
                       onMouseLeave={() => setTooltip(null)}
                     />
+                    {medalRank && (
+                      <image
+                        href={`/src/assets/medal${medalRank}.png`}
+                        x={-medalSize / 2}
+                        y={-(r + medalSize)}
+                        width={medalSize}
+                        height={medalSize}
+                        style={{ pointerEvents: "none" }}
+                      />
+                    )}
                   </Marker>
                 );
               })}

@@ -186,9 +186,6 @@ export function TripSettingsPanel() {
           초기화
         </button>
       </div>
-      <Button onClick={() => toast.error("테스트 토스트")}>
-        토스트 테스트
-      </Button>
       {/* 여행 월 */}
       <div className="flex flex-col gap-1.5">
         <label className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
