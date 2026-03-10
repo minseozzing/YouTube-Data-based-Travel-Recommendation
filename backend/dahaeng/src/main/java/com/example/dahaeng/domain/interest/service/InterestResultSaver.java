@@ -4,12 +4,14 @@ import com.example.dahaeng.global.exception.CustomException;
 import com.example.dahaeng.global.exception.ErrorCode;
 import com.example.dahaeng.domain.interest.dto.InterestKeywordCandidate;
 import com.example.dahaeng.domain.interest.enums.InterestCategory;
+import com.example.dahaeng.domain.interest.enums.InterestSourceType;
 import com.example.dahaeng.domain.interest.repository.YoutubeInterestKeywordRepository;
 import com.example.dahaeng.domain.interest.repository.YoutubeInterestRepository;
-import com.example.dahaeng.youtube.entity.YouTubeAccount;
-import com.example.dahaeng.youtube.entity.YouTubeInterest;
-import com.example.dahaeng.youtube.entity.YouTubeInterestKeyword;
-import com.example.dahaeng.youtube.repository.YouTubeAccountRepository;
+import com.example.dahaeng.domain.youtube.entity.YouTubeAccount;
+import com.example.dahaeng.domain.youtube.entity.YouTubeInterest;
+import com.example.dahaeng.domain.youtube.entity.YouTubeInterestKeyword;
+import com.example.dahaeng.domain.youtube.enums.SourceType;
+import com.example.dahaeng.domain.youtube.repository.YouTubeAccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,15 +34,17 @@ public class InterestResultSaver {
                      List<InterestKeywordCandidate> keywords,
                      Map<InterestCategory, Double> categories) {
 
-        // TODO: accountId가 memberId로 넘어오는 경우, accountRepository.findByMemberId로 변경 필요
+        // 1. 연동 계정 조회
         YouTubeAccount account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "연동 계정을 찾을 수 없습니다."));
 
+        // 2. 기존 분석 결과 초기화 (삭제 후 재삽입)
         keywordRepository.deleteByAccount_Id(accountId);
         interestRepository.deleteByAccount_Id(accountId);
 
         LocalDateTime now = LocalDateTime.now();
 
+        // 3. 관심 키워드(Keyword) 저장
         List<YouTubeInterestKeyword> keywordEntities = keywords.stream()
                 .map(k -> YouTubeInterestKeyword.builder()
                         .account(account)
@@ -53,6 +57,7 @@ public class InterestResultSaver {
                 .toList();
         keywordRepository.saveAll(keywordEntities);
 
+        // 4. 관심 카테고리(Category) 점수 기반 정렬 및 저장
         List<Map.Entry<InterestCategory, Double>> sorted = categories.entrySet().stream()
                 .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
                 .toList();
@@ -71,24 +76,22 @@ public class InterestResultSaver {
         }
     }
 
-    private com.example.dahaeng.youtube.enums.SourceType mapSourceType(com.example.dahaeng.domain.interest.enums.InterestSourceType type) {
+    /**
+     * 관심분야 모듈의 SourceType을 유튜브 모듈의 SourceType으로 매핑
+     */
+    private SourceType mapSourceType(InterestSourceType type) {
         if (type == null) {
-            return com.example.dahaeng.youtube.enums.SourceType.PLAYLIST_TITLE;
+            return SourceType.PLAYLIST_TITLE;
         }
-        switch (type) {
-            case PLAYLIST_TITLE:
-                return com.example.dahaeng.youtube.enums.SourceType.PLAYLIST_TITLE;
-            case PLAYLIST_VIDEO_TITLE:
-                return com.example.dahaeng.youtube.enums.SourceType.PLAYLIST_VIDEO_TITLE;
-            case PLAYLIST_VIDEO_TAG:
-                return com.example.dahaeng.youtube.enums.SourceType.PLAYLIST_VIDEO_TAG;
-            case LIKED_VIDEO_TITLE:
-                return com.example.dahaeng.youtube.enums.SourceType.LIKED_VIDEO_TITLE;
-            case LIKED_VIDEO_TAG:
-                return com.example.dahaeng.youtube.enums.SourceType.LIKED_VIDEO_TAG;
-            case SUBSCRIPTION_TITLE:
-            default:
-                return com.example.dahaeng.youtube.enums.SourceType.SUBSCRIPTION_TITLE;
-        }
+
+        return switch (type) {
+            case PLAYLIST_TITLE -> SourceType.PLAYLIST_TITLE;
+            case PLAYLIST_VIDEO_TITLE -> SourceType.PLAYLIST_VIDEO_TITLE;
+            case PLAYLIST_VIDEO_TAG -> SourceType.PLAYLIST_VIDEO_TAG;
+            case LIKED_VIDEO_TITLE -> SourceType.LIKED_VIDEO_TITLE;
+            case LIKED_VIDEO_TAG -> SourceType.LIKED_VIDEO_TAG;
+            case SUBSCRIPTION_TITLE -> SourceType.SUBSCRIPTION_TITLE;
+            default -> SourceType.SUBSCRIPTION_TITLE;
+        };
     }
 }

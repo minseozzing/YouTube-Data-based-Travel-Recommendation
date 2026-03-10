@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: dahaeng
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/test
+    username: root
+    password: 1111
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    generate-ddl: true
+
+  jwt:
+    secret: Y3VzdG9tLXNlY3JldC1rZXktZm9yLWp3dC1zaWduaW5n
+    access-expiration: 360000000
+    refresh-expiration: 604800000
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 800167123778-ppuuodmbdg3co7qoffenepfpvkqeck70.apps.googleusercontent.com
+            client-secret: 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
+            scope: profile,email,https://www.googleapis.com/auth/youtube.readonly
+            authorization-grant-type: authorization_code
+            redirect-uri: http://localhost:8080/login/oauth2/code/google
+
+app:
+  front-callback-url: http://localhost:8080/
