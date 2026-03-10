@@ -11,7 +11,10 @@ import com.example.dahaeng.domain.youtube.entity.YouTubeAccount;
 import com.example.dahaeng.domain.youtube.entity.YouTubeInterest;
 import com.example.dahaeng.domain.youtube.entity.YouTubeInterestKeyword;
 import com.example.dahaeng.domain.youtube.enums.SourceType;
+import com.example.dahaeng.domain.interest.dto.TravelTagScore;
+import com.example.dahaeng.domain.youtube.entity.YouTubeTravelTag;
 import com.example.dahaeng.domain.youtube.repository.YouTubeAccountRepository;
+import com.example.dahaeng.domain.youtube.repository.YouTubeTravelTagRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,11 +31,13 @@ public class InterestResultSaver {
     private final YouTubeAccountRepository accountRepository;
     private final YoutubeInterestRepository interestRepository;
     private final YoutubeInterestKeywordRepository keywordRepository;
+    private final YouTubeTravelTagRepository travelTagRepository;
 
     @Transactional
     public void save(Long accountId,
                      List<InterestKeywordCandidate> keywords,
-                     Map<InterestCategory, Double> categories) {
+                     Map<InterestCategory, Double> categories,
+                     List<TravelTagScore> travelTags) {
 
         // 1. 연동 계정 조회
         YouTubeAccount account = accountRepository.findById(accountId)
@@ -41,38 +46,62 @@ public class InterestResultSaver {
         // 2. 기존 분석 결과 초기화 (삭제 후 재삽입)
         keywordRepository.deleteByAccount_Id(accountId);
         interestRepository.deleteByAccount_Id(accountId);
+        travelTagRepository.deleteByAccount_Id(accountId);
 
         LocalDateTime now = LocalDateTime.now();
 
         // 3. 관심 키워드(Keyword) 저장
-        List<YouTubeInterestKeyword> keywordEntities = keywords.stream()
-                .map(k -> YouTubeInterestKeyword.builder()
-                        .account(account)
-                        .keyword(k.getRawKeyword())
-                        .normalizedKeyword(k.getNormalizedKeyword())
-                        .sourceType(mapSourceType(k.getSourceType()))
-                        .score(k.getScore())
-                        .analyzedAt(now)
-                        .build())
-                .toList();
-        keywordRepository.saveAll(keywordEntities);
+        if (keywords != null) {
+            List<YouTubeInterestKeyword> keywordEntities = keywords.stream()
+                    .map(k -> YouTubeInterestKeyword.builder()
+                            .account(account)
+                            .keyword(k.getRawKeyword())
+                            .normalizedKeyword(k.getNormalizedKeyword())
+                            .sourceType(mapSourceType(k.getSourceType()))
+                            .score(k.getScore())
+                            .analyzedAt(now)
+                            .build())
+                    .toList();
+            keywordRepository.saveAll(keywordEntities);
+        }
 
         // 4. 관심 카테고리(Category) 점수 기반 정렬 및 저장
-        List<Map.Entry<InterestCategory, Double>> sorted = categories.entrySet().stream()
-                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-                .toList();
+        if (categories != null) {
+            List<Map.Entry<InterestCategory, Double>> sorted = categories.entrySet().stream()
+                    .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                    .toList();
 
-        int rank = 1;
-        for (Map.Entry<InterestCategory, Double> e : sorted) {
-            YouTubeInterest interest = YouTubeInterest.builder()
-                    .account(account)
-                    .categoryName(e.getKey().name())
-                    .score(e.getValue())
-                    .rankNo(rank++)
-                    .analysisVersion("rule-v1")
-                    .analyzedAt(now)
-                    .build();
-            interestRepository.save(interest);
+            int rank = 1;
+            for (Map.Entry<InterestCategory, Double> e : sorted) {
+                YouTubeInterest interest = YouTubeInterest.builder()
+                        .account(account)
+                        .categoryName(e.getKey().name())
+                        .score(e.getValue())
+                        .rankNo(rank++)
+                        .analysisVersion("rule-v1")
+                        .analyzedAt(now)
+                        .build();
+                interestRepository.save(interest);
+            }
+        }
+
+        // 5. [신규] 여행 취향 태그(Travel Tags) 저장
+        if (travelTags != null && !travelTags.isEmpty()) {
+            List<YouTubeTravelTag> tagEntities = travelTags.stream()
+                    .map(t -> YouTubeTravelTag.builder()
+                            .account(account)
+                            .tagName(t.getTag())
+                            .categoryName(t.getCategory())
+                            .score(t.getScore())
+                            .confidence(t.getConfidence())
+                            .reason(t.getReason())
+                            .analyzedAt(now)
+                            .build())
+                    .toList();
+            travelTagRepository.saveAllAndFlush(tagEntities);
+            System.out.println(">>> [DB SAVE SUCCESS] Saved " + tagEntities.size() + " travel tags for account " + accountId);
+        } else {
+            System.out.println(">>> [DB SAVE SKIP] No travel tags to save for account " + accountId);
         }
     }
 

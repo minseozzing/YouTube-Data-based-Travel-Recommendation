@@ -3,6 +3,8 @@ package com.example.dahaeng.domain.bookmark.entity;
 import com.example.dahaeng.domain.city.entity.City;
 import com.example.dahaeng.domain.member.entity.Member;
 import com.example.dahaeng.global.entity.BaseEntity;
+import com.example.dahaeng.global.exception.CustomException;
+import com.example.dahaeng.global.exception.ErrorCode;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -29,5 +31,12 @@ public class Bookmark extends BaseEntity {
 	private City city;
 
 	@Column(columnDefinition = "TEXT")
-	private String content;
+	private String json;
+
+	public void delete() {
+		if (isDeleted()) {
+			throw new CustomException(ErrorCode.INVALID_REQUEST, "이미 삭제된 북마크입니다.");
+		}
+		super.delete();
+	}
 }
