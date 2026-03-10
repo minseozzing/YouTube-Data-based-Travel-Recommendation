@@ -20,7 +20,7 @@ public class FlightSummary extends BaseEntity {
     @JoinColumn(name = "city_id")
     private City city;
 
-    @Column(name = "year_month")
+    @Column(name = "target_year_month")
     private String yearMonth;
 
     @Column(name = "origin_airport")
