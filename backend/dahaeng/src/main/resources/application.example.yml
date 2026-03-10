@@ -15,6 +15,10 @@ spring:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     generate-ddl: true
 
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb://localhost:27017/dahaeng}
+
   jwt:
     secret: ${JWT_SECRET}
     access-expiration: ${JWT_ACCESS_EXPIRATION:360000000}
