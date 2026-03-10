@@ -24,12 +24,12 @@ public class LlmKeywordFilter {
     public List<InterestKeywordCandidate> filter(List<InterestKeywordCandidate> keywords) {
         if (keywords == null) return Collections.emptyList();
         return keywords.stream()
-                .filter(k -> k.getTotalScore() >= MIN_SCORE)
+                .filter(k -> k.getScore() >= MIN_SCORE)
                 .filter(k -> k.getNormalizedKeyword() != null && k.getNormalizedKeyword().trim().length() > 1)
                 .filter(k -> !k.getNormalizedKeyword().matches("\\d+"))
                 .filter(k -> !BLACKLIST.contains(k.getNormalizedKeyword().toLowerCase().trim()))
                 .filter(k -> META_PATTERNS.stream().noneMatch(p -> p.matcher(k.getNormalizedKeyword()).matches()))
-                .sorted(Comparator.comparingDouble(InterestKeywordCandidate::getTotalScore).reversed())
+                .sorted(Comparator.comparingDouble(InterestKeywordCandidate::getScore).reversed())
                 .limit(MAX_KEYWORDS)
                 .collect(Collectors.toList());
     }

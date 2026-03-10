@@ -14,47 +14,43 @@ public class TravelTagPromptFactory {
         return String.format("""
                 당신은 사용자의 관심 키워드를 분석하여 고정된 여행 취향 태그로 변환하는 시맨틱 매핑 전문가입니다.
                 
-                [미션]
-                제공된 키워드를 분석하여 아래 '태그 정의 가이드' 내에서 가장 적합한 태그를 선택하세요.
+                [절대 규칙 - 위반 시 시스템 오류]
+                1. 'tag' 필드에는 반드시 아래 제공된 '허용 태그 목록'에 있는 단어만 사용하세요.
+                2. 'Japan', 'Osaka', 'Seoul' 같은 지명이나 '레시피', '노래' 같은 일반 단어를 태그로 사용하는 것을 절대 금지합니다.
+                3. 지명이 나오면 그 지역의 성향을 해석하여 태그로 매핑하세요. (예: '오사카' -> Vibe: '로컬감성' 또는 '활기찬')
                 
-                [태그 정의 가이드 - 반드시 이 목록 내에서만 선택]
-                1. Vibe (분위기): 여유로운, 힙한, 로컬감성, 활기찬, 럭셔리한, 조용한, 전통적인
-                2. Landscape (풍경): 도시의밤, 푸른바다, 초록대자연, 역사속으로, 눈부신설원, 이국적인
-                3. Activity (활동): 미식탐방, 쇼핑중독, 액티비티, 예술과전시, 사진에진심, 배움이있는
-                4. Who (동행): 나홀로, 연인과, 친구와, 가족과
-                5. Climate (기후): 따뜻한곳, 추운곳, 눈과함께, 사계절, 건조한, 습한, 열대, 온화한
+                [허용 태그 목록 - 이 중에서만 선택]
+                %%s
                 
-                [엄격한 출력 규칙 - 반드시 준수]
-                1. **score 필드 값**: 반드시 0.0에서 1.0 사이의 실수로 작성하세요. 
-                   **절대로 입력 데이터에 있는 큰 숫자(예: 18.1, 8.2 등)를 그대로 복사하지 마세요.** 
-                   입력 키워드와 태그의 연관성을 당신이 판단하여 0과 1 사이로 재계산해야 합니다.
-                2. **confidence 필드 값**: 당신의 추론 확신도를 0.0에서 1.0 사이의 실수로 작성하세요.
-                3. **category/tag 필드**: 반드시 가이드에 명시된 단어만 사용하세요.
-                4. 결과는 반드시 JSON 형식으로 반환하세요.
+                [매핑 가이드]
+                - 특정 국가/도시 여행 키워드 -> Landscape: '이국적인', Vibe: '로컬감성'
+                - 맛집, 레시피, 카페 키워드 -> Activity: '미식탐방'
+                - 노래, 가사, 버튜버 키워드 -> Activity: '예술과전시', Vibe: '여유로운'
+                - 기술, 테슬라, 개발 키워드 -> Vibe: '힙한', Landscape: '도시의밤'
                 
-                [응답 예시]
-                {
-                  "tags": [
-                    { "tag": "힙한", "category": "Vibe", "score": 0.92, "confidence": 0.85, "reason": "테슬라, 자율주행 등 최신 기술 트렌드 선호" }
-                  ]
-                }
-                """);
+                [출력 규칙]
+                - score(연관도)와 confidence(확신도)는 반드시 0.0 ~ 1.0 사이의 실수로 작성하세요.
+                - 결과는 반드시 JSON 형식으로 반환하세요.
+                """).replace("%%s", TravelTagCatalog.getAllowedTagsPrompt());
     }
 
     public String createUserPrompt(List<InterestKeywordCandidate> keywords) {
-        if (keywords == null || keywords.isEmpty()) {
-            return "[]";
-        }
-        return keywords.stream()
-                .map(k -> String.format("{\"raw\":\"%s\",\"norm\":\"%s\",\"score\":%.1f,\"src\":\"%s\"}",
-                        escapeJson(k.getRawKeyword()), 
-                        escapeJson(k.getNormalizedKeyword()), 
-                        k.getTotalScore(),
-                        k.getSourceType()))
-                .collect(Collectors.joining(",", "[", "]"));
+        if (keywords == null || keywords.isEmpty()) return "[]";
+
+        String jsonData = keywords.stream()
+                .map(k -> String.format(
+                    "{\"k\":\"%s\",\"s\":%.2f,\"c\":%.2f,\"r\":%.2f}",
+                    escape(k.getNormalizedKeyword()),
+                    k.getScore(),
+                    k.getConfidence(),
+                    k.getTravelRelevance()
+                ))
+                .collect(Collectors.joining(",", "{\"top_keywords\":[", "]}"));
+
+        return "분석 데이터:\n" + jsonData;
     }
 
-    private String escapeJson(String s) {
+    private String escape(String s) {
         if (s == null) return "";
         return s.replace("\"", "\\\"");
     }
