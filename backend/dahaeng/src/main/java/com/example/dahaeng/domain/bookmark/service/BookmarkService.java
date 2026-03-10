@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.example.dahaeng.domain.bookmark.dto.request.BookMarkCreateRequest;
+import com.example.dahaeng.domain.bookmark.dto.response.BookmarkCreateResponse;
 import com.example.dahaeng.domain.bookmark.dto.response.BookmarkDetailResponse;
 import com.example.dahaeng.domain.bookmark.entity.Bookmark;
 import com.example.dahaeng.domain.bookmark.repository.BookmarkRepository;
@@ -20,6 +21,8 @@ import com.example.dahaeng.domain.member.repository.MemberRepository;
 import com.example.dahaeng.domain.member.service.MemberService;
 import com.example.dahaeng.global.exception.CustomException;
 import com.example.dahaeng.global.exception.ErrorCode;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
 
@@ -31,8 +34,9 @@ public class BookmarkService {
 	private final MemberRepository memberRepository;
 	private final ExchangeRepository exchangeRepository;
 	private final CityRepository cityRepository;
+	private final ObjectMapper mapper;
 
-	public BookmarkDetailResponse detail(Long bookmarkId, Long memberId) {
+	public BookmarkDetailResponse detail(Long bookmarkId, Long memberId) throws JsonProcessingException {
 		Member member = validMember(memberId);
 
 		Bookmark bookmark = bookmarkRepository
@@ -44,12 +48,12 @@ public class BookmarkService {
 			.orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "유효하지 않은 환율 아이디입니다."));
 
 		return new BookmarkDetailResponse(
-			bookmark.getJson(),
+			mapper.readTree(bookmark.getJson()),
 			ExchangeRateResponse.from(exchange)
 		);
 	}
 
-	public void save(BookMarkCreateRequest request, Long memberId) {
+	public BookmarkCreateResponse save(BookMarkCreateRequest request, Long memberId) throws JsonProcessingException {
 		Member member = validMember(memberId);
 
 		City city = cityRepository.findById(request.cityId())
@@ -58,10 +62,10 @@ public class BookmarkService {
 		Bookmark bookmark = Bookmark.builder()
 			.member(member)
 			.city(city)
-			.json(request.json())
+			.json(mapper.writeValueAsString(request.json()))
 			.build();
 
-		bookmarkRepository.save(bookmark);
+		return new BookmarkCreateResponse("북마크 생성 완료", bookmarkRepository.save(bookmark).getId());
 	}
 
 	private Member validMember(Long memberId) {

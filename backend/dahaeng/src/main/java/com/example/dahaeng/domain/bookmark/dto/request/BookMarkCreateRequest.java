@@ -1,8 +1,9 @@
 package com.example.dahaeng.domain.bookmark.dto.request;
 
+import jakarta.validation.constraints.NotNull;
+
 public record BookMarkCreateRequest(
-	@NotBlank Long cityId,
-	String json,
-	String imgUrl
+	@NotNull Long cityId,
+	@NotNull Object json
 ) {
 }
