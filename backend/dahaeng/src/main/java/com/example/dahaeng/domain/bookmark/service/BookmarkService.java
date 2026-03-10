@@ -2,6 +2,10 @@ package com.example.dahaeng.domain.bookmark.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +26,7 @@ import com.example.dahaeng.domain.exchange.repository.ExchangeRepository;
 import com.example.dahaeng.domain.member.entity.Member;
 import com.example.dahaeng.domain.member.repository.MemberRepository;
 import com.example.dahaeng.domain.member.service.MemberService;
+import com.example.dahaeng.global.dto.page.response.PageResponse;
 import com.example.dahaeng.global.exception.CustomException;
 import com.example.dahaeng.global.exception.ErrorCode;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -71,13 +76,16 @@ public class BookmarkService {
 		return new BookmarkCreateResponse("북마크 생성 완료", bookmarkRepository.save(bookmark).getId());
 	}
 
-	public List<BookmarkSummaryResponse> summaries(String keyword, Long memberId) {
+	public PageResponse<BookmarkSummaryResponse> summaries(String keyword, Long memberId, Pageable pageable) {
 		Member member = validMember(memberId);
 
-		List<Bookmark> bookmarks = bookmarkRepository.findAllByKeywordAndMember(keyword, member);
-		return bookmarks.stream()
-			.map(BookmarkSummaryResponse::from)
-			.toList();
+		Page<Bookmark> bookmarks = bookmarkRepository.findAllByKeywordAndMember(keyword, member, pageable);
+
+		return PageResponse.from(
+			new PageImpl<>(bookmarks.stream()
+				.map(BookmarkSummaryResponse::from)
+				.toList(), pageable, bookmarks.getTotalElements())
+		);
 	}
 
 	private Member validMember(Long memberId) {

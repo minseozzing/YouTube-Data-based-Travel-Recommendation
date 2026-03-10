@@ -2,10 +2,14 @@ package com.example.dahaeng.domain.bookmark.controller;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,6 +23,7 @@ import com.example.dahaeng.domain.bookmark.dto.request.BookMarkCreateRequest;
 import com.example.dahaeng.domain.bookmark.dto.response.BookmarkDetailResponse;
 import com.example.dahaeng.domain.bookmark.dto.response.BookmarkSummaryResponse;
 import com.example.dahaeng.domain.bookmark.service.BookmarkService;
+import com.example.dahaeng.global.dto.page.response.PageResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import jakarta.annotation.Nullable;
@@ -42,11 +47,13 @@ public class BookmarkController {
 	}
 
 	@GetMapping
-	public ResponseEntity<List<BookmarkSummaryResponse>> summaries(
-		@RequestParam("keyword") @Nullable String keyword,
+	public ResponseEntity<PageResponse<BookmarkSummaryResponse>> summaries(
+		@RequestParam(value = "keyword", required = false) @Nullable String keyword,
+		@PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.DESC)
+		Pageable pageable,
 		@AuthenticationPrincipal CustomOAuth2User user
 	) {
-		return ResponseEntity.ok(bookmarkService.summaries(keyword, user.getId()));
+		return ResponseEntity.ok(bookmarkService.summaries(keyword, user.getId(), pageable));
 	}
 
 	@PostMapping
