@@ -4,6 +4,7 @@ import { AlertCircle, Loader2 } from 'lucide-react';
 import { ExchangeRateCombinedSection } from '@/components/cost/ExchangeRateCombinedSection';
 import { CostDetailTable } from '@/components/cost/CostDetailTable';
 import { SeoulCompareSection } from '@/components/cost/SeoulCompareSection';
+import { SalaryPopulationSection } from '@/components/cost/SalaryPopulationSection';
 import { useCityPriceTab } from '@/hooks/cost/useCityPriceTab';
 import { SEOUL_CITY_ID } from '@/api/cost.api';
 import { useCostDetail } from '@/hooks/cost/useCostDetail';
@@ -74,18 +75,25 @@ export function CostCompareTab({ city }: CostCompareTabProps) {
           isLoading={exchangeRate.isLoading}
         />
 
-        {/* B. 항목별 전체 물가표 (월급, 인구 정보 포함) */}
-        <CostDetailTable
-          data={costDetail.data}
+        {/* B. 세후 평균 월급 및 인구 정보 */}
+        <SalaryPopulationSection
+          livingCost={costDetail.data?.living_cost}
           isLoading={costDetail.isLoading}
-          seoulLivingCost={seoulDetail.data?.living_cost}
-          krwPerTarget={exchangeRate.data ? Math.round(1 / exchangeRate.data.rate) : undefined}
+          currency={currency}
         />
 
         {/* C. 서울 vs 도시 물가 요약 및 비교 지표 (항목별 차이 차트 포함) */}
         <SeoulCompareSection
           data={costCompare.data}
           isLoading={costCompare.isLoading}
+        />
+
+        {/* C. 항목별 전체 물가표 (월급, 인구 정보 포함) */}
+        <CostDetailTable
+          data={costDetail.data}
+          isLoading={costDetail.isLoading}
+          seoulLivingCost={seoulDetail.data?.living_cost}
+          krwPerTarget={exchangeRate.data ? Math.round(exchangeRate.data.krw_per_1target) : undefined}
         />
       </motion.div>
     </AnimatePresence>

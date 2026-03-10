@@ -37,25 +37,25 @@ const BUDGET_LABELS: Record<string, string> = {
 };
 
 export function SeoulCompareSection({ data, isLoading }: SeoulCompareSectionProps) {
-  const vs = data?.cost_vs_seoul;
-  const isMoreExpensive = (vs?.daily_budget_gap_percent ?? 0) >= 0;
+  const vs = data?.costCompare;
+  const isMoreExpensive = (vs?.dailyBudgetGapPercent ?? 0) >= 0;
 
   const pieData = data
-    ? Object.entries(data.expected_daily_budget.breakdown).map(([key, value]) => ({
+    ? Object.entries(data.expectedTargetDailyBudget.breakdown).map(([key, value]) => ({
         name: BUDGET_LABELS[key] ?? key,
         value,
         color: PIE_COLORS[key] ?? '#94a3b8',
       }))
     : [];
 
-  const targetCityName = data?.item_comparison.target_city ?? '도시';
+  const targetName = data?.target.name ?? '도시';
 
   // 서울=0 기준 ±% 다이버전트 차트 데이터
   const barData =
-    data?.item_comparison.items.map((item) => ({
-      name: item.item_name,
-      차이: item.difference_percent,
-      금액차이: item.difference_krw,
+    data?.itemComparison.items.map((item) => ({
+      name: item.itemName,
+      차이: item.differencePercent,
+      금액차이: item.difference,
     })) ?? [];
 
   return (
@@ -93,7 +93,7 @@ export function SeoulCompareSection({ data, isLoading }: SeoulCompareSectionProp
                 )}
               >
                 서울보다{' '}
-                {Math.abs(vs.daily_budget_gap_percent).toFixed(1)}%
+                {Math.abs(vs.dailyBudgetGapPercent).toFixed(1)}%
                 <br />
                 {isMoreExpensive ? '비싸요' : '저렴해요'}
               </p>
@@ -107,7 +107,7 @@ export function SeoulCompareSection({ data, isLoading }: SeoulCompareSectionProp
               <div className="flex items-center justify-between mb-2">
                 <p className="text-sm font-semibold text-foreground">하루 예산 구성</p>
                 <p className="text-xs text-muted-foreground text-right">
-                  총 {data.expected_daily_budget.total.toLocaleString()} {vs.currency}
+                  총 {data.expectedTargetDailyBudget.total.toLocaleString()} {vs.currency}
                 </p>
               </div>
               <ResponsiveContainer width="100%" height={180}>
@@ -139,7 +139,7 @@ export function SeoulCompareSection({ data, isLoading }: SeoulCompareSectionProp
                     formatter={(value, entry) => {
                       const item = pieData.find((d) => d.name === value);
                       const pct = item
-                        ? ((item.value / data.expected_daily_budget.total) * 100).toFixed(0)
+                        ? ((item.value / data.expectedTargetDailyBudget.total) * 100).toFixed(0)
                         : '';
                       return `${value} ${pct}%`;
                     }}
@@ -153,7 +153,7 @@ export function SeoulCompareSection({ data, isLoading }: SeoulCompareSectionProp
           <div>
             <div className="flex items-center justify-between mb-3">
               <p className="text-sm font-semibold text-foreground">
-                항목별 서울 대비 차이 ({targetCityName})
+                항목별 서울 대비 차이 ({targetName})
               </p>
               <span className="text-xs text-muted-foreground">서울 = 0%</span>
             </div>
@@ -232,10 +232,12 @@ export function SeoulCompareSection({ data, isLoading }: SeoulCompareSectionProp
           </div>
 
           {/* Summary note */}
-          <div className="flex items-start gap-2.5 rounded-lg bg-muted/40 px-4 py-3 text-sm text-muted-foreground">
-            <Info className="size-4 mt-0.5 shrink-0" />
-            <span>{vs.summary}</span>
-          </div>
+          {vs.summary && (
+            <div className="flex items-start gap-2.5 rounded-lg bg-muted/40 px-4 py-3 text-sm text-muted-foreground">
+              <Info className="size-4 mt-0.5 shrink-0" />
+              <span>{vs.summary}</span>
+            </div>
+          )}
         </div>
       ) : (
         <p className="text-base text-muted-foreground p-4">비교 데이터를 불러올 수 없습니다</p>
