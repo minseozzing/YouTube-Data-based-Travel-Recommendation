@@ -1,13 +1,11 @@
-package com.example.dahaeng.domain.livingcost.dto.response;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
+package com.example.dahaeng.domain.livingcost.dto.response.detail;
 
 public record EatingOutResponse(
-	Double lunchMenu,
-	Double dinnerInAResturantFor2,
-	Double fastFoodMeal,
-	Double beerInAPub,
-	Double cappuccino,
-	Double cokePepsi
+	Integer lunchMenu,
+	Integer dinnerInAResturantFor2,
+	Integer fastFoodMeal,
+	Integer beerInAPub,
+	Integer cappuccino,
+	Integer cokePepsi
 ) {
 }

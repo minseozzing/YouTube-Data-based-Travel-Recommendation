@@ -1,15 +1,17 @@
-package com.example.dahaeng.interest.service;
+package com.example.dahaeng.domain.interest.service;
 
+import com.example.dahaeng.domain.interest.enums.InterestSourceType;
+import com.example.dahaeng.domain.youtube.enums.SourceType;
 import com.example.dahaeng.global.exception.CustomException;
 import com.example.dahaeng.global.exception.ErrorCode;
-import com.example.dahaeng.interest.dto.InterestKeywordCandidate;
-import com.example.dahaeng.interest.enums.InterestCategory;
-import com.example.dahaeng.interest.repository.YoutubeInterestKeywordRepository;
-import com.example.dahaeng.interest.repository.YoutubeInterestRepository;
-import com.example.dahaeng.youtube.entity.YouTubeAccount;
-import com.example.dahaeng.youtube.entity.YouTubeInterest;
-import com.example.dahaeng.youtube.entity.YouTubeInterestKeyword;
-import com.example.dahaeng.youtube.repository.YouTubeAccountRepository;
+import com.example.dahaeng.domain.interest.dto.InterestKeywordCandidate;
+import com.example.dahaeng.domain.interest.enums.InterestCategory;
+import com.example.dahaeng.domain.interest.repository.YoutubeInterestKeywordRepository;
+import com.example.dahaeng.domain.interest.repository.YoutubeInterestRepository;
+import com.example.dahaeng.domain.youtube.entity.YouTubeAccount;
+import com.example.dahaeng.domain.youtube.entity.YouTubeInterest;
+import com.example.dahaeng.domain.youtube.entity.YouTubeInterestKeyword;
+import com.example.dahaeng.domain.youtube.repository.YouTubeAccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -71,24 +73,24 @@ public class InterestResultSaver {
         }
     }
 
-    private com.example.dahaeng.youtube.enums.SourceType mapSourceType(com.example.dahaeng.interest.enums.InterestSourceType type) {
+    private SourceType mapSourceType(InterestSourceType type) {
         if (type == null) {
-            return com.example.dahaeng.youtube.enums.SourceType.PLAYLIST_TITLE;
+            return SourceType.PLAYLIST_TITLE;
         }
         switch (type) {
             case PLAYLIST_TITLE:
-                return com.example.dahaeng.youtube.enums.SourceType.PLAYLIST_TITLE;
+                return SourceType.PLAYLIST_TITLE;
             case PLAYLIST_VIDEO_TITLE:
-                return com.example.dahaeng.youtube.enums.SourceType.PLAYLIST_VIDEO_TITLE;
+                return SourceType.PLAYLIST_VIDEO_TITLE;
             case PLAYLIST_VIDEO_TAG:
-                return com.example.dahaeng.youtube.enums.SourceType.PLAYLIST_VIDEO_TAG;
+                return SourceType.PLAYLIST_VIDEO_TAG;
             case LIKED_VIDEO_TITLE:
-                return com.example.dahaeng.youtube.enums.SourceType.LIKED_VIDEO_TITLE;
+                return SourceType.LIKED_VIDEO_TITLE;
             case LIKED_VIDEO_TAG:
-                return com.example.dahaeng.youtube.enums.SourceType.LIKED_VIDEO_TAG;
+                return SourceType.LIKED_VIDEO_TAG;
             case SUBSCRIPTION_TITLE:
             default:
-                return com.example.dahaeng.youtube.enums.SourceType.SUBSCRIPTION_TITLE;
+                return SourceType.SUBSCRIPTION_TITLE;
         }
     }
 }

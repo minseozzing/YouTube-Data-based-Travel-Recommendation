@@ -1,10 +1,9 @@
-package com.example.dahaeng.domain.livingcost.dto.response;
-import com.fasterxml.jackson.annotation.JsonProperty;
+package com.example.dahaeng.domain.livingcost.dto.response.detail;
 
 public record TransportationResponse(
-	Double localTransportTicket,
-	Double monthlyTicketLocalTransport,
-	Double taxiRide,
-	Double gasPetrol
+	Integer localTransportTicket,
+	Integer monthlyTicketLocalTransport,
+	Integer taxiRide,
+	Integer gasPetrol
 ) {
 }

@@ -2,9 +2,9 @@ package com.example.dahaeng.domain.livingcost.dto.request;
 
 import com.example.dahaeng.domain.livingcost.enums.TargetType;
 
-public record LivingCostCompareRequest (
+public record LivingCostComparisonRequest(
 	TargetType targetType,
-	Long base_id,
-	Long target_id
+	Long baseId,
+	Long targetId
 ){
 }

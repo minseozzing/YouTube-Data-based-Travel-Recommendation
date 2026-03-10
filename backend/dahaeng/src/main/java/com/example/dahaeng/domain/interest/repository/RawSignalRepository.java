@@ -1,4 +1,4 @@
-package com.example.dahaeng.interest.repository;
+package com.example.dahaeng.domain.interest.repository;
 
 import org.springframework.stereotype.Repository;
 

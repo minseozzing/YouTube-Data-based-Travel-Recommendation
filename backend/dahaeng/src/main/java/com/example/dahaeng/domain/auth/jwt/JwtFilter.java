@@ -1,9 +1,9 @@
-package com.example.dahaeng.auth.jwt;
+package com.example.dahaeng.domain.auth.jwt;
 
-import com.example.dahaeng.auth.dto.CustomOAuth2User;
-import com.example.dahaeng.member.dto.MemberDto;
-import com.example.dahaeng.member.entity.Member;
-import com.example.dahaeng.member.repository.MemberRepository;
+import com.example.dahaeng.domain.auth.dto.CustomOAuth2User;
+import com.example.dahaeng.domain.member.dto.MemberDto;
+import com.example.dahaeng.domain.member.entity.Member;
+import com.example.dahaeng.domain.member.repository.MemberRepository;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

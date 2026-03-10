@@ -1,6 +1,6 @@
-package com.example.dahaeng.auth.dto;
+package com.example.dahaeng.domain.auth.dto;
 
-import com.example.dahaeng.member.dto.MemberDto;
+import com.example.dahaeng.domain.member.dto.MemberDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

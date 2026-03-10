@@ -1,7 +1,7 @@
-package com.example.dahaeng.interest.controller;
+package com.example.dahaeng.domain.interest.controller;
 
-import com.example.dahaeng.interest.dto.InterestAnalysisResult;
-import com.example.dahaeng.interest.service.InterestAnalysisService;
+import com.example.dahaeng.domain.interest.dto.InterestAnalysisResult;
+import com.example.dahaeng.domain.interest.service.InterestAnalysisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

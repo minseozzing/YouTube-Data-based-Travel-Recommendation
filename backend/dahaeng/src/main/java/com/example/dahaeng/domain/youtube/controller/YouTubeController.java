@@ -1,13 +1,13 @@
-package com.example.dahaeng.youtube.controller;
+package com.example.dahaeng.domain.youtube.controller;
 
-import com.example.dahaeng.auth.dto.CustomOAuth2User;
+import com.example.dahaeng.domain.auth.dto.CustomOAuth2User;
 import com.example.dahaeng.global.exception.CustomException;
 import com.example.dahaeng.global.exception.ErrorCode;
-import com.example.dahaeng.youtube.dto.YouTubePlaylistDto;
-import com.example.dahaeng.youtube.dto.YouTubeSubscriptionDto;
-import com.example.dahaeng.youtube.dto.YouTubeVideoDto;
-import com.example.dahaeng.youtube.service.YouTubeQueryService;
-import com.example.dahaeng.youtube.service.YouTubeSyncService;
+import com.example.dahaeng.domain.youtube.dto.YouTubePlaylistDto;
+import com.example.dahaeng.domain.youtube.dto.YouTubeSubscriptionDto;
+import com.example.dahaeng.domain.youtube.dto.YouTubeVideoDto;
+import com.example.dahaeng.domain.youtube.service.YouTubeQueryService;
+import com.example.dahaeng.domain.youtube.service.YouTubeSyncService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

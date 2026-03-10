@@ -1,29 +1,26 @@
-package com.example.dahaeng.domain.livingcost.dto.response;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonValue;
+package com.example.dahaeng.domain.livingcost.dto.response.detail;
 
 public record GroceriesResponse(
-	Double milk,
-	Double bread,
-	Double rice,
-	Double egg,
-	Double chicken,
-	Double steak,
-	Double apple,
-	Double banana,
-	Double orange,
-	Double tomato,
-	Double potato,
-	Double onion,
-	Double water,
-	Double coke,
-	Double wine,
-	Double beer,
-	Double cigarette,
-	Double coldMedicine,
-	Double shampoo,
-	Double toiletPaper,
-	Double toothpaste
+	Integer milk,
+	Integer bread,
+	Integer rice,
+	Integer egg,
+	Integer chicken,
+	Integer steak,
+	Integer apple,
+	Integer banana,
+	Integer orange,
+	Integer tomato,
+	Integer potato,
+	Integer onion,
+	Integer water,
+	Integer coke,
+	Integer wine,
+	Integer beer,
+	Integer cigarette,
+	Integer coldMedicine,
+	Integer shampoo,
+	Integer toiletPaper,
+	Integer toothpaste
 ) {
 }

@@ -1,15 +1,14 @@
-package com.example.dahaeng.domain.livingcost.dto.response;
+package com.example.dahaeng.domain.livingcost.dto.response.detail;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDateTime;
 
 public record LivingCostResponse(
 	Long id,
-	Double dailyBudget,
-	Double withoutRent,
-	Double food,
-	Double transport,
-	Double monthlySalaryAfterTax,
+	Integer dailyBudget,
+	Integer withoutRent,
+	Integer food,
+	Integer transport,
+	Integer monthlySalaryAfterTax,
 	Double population,
 	EatingOutResponse eatingOut,
 	TransportationResponse transportation,

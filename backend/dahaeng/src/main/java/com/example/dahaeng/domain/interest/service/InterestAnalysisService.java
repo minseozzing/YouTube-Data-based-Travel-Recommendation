@@ -1,6 +1,6 @@
-package com.example.dahaeng.interest.service;
+package com.example.dahaeng.domain.interest.service;
 
-import com.example.dahaeng.interest.dto.InterestAnalysisResult;
+import com.example.dahaeng.domain.interest.dto.InterestAnalysisResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

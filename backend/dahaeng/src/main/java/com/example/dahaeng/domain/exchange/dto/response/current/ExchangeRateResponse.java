@@ -1,9 +1,8 @@
-package com.example.dahaeng.domain.exchange.dto.response;
+package com.example.dahaeng.domain.exchange.dto.response.current;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 
 import com.example.dahaeng.domain.exchange.entity.Exchange;
 import com.example.dahaeng.domain.exchange.enums.Currency;

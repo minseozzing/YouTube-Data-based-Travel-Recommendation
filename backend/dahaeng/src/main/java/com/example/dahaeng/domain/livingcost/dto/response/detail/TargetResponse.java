@@ -1,4 +1,4 @@
-package com.example.dahaeng.domain.livingcost.dto.response;
+package com.example.dahaeng.domain.livingcost.dto.response.detail;
 
 public record TargetResponse(
 	Long id,

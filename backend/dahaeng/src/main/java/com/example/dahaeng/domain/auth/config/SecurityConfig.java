@@ -1,11 +1,11 @@
-package com.example.dahaeng.auth.config;
+package com.example.dahaeng.domain.auth.config;
 
-import com.example.dahaeng.auth.jwt.JwtFilter;
-import com.example.dahaeng.auth.jwt.JwtProperties;
-import com.example.dahaeng.auth.jwt.JwtUtil;
-import com.example.dahaeng.auth.oauth2.CustomSuccessHandler;
-import com.example.dahaeng.auth.service.CustomOAuth2UserService;
-import com.example.dahaeng.member.repository.MemberRepository;
+import com.example.dahaeng.domain.auth.jwt.JwtFilter;
+import com.example.dahaeng.domain.auth.jwt.JwtProperties;
+import com.example.dahaeng.domain.auth.jwt.JwtUtil;
+import com.example.dahaeng.domain.auth.oauth2.CustomSuccessHandler;
+import com.example.dahaeng.domain.auth.service.CustomOAuth2UserService;
+import com.example.dahaeng.domain.member.repository.MemberRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -88,7 +88,9 @@ public class SecurityConfig {
                                 "/login/**",
                                 "/oauth2/**",
                                 "/api/auth/google/login-url",
-                                "/api/auth/exchange"
+                                "/api/auth/exchange",
+                                  "/api/cost/**",
+                            "/api/exchange-rate/**"
                         ).permitAll()
                         .anyRequest().authenticated());
 

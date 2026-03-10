@@ -1,12 +1,20 @@
 package com.example.dahaeng.domain.exchange.dto.response.history;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public record ExchangeRateTrendItemResponse(
+import com.example.dahaeng.domain.exchange.entity.Exchange;
+
+public record ExchangeRateHistoryItemResponse(
 	LocalDate date,
 	BigDecimal rate1krwToTarget,
 	BigDecimal krwPer1target
 ) {
+	public static ExchangeRateHistoryItemResponse from(Exchange exchange) {
+		return new ExchangeRateHistoryItemResponse(
+			exchange.getEventDate(),
+			new BigDecimal(exchange.getRate1krwToCur()),
+			new BigDecimal(exchange.getKrwPer1cur())
+		);
+	}
 }

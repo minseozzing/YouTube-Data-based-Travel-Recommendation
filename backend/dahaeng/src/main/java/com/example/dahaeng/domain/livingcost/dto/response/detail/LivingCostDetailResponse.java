@@ -1,4 +1,4 @@
-package com.example.dahaeng.domain.livingcost.dto.response;
+package com.example.dahaeng.domain.livingcost.dto.response.detail;
 
 import com.example.dahaeng.domain.livingcost.entity.LivingCostOfCity;
 import com.example.dahaeng.domain.livingcost.entity.LivingCostOfCountry;
@@ -153,10 +153,10 @@ public record LivingCostDetailResponse(
 		);
 	}
 
-	private static Double multiply(Double value, double rate) {
+	private static Integer multiply(Double value, double rate) {
 		if (value == null) {
 			return null;
 		}
-		return value * rate;
+		return (int)Math.round(value * rate);
 	}
 }

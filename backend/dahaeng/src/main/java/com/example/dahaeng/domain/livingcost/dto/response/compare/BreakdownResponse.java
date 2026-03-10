@@ -1,4 +1,8 @@
 package com.example.dahaeng.domain.livingcost.dto.response.compare;
 
-public class BreakdownResponse {
+public record BreakdownResponse(
+	Integer food,
+	Integer transport,
+	Integer accommodation
+) {
 }
