@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import com.example.dahaeng.domain.location.exchange.enums.Currency;
+import com.example.dahaeng.domain.exchange.enums.Currency;
 import com.example.dahaeng.global.entity.BaseEntity;
 
 import lombok.*;

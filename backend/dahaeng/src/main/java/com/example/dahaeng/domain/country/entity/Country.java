@@ -1,7 +1,7 @@
 package com.example.dahaeng.domain.country.entity;
 
-import com.example.dahaeng.domain.location.country.enums.Continent;
-import com.example.dahaeng.domain.location.exchange.enums.Currency;
+import com.example.dahaeng.domain.country.enums.Continent;
+import com.example.dahaeng.domain.exchange.enums.Currency;
 import com.example.dahaeng.global.entity.BaseEntity;
 
 import jakarta.persistence.*;
