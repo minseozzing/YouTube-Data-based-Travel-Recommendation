@@ -5,11 +5,14 @@ import {
   TrendingUp,
   Newspaper,
   ChevronRight,
+  AlertCircle,
+  ExternalLink,
   type LucideIcon,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import type { CityDetail } from "@/schemas/city.schema";
+import dayjs from "dayjs";
 
 interface RecommendTabProps {
   city: CityDetail;
@@ -29,7 +32,7 @@ function CostBar({ label, amount, pct, color }: CostBarProps) {
     <div>
       <div className="flex justify-between text-sm mb-1.5">
         <span className="font-medium text-slate-700">{label}</span>
-        <span className="text-slate-500">{amount}</span>
+        <span className="text-slate-500 font-bold">{amount}</span>
       </div>
       <div className="w-full bg-slate-200 rounded-full h-2">
         <div
@@ -46,10 +49,11 @@ interface InfoCardProps {
   icon: LucideIcon;
   label: string;
   value: string;
+  subValue?: string;
   onClick: () => void;
 }
 
-function InfoCard({ icon: Icon, label, value, onClick }: InfoCardProps) {
+function InfoCard({ icon: Icon, label, value, subValue, onClick }: InfoCardProps) {
   return (
     <button
       onClick={onClick}
@@ -65,6 +69,7 @@ function InfoCard({ icon: Icon, label, value, onClick }: InfoCardProps) {
       <div className="min-w-0">
         <p className="text-xs text-slate-500">{label}</p>
         <p className="text-sm font-bold text-slate-900 truncate">{value}</p>
+        {subValue && <p className="text-[10px] text-slate-400 truncate">{subValue}</p>}
       </div>
     </button>
   );
@@ -75,17 +80,25 @@ export function RecommendTab({ city, onTabChange }: RecommendTabProps) {
   const recommendText =
     city.recommendReason ?? "AI가 분석한 추천 이유를 불러오는 중입니다.";
 
-  // 비용 분해 (숙박 45 / 식비 35 / 교통·활동 20)
-  const daily = city.dailyCost;
-  const accom = daily ? Math.round(daily * 0.45) : undefined;
-  const food = daily ? Math.round(daily * 0.35) : undefined;
-  const act = daily ? Math.round(daily * 0.2) : undefined;
+  // API 데이터 (livingCostFor1Day) 사용
+  const lc = city.livingCostFor1Day;
+  const totalDaily = lc ? (lc.accommodation + lc.food + lc.transportation) : city.dailyCost;
+  
+  const accomPct = lc && totalDaily ? (lc.accommodation / totalDaily) * 100 : 45;
+  const foodPct = lc && totalDaily ? (lc.food / totalDaily) * 100 : 35;
+  const transPct = lc && totalDaily ? (lc.transportation / totalDaily) * 100 : 20;
 
-  const flightText = city.flightPrice
-    ? `₩${city.flightPrice.toLocaleString()}~`
-    : "조회하기";
+  // 항공권 상세 정보
+  const at = city.airTicket;
+  const flightValue = at 
+    ? `₩${(at.departAirTicket + at.arriveAirTicket).toLocaleString()}`
+    : city.flightPrice ? `₩${city.flightPrice.toLocaleString()}~` : "조회하기";
+  
+  const flightSub = at 
+    ? `가는편 ₩${at.departAirTicket.toLocaleString()} / 오는편 ₩${at.arriveAirTicket.toLocaleString()}`
+    : undefined;
 
-  const costText = daily ? `일평균 ₩${daily.toLocaleString()}` : "비교 보기";
+  const costValue = totalDaily ? `일평균 ₩${totalDaily.toLocaleString()}` : "비교 보기";
 
   return (
     <div className="flex flex-col gap-8 p-5 overflow-y-auto">
@@ -95,14 +108,16 @@ export function RecommendTab({ city, onTabChange }: RecommendTabProps) {
           <Sparkles className="size-5 text-blue-500" aria-hidden="true" />
           {city.cityName} 추천 이유
         </h2>
-        <p className="text-slate-600 leading-relaxed text-base">
-          {recommendText}
-        </p>
+        <div className="bg-blue-50/50 border border-blue-100 rounded-2xl p-5 relative">
+          <p className="text-slate-700 leading-relaxed text-base italic">
+            "{recommendText}"
+          </p>
+        </div>
 
-        {/* 키워드 뱃지 */}
-        {city.keywords && city.keywords.length > 0 && (
+        {/* 키워드 뱃지 (API tags 우선) */}
+        {(city.tags || city.keywords) && (
           <div className="flex flex-wrap gap-2 mt-4">
-            {city.keywords.map((kw) => (
+            {(city.tags ? city.tags.map(t => t.name) : (city.keywords ?? [])).map((kw) => (
               <Badge
                 key={kw}
                 variant="outline"
@@ -124,60 +139,62 @@ export function RecommendTab({ city, onTabChange }: RecommendTabProps) {
           예산 계획
         </h3>
 
-        <div className="bg-slate-50 rounded-xl p-5 border border-slate-100">
+        <div className="bg-slate-50 rounded-xl p-5 border border-slate-100 shadow-sm">
           <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">
-            일평균 예상 비용
+            AI 분석 하루 예상 비용
           </p>
 
-          {daily ? (
+          {totalDaily ? (
             <>
-              <div className="flex items-end gap-2 mb-5">
+              <div className="flex items-end gap-2 mb-6">
                 <span className="text-4xl font-bold text-slate-900">
-                  ₩{daily.toLocaleString()}
+                  ₩{totalDaily.toLocaleString()}
                 </span>
-                <span className="text-slate-500 mb-0.5 text-sm">/ 일</span>
+                <span className="text-slate-500 mb-1 text-sm font-medium">/ 일</span>
               </div>
 
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-5">
                 <CostBar
-                  label="숙박"
-                  amount={`₩${accom?.toLocaleString()}`}
-                  pct={45}
+                  label="숙박 (평균)"
+                  amount={`₩${(lc?.accommodation ?? Math.round(totalDaily * 0.45)).toLocaleString()}`}
+                  pct={accomPct}
                   color="bg-blue-500"
                 />
                 <CostBar
                   label="식비"
-                  amount={`₩${food?.toLocaleString()}`}
-                  pct={35}
+                  amount={`₩${(lc?.food ?? Math.round(totalDaily * 0.35)).toLocaleString()}`}
+                  pct={foodPct}
                   color="bg-emerald-500"
                 />
                 <CostBar
-                  label="교통 & 활동"
-                  amount={`₩${act?.toLocaleString()}`}
-                  pct={20}
+                  label="교통"
+                  amount={`₩${(lc?.transportation ?? Math.round(totalDaily * 0.2)).toLocaleString()}`}
+                  pct={transPct}
                   color="bg-amber-500"
                 />
               </div>
             </>
           ) : (
-            <p className="text-sm text-slate-400">
-              비용 데이터를 불러오는 중입니다.
-            </p>
+            <div className="flex items-center gap-2 py-4 text-slate-400">
+              <AlertCircle className="size-4" />
+              <p className="text-sm">비용 데이터를 불러오는 중입니다.</p>
+            </div>
           )}
         </div>
 
         {/* 항공 / 물가 카드 */}
-        <div className="mt-4 flex gap-3">
+        <div className="mt-4 flex flex-col sm:flex-row gap-3">
           <InfoCard
             icon={Plane}
-            label="최저 항공권"
-            value={flightText}
+            label="최저 항공권 (왕복)"
+            value={flightValue}
+            subValue={flightSub}
             onClick={() => onTabChange("flight")}
           />
           <InfoCard
             icon={TrendingUp}
             label="생활물가 비교"
-            value={costText}
+            value={costValue}
             onClick={() => onTabChange("cost")}
           />
         </div>
@@ -185,34 +202,54 @@ export function RecommendTab({ city, onTabChange }: RecommendTabProps) {
 
       <hr className="border-slate-200" />
 
-      {/* ③ 현지 뉴스 */}
+      {/* ③ 현지 소식 요약 */}
       <section>
-        <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-          <Newspaper className="size-5 text-blue-500" aria-hidden="true" />
-          현지 뉴스
-        </h3>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+            <Newspaper className="size-5 text-blue-500" aria-hidden="true" />
+            현지 소식 요약
+          </h3>
+          <button 
+            onClick={() => onTabChange("news")}
+            className="text-xs font-bold text-blue-600 hover:underline flex items-center gap-0.5"
+          >
+            전체보기 <ChevronRight className="size-3" />
+          </button>
+        </div>
 
-        <button
-          onClick={() => onTabChange("news")}
-          className={cn(
-            "w-full flex items-center gap-4 p-4 rounded-xl border border-slate-200",
-            "hover:border-blue-300 hover:bg-blue-50/40 transition-colors text-left",
-            "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/50",
+        <div className="flex flex-col gap-4">
+          {/* AI Summation */}
+          {city.news?.summation && (
+            <div className="bg-slate-50 border border-slate-100 rounded-xl p-4">
+              <p className="text-sm text-slate-600 leading-relaxed font-medium">
+                {city.news.summation}
+              </p>
+            </div>
           )}
-        >
-          <div className="w-11 h-11 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
-            <Newspaper className="size-4 text-blue-500" aria-hidden="true" />
+
+          {/* Top 3 News Preview */}
+          <div className="flex flex-col gap-2">
+            {city.news?.top3.map((news, idx) => (
+              <a
+                key={idx}
+                href={news.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-center justify-between p-3.5 rounded-xl border border-slate-100 bg-white hover:border-blue-200 hover:shadow-sm transition-all"
+              >
+                <div className="min-w-0">
+                  <p className="text-sm font-bold text-slate-800 truncate group-hover:text-blue-600 transition-colors">
+                    {news.title}
+                  </p>
+                  <p className="text-[10px] text-slate-400 mt-1">
+                    {dayjs(news.createdAt).format('YYYY.MM.DD')}
+                  </p>
+                </div>
+                <ExternalLink className="size-3.5 text-slate-300 group-hover:text-blue-400 transition-colors shrink-0 ml-3" />
+              </a>
+            ))}
           </div>
-          <div>
-            <p className="text-sm font-semibold text-slate-800">
-              최신 현지 소식 보기
-            </p>
-            <p className="text-xs text-slate-500 mt-0.5">
-              {city.cityName}의 최신 뉴스와 여행 정보
-            </p>
-          </div>
-          <ChevronRight className="size-4 text-slate-400 ml-auto shrink-0" />
-        </button>
+        </div>
       </section>
     </div>
   );
