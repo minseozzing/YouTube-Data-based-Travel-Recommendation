@@ -1,6 +1,6 @@
-package com.example.dahaeng.auth.service;
+package com.example.dahaeng.domain.auth.service;
 
-import com.example.dahaeng.auth.dto.CustomOAuth2User;
+import com.example.dahaeng.domain.auth.dto.CustomOAuth2User;
 import com.example.dahaeng.global.exception.CustomException;
 import com.example.dahaeng.global.exception.ErrorCode;
 import org.springframework.stereotype.Service;

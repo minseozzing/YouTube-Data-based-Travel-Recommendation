@@ -1,7 +1,7 @@
-package com.example.dahaeng.domain.location.country.entity;
+package com.example.dahaeng.domain.country.entity;
 
-import com.example.dahaeng.domain.location.country.enums.Continent;
-import com.example.dahaeng.domain.location.exchange.enums.Currency;
+import com.example.dahaeng.domain.country.enums.Continent;
+import com.example.dahaeng.domain.exchange.enums.Currency;
 import com.example.dahaeng.global.entity.BaseEntity;
 
 import jakarta.persistence.*;
@@ -17,6 +17,7 @@ import lombok.*;
 public class Country extends BaseEntity {
 
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	@Enumerated(EnumType.STRING)
@@ -31,9 +32,6 @@ public class Country extends BaseEntity {
 
 	@Column(name = "img_url", columnDefinition = "TEXT")
 	private String imgUrl;
-
-	@Column(name = "is_deleted")
-	private Boolean isDeleted;
 
 	private Double lat;
 	private Double lng;

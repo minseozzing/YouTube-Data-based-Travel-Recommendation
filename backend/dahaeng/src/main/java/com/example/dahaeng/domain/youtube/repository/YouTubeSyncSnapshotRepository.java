@@ -1,7 +1,7 @@
-package com.example.dahaeng.youtube.repository;
+package com.example.dahaeng.domain.youtube.repository;
 
-import com.example.dahaeng.youtube.entity.YouTubeSyncSnapshot;
-import com.example.dahaeng.youtube.enums.SnapshotType;
+import com.example.dahaeng.domain.youtube.entity.YouTubeSyncSnapshot;
+import com.example.dahaeng.domain.youtube.enums.SnapshotType;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface YouTubeSyncSnapshotRepository extends JpaRepository<YouTubeSyncSnapshot, Long> {

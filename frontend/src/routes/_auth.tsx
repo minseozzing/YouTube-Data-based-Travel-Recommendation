@@ -259,7 +259,13 @@ const LoginCardContent = () => {
 
   const handleDevLogin = () => {
     setAccessToken('dev-mock-token');
-    setUser({ id: 1, email: 'dev@dahaeng.com', name: '개발자', profileImageUrl: '' });
+    setUser({
+      id: 1,
+      email: 'dev@dahaeng.com',
+      nickname: '개발자',
+      profileImageUrl: null,
+      role: 'ROLE_USER',
+    });
     setHasCompletedPreference(true);
     navigate({ to: '/main' });
   };

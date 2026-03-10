@@ -1,6 +1,6 @@
-package com.example.dahaeng.interest.repository;
+package com.example.dahaeng.domain.interest.repository;
 
-import com.example.dahaeng.youtube.entity.YouTubeInterestKeyword;
+import com.example.dahaeng.domain.youtube.entity.YouTubeInterestKeyword;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface YoutubeInterestKeywordRepository extends JpaRepository<YouTubeInterestKeyword, Long> {

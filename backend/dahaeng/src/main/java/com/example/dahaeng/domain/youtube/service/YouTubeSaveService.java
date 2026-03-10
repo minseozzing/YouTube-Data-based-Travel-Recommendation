@@ -1,11 +1,11 @@
-package com.example.dahaeng.youtube.service;
+package com.example.dahaeng.domain.youtube.service;
 
-import com.example.dahaeng.member.entity.Member;
-import com.example.dahaeng.youtube.entity.*;
-import com.example.dahaeng.youtube.enums.PrivacyStatus;
-import com.example.dahaeng.youtube.enums.SnapshotType;
-import com.example.dahaeng.youtube.enums.SyncStatus;
-import com.example.dahaeng.youtube.repository.*;
+import com.example.dahaeng.domain.member.entity.Member;
+import com.example.dahaeng.domain.youtube.entity.*;
+import com.example.dahaeng.domain.youtube.enums.PrivacyStatus;
+import com.example.dahaeng.domain.youtube.enums.SnapshotType;
+import com.example.dahaeng.domain.youtube.enums.SyncStatus;
+import com.example.dahaeng.domain.youtube.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

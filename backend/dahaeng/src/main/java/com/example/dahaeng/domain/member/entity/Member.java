@@ -1,4 +1,4 @@
-package com.example.dahaeng.member.entity;
+package com.example.dahaeng.domain.member.entity;
 
 import com.example.dahaeng.global.entity.BaseEntity;
 import jakarta.persistence.*;

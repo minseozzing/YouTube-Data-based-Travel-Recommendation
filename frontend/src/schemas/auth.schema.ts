@@ -1,19 +1,20 @@
 import { z } from 'zod';
 
-// 사용자 정보
+// 사용자 정보 (백엔드 UserResponse와 일치)
 export const UserSchema = z.object({
   id: z.number(),
-  email: z.string().email(),
-  name: z.string(),
-  profileImageUrl: z.string(),
-  hasCompletedPreference: z.boolean(),
+  role: z.string(),
+  nickname: z.string(),
+  profileImageUrl: z.string().nullable(),
+  email: z.string().email().optional(), // /api/auth/me 등에서 사용될 수 있음
 });
 export type User = z.infer<typeof UserSchema>;
 
-// 로그인/콜백 응답
+// 로그인/콜백 응답 (백엔드 ExchangeResponse와 일치)
 export const AuthCallbackResponseSchema = z.object({
+  tokenType: z.string(),
   accessToken: z.string(),
-  user: UserSchema,
+  member: UserSchema,
 });
 export type AuthCallbackResponse = z.infer<typeof AuthCallbackResponseSchema>;
 
