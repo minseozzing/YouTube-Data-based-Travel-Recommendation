@@ -1,8 +1,8 @@
-package com.example.dahaeng.youtube.entity;
+package com.example.dahaeng.domain.youtube.entity;
 
 import com.example.dahaeng.global.entity.BaseEntity;
-import com.example.dahaeng.member.entity.Member;
-import com.example.dahaeng.youtube.enums.SyncStatus;
+import com.example.dahaeng.domain.member.entity.Member;
+import com.example.dahaeng.domain.youtube.enums.SyncStatus;
 import jakarta.persistence.*;
 import lombok.*;
 

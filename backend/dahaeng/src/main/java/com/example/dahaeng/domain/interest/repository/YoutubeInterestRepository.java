@@ -1,4 +1,4 @@
-package com.example.dahaeng.interest.repository;
+package com.example.dahaeng.domain.interest.repository;
 
 import com.example.dahaeng.youtube.entity.YouTubeInterest;
 import org.springframework.data.jpa.repository.JpaRepository;

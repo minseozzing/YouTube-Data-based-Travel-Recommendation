@@ -1,4 +1,4 @@
-package com.example.dahaeng.auth.dto;
+package com.example.dahaeng.domain.auth.dto;
 
 import com.example.dahaeng.member.dto.MemberDto;
 import lombok.AllArgsConstructor;

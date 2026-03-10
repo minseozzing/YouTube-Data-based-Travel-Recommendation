@@ -1,11 +1,11 @@
-package com.example.dahaeng.interest.service;
+package com.example.dahaeng.domain.interest.service;
 
 import com.example.dahaeng.global.exception.CustomException;
 import com.example.dahaeng.global.exception.ErrorCode;
-import com.example.dahaeng.interest.dto.InterestKeywordCandidate;
-import com.example.dahaeng.interest.enums.InterestCategory;
-import com.example.dahaeng.interest.repository.YoutubeInterestKeywordRepository;
-import com.example.dahaeng.interest.repository.YoutubeInterestRepository;
+import com.example.dahaeng.domain.interest.dto.InterestKeywordCandidate;
+import com.example.dahaeng.domain.interest.enums.InterestCategory;
+import com.example.dahaeng.domain.interest.repository.YoutubeInterestKeywordRepository;
+import com.example.dahaeng.domain.interest.repository.YoutubeInterestRepository;
 import com.example.dahaeng.youtube.entity.YouTubeAccount;
 import com.example.dahaeng.youtube.entity.YouTubeInterest;
 import com.example.dahaeng.youtube.entity.YouTubeInterestKeyword;
@@ -71,7 +71,7 @@ public class InterestResultSaver {
         }
     }
 
-    private com.example.dahaeng.youtube.enums.SourceType mapSourceType(com.example.dahaeng.interest.enums.InterestSourceType type) {
+    private com.example.dahaeng.youtube.enums.SourceType mapSourceType(com.example.dahaeng.domain.interest.enums.InterestSourceType type) {
         if (type == null) {
             return com.example.dahaeng.youtube.enums.SourceType.PLAYLIST_TITLE;
         }

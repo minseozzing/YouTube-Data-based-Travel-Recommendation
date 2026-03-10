@@ -1,7 +1,7 @@
-package com.example.dahaeng.interest.config;
+package com.example.dahaeng.domain.interest.config;
 
-import com.example.dahaeng.interest.enums.InterestCategory;
-import com.example.dahaeng.interest.enums.InterestSourceType;
+import com.example.dahaeng.domain.interest.enums.InterestCategory;
+import com.example.dahaeng.domain.interest.enums.InterestSourceType;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
