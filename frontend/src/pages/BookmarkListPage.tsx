@@ -214,7 +214,7 @@ const BookmarkListPage = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, ease: "easeOut" }}
     >
-      <div className="mx-auto max-w-7xl px-6 py-8">
+      <div className="mx-auto max-w-7xl px-3 pt-24 pb-6">
         {/* 브레드크럼 */}
         <nav
           className="mb-6 flex items-center gap-1.5 text-sm text-slate-400"

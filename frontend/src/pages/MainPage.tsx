@@ -1,14 +1,22 @@
 import { useSearch } from "@tanstack/react-router";
+import { useState, useEffect } from "react";
 import { CityDetailModal } from "@/components/city/CityDetailModal";
-import { MainNavBar } from "@/components/main/MainNavBar";
 import { LeftSidebar } from "@/components/main/LeftSidebar";
 import { HeroTextBlock } from "@/components/main/HeroTextBlock";
 import { StatBar } from "@/components/main/StatBar";
 import { GlobeContainer } from "@/components/globe/GlobeContainer";
 import { RightPanel } from "@/components/main/RightPanel";
+
 const MainPage = () => {
   // Activates TanStack Router search param subscription for this route
   useSearch({ from: "/_authenticated/main" });
+
+  // navbar 애니메이션(0.4s)이 끝난 뒤 Globe를 마운트해 JS 스레드 경합 방지
+  const [globeReady, setGlobeReady] = useState(false);
+  useEffect(() => {
+    const id = setTimeout(() => setGlobeReady(true), 450);
+    return () => clearTimeout(id);
+  }, []);
 
   return (
     <div
@@ -27,18 +35,10 @@ const MainPage = () => {
       {/* Dark overlay */}
       <div className="absolute inset-0 bg-black/1" aria-hidden="true" />
 
-      {/* MainNavBar — absolute overlay */}
-      <MainNavBar />
-
       {/* Left Sidebar — absolute overlay */}
       <LeftSidebar />
 
-      {/*
-        Globe 영역은 기본적으로 right-3(12px)까지 사용합니다.
-        오른쪽 패널이 열리면 패널 폭(300px) + 패널과의 간격(12px) + 여유 간격(12px)만큼 오른쪽 공간을 비워
-        지구가 좌측 사이드바와 우측 패널 사이의 가운데 영역으로 오도록 합니다.
-      */}
-      <GlobeContainer className="absolute inset-0" />
+      {globeReady && <GlobeContainer className="absolute inset-0" />}
 
       {/* Hero Text — overlaid on globe area, pointer-events-none */}
       <HeroTextBlock />

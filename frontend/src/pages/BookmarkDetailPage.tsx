@@ -5,7 +5,6 @@ import { useBookmarkDetail } from '@/hooks/bookmark/useBookmarkDetail';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import QueryErrorFallback from '@/components/common/QueryErrorFallback';
 import { Button } from '@/components/ui/button';
-import { MainNavBar } from '@/components/main/MainNavBar';
 import { BookmarkHeroSection } from '@/components/bookmark/BookmarkHeroSection';
 import { SavedFlightPriceCard } from '@/components/bookmark/SavedFlightPriceCard';
 import { ExchangeRateCard } from '@/components/bookmark/ExchangeRateCard';
@@ -21,12 +20,7 @@ const BookmarkDetailPage = () => {
       className="relative min-h-screen"
       style={{ background: 'linear-gradient(135deg, #93C5FD 0%, #93C5FD 100%)' }}
     >
-      {/* 메인페이지와 동일한 네비게이션 바 */}
-      <MainNavBar />
-
-      {/* 콘텐츠 — 네비바 아래부터 시작 */}
       <motion.div
-        className="pt-[72px]"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.35, ease: 'easeOut' }}
