@@ -79,6 +79,7 @@ export function CostCompareTab({ city }: CostCompareTabProps) {
           data={costDetail.data}
           isLoading={costDetail.isLoading}
           seoulLivingCost={seoulDetail.data?.living_cost}
+          krwPerTarget={exchangeRate.data ? Math.round(1 / exchangeRate.data.rate) : undefined}
         />
 
         {/* C. 서울 vs 도시 물가 요약 및 비교 지표 (항목별 차이 차트 포함) */}

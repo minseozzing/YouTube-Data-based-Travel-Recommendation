@@ -16,6 +16,7 @@ import {
   ReferenceLine,
 } from 'recharts';
 import { useExchangeRateHistory } from '@/hooks/cost/useExchangeRateHistory';
+import { CostCard } from './CostCard';
 import type { ExchangeRateNew } from '@/schemas/cost.schema';
 
 dayjs.locale('ko');
@@ -86,7 +87,7 @@ export function ExchangeRateCombinedSection({
   return (
     <div className="flex flex-col md:flex-row gap-4 w-full">
       {/* Left Column (Ratio 4) */}
-      <div className="md:w-2/5 bg-card border border-border rounded-xl p-4 flex flex-col justify-between">
+      <CostCard className="md:w-2/5" contentClassName="flex flex-col justify-between h-full">
         <div>
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
@@ -127,10 +128,10 @@ export function ExchangeRateCombinedSection({
             avgRate={weeklyAvg} 
           />
         </div>
-      </div>
+      </CostCard>
 
       {/* Right Column (Ratio 6) */}
-      <div className="md:w-3/5 bg-card border border-border rounded-xl p-4">
+      <CostCard className="md:w-3/5">
         <div className="flex items-center justify-between mb-4">
           <span className="text-sm font-semibold text-foreground">
             환율 추이
@@ -216,7 +217,7 @@ export function ExchangeRateCombinedSection({
             <p className="text-sm text-muted-foreground">환율 데이터를 불러올 수 없습니다</p>
           </div>
         )}
-      </div>
+      </CostCard>
     </div>
   );
 }

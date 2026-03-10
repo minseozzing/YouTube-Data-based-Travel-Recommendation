@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Users, DollarSign, ChevronDown } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { DollarSign, Users, ChevronDown } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
@@ -9,6 +10,7 @@ interface CostDetailTableProps {
   data: CostDetail | undefined;
   isLoading: boolean;
   seoulLivingCost?: LivingCost;
+  krwPerTarget?: number;
 }
 
 const EATING_OUT_LABELS: Record<string, string> = {
@@ -45,199 +47,297 @@ const OTHER_LABELS: Record<string, string> = {
   brand_sneakers: '브랜드 운동화',
 };
 
-type CategoryKey = 'eating_out' | 'transportation' | 'groceries' | 'other';
-
-const CATEGORIES: { key: CategoryKey; title: string; labels: Record<string, string> }[] = [
-  { key: 'eating_out', title: '🍽 외식', labels: EATING_OUT_LABELS },
-  { key: 'transportation', title: '🚌 교통', labels: TRANSPORT_LABELS },
-  { key: 'groceries', title: '🛒 생필품', labels: GROCERIES_LABELS },
-  { key: 'other', title: '🎬 기타', labels: OTHER_LABELS },
-];
-
 function calcDiff(cityVal: number, seoulVal: number): number {
   if (seoulVal === 0) return 0;
   return ((cityVal - seoulVal) / seoulVal) * 100;
 }
 
-interface CategorySectionProps {
+// ── 단일 항목 렌더러 ──────────────────────────────────────────────────────────
+interface ItemRowProps {
+  cityVal: number;
+  seoulVal: number | undefined;
+  label: string;
+  currency: string;
+  cityName: string;
+  krwPerTarget: number | undefined;
+}
+
+function ItemRow({ cityVal, seoulVal, label, currency, cityName, krwPerTarget }: ItemRowProps) {
+  const diff = seoulVal !== undefined ? calcDiff(cityVal, seoulVal) : null;
+  const isHigher = diff !== null && diff >= 0;
+  const cityKRW = krwPerTarget ? cityVal * krwPerTarget : null;
+
+  let seoulRatio = 50;
+  let cityRatio = 50;
+  if (seoulVal !== undefined && cityKRW !== null && seoulVal + cityKRW > 0) {
+    const total = seoulVal + cityKRW;
+    seoulRatio = (seoulVal / total) * 100;
+    cityRatio = (cityKRW / total) * 100;
+  } else if (diff !== null) {
+    const cityNorm = 100 + diff;
+    if (cityNorm > 0) {
+      seoulRatio = (100 / (100 + cityNorm)) * 100;
+      cityRatio = (cityNorm / (100 + cityNorm)) * 100;
+    }
+  }
+
+  return (
+    <div className="px-3.5 py-3">
+      {/* 행 1: 항목명 + 배지 */}
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-xs font-medium text-foreground truncate mr-2">{label}</span>
+        {diff !== null && (
+          <Badge
+            className={cn(
+              'px-1.5 py-0.5 text-[10px] font-bold border-none shrink-0 rounded-full',
+              isHigher ? 'bg-red-500/10 text-red-600' : 'bg-blue-500/10 text-blue-600',
+            )}
+          >
+            {isHigher ? '+' : ''}{diff.toFixed(1)}%
+          </Badge>
+        )}
+      </div>
+
+      {/* 행 2: 서울 | ⇄ | 도시 */}
+      {seoulVal !== undefined && (
+        <div className="flex items-center gap-1.5 mb-2">
+          <div className="flex-1 min-w-0">
+            <p className="text-[9px] text-muted-foreground mb-0.5">서울</p>
+            <p className="text-[11px] font-semibold text-blue-600 leading-none">
+              {Math.round(seoulVal).toLocaleString()}원
+            </p>
+          </div>
+          <span className="text-xs text-muted-foreground/50 shrink-0">⇄</span>
+          <div className="flex-1 min-w-0 text-right">
+            <p className="text-[9px] text-muted-foreground mb-0.5">{cityName}</p>
+            <p className="text-[11px] font-semibold text-red-600 leading-none">
+              {cityKRW !== null && (
+                <span>{Math.round(cityKRW).toLocaleString()}원 </span>
+              )}
+              <span className={cn('font-normal', cityKRW !== null ? 'text-muted-foreground text-[9px]' : '')}>
+                ({cityVal.toFixed(2)} {currency})
+              </span>
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* 행 3: 비교 바 */}
+      <div className="flex h-[5px] w-full gap-[2px]">
+        <div className="h-full bg-blue-400 rounded-l-full" style={{ flex: seoulRatio }} />
+        <div className="h-full bg-red-400 rounded-r-full" style={{ flex: cityRatio }} />
+      </div>
+    </div>
+  );
+}
+
+// ── 카드 컴포넌트 (controlled) ─────────────────────────────────────────────────
+interface CategoryCardProps {
   title: string;
-  sectionKey: string;
   cityData: Record<string, number>;
   seoulData: Record<string, number> | undefined;
   labels: Record<string, string>;
   currency: string;
   cityName: string;
+  krwPerTarget: number | undefined;
   isOpen: boolean;
-  onToggle: (key: string) => void;
+  onToggle: () => void;
+  /** 내부 항목을 몇 열로 표시할지 (기본 1) */
+  innerCols?: 1 | 2 | 3;
+  className?: string;
 }
 
-function CategorySection({
-  title, sectionKey, cityData, seoulData, labels, currency, cityName, isOpen, onToggle,
-}: CategorySectionProps) {
-  // ── 해당 카테고리 내의 최대값 계산 (90% 스케일용) ──
-  const categoryMax = (() => {
-    const allValues = [
-      ...Object.values(cityData),
-      ...Object.values(seoulData ?? {}),
-    ];
-    return allValues.length > 0 ? Math.max(...allValues) : 1;
-  })();
+function CategoryCard({
+  title, cityData, seoulData, labels, currency, cityName, krwPerTarget,
+  isOpen, onToggle, innerCols = 1, className,
+}: CategoryCardProps) {
+  const itemCount = Object.keys(cityData).length;
+  const entries = Object.entries(cityData);
+
+  const innerGridClass = {
+    1: 'grid-cols-1',
+    2: 'grid-cols-2',
+    3: 'grid-cols-3',
+  }[innerCols];
 
   return (
-    <div className="border-b border-border last:border-0">
+    <div
+      className={cn(
+        'bg-card rounded-xl border border-border overflow-hidden transition-shadow duration-300',
+        isOpen ? 'shadow-md' : 'shadow-sm',
+        className,
+      )}
+    >
+      {/* 헤더 */}
       <button
         type="button"
-        onClick={() => onToggle(sectionKey)}
-        className="w-full flex items-center justify-between px-4 py-3.5 text-sm font-semibold text-foreground hover:bg-muted/40 transition-colors"
-        aria-expanded={isOpen}
+        onClick={onToggle}
+        className={cn(
+          'w-full flex items-center justify-between px-4 py-3.5 transition-colors duration-200',
+          isOpen ? 'border-b border-border bg-card' : 'bg-muted/30 hover:bg-muted/50',
+        )}
       >
-        <span>{title}</span>
-        <ChevronDown
-          className={cn(
-            'size-4 text-muted-foreground transition-transform duration-200',
-            isOpen && 'rotate-180',
-          )}
-        />
+        <div className="flex items-center gap-2.5 min-w-0">
+          <h3 className="text-sm font-bold text-foreground">{title}</h3>
+          <AnimatePresence>
+            {!isOpen && (
+              <motion.span
+                key="count"
+                initial={{ opacity: 0, scale: 0.7 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.7 }}
+                transition={{ duration: 0.15 }}
+                className="text-[10px] bg-muted text-muted-foreground px-1.5 py-0.5 rounded-full font-medium"
+              >
+                {itemCount}개 항목
+              </motion.span>
+            )}
+          </AnimatePresence>
+        </div>
+        <motion.div
+          animate={{ rotate: isOpen ? 180 : 0 }}
+          transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
+          className="shrink-0 ml-2"
+        >
+          <ChevronDown className="size-4 text-muted-foreground" />
+        </motion.div>
       </button>
 
-      {isOpen && (
-        <div className="px-4 pb-4">
-          {/* 항목별 상세 행: 2:2:4 비율 (명칭:가격:막대) */}
-          <div className="flex flex-col divide-y divide-border/50">
-            {Object.entries(cityData).map(([key, cityVal]) => {
-              const seoulVal = seoulData?.[key];
-              const diff = seoulVal !== undefined ? calcDiff(cityVal, seoulVal) : null;
-              const isHigher = diff !== null && diff >= 0;
-
-              return (
-                <div key={key} className="grid grid-cols-8 gap-3 items-center py-3.5">
-                  {/* 왼쪽 (2): 항목명 (왼쪽 정렬 + 더 넓은 왼쪽 여백) */}
-                  <span className="col-span-2 text-sm text-muted-foreground truncate text-left pl-12">
-                    {labels[key] ?? key}
-                  </span>
-
-                  {/* 중간 (2): 상세 가격 정보 (한 줄로 표시) */}
-                  <div className="col-span-2 flex items-center gap-2 min-w-0">
-                    <div className="flex items-center gap-1 shrink-0">
-                      {seoulVal !== undefined && (
-                        <>
-                          <span className="text-xs text-muted-foreground whitespace-nowrap">
-                            서울 {seoulVal.toFixed(1)}
-                          </span>
-                          <span className="text-[10px] text-muted-foreground">→</span>
-                        </>
-                      )}
-                      <span className="text-sm font-bold text-foreground whitespace-nowrap">
-                        {cityVal.toFixed(1)} {currency}
-                      </span>
-                    </div>
-                    {diff !== null && (
-                      <Badge
-                        className={cn(
-                          'px-1.5 py-0.5 h-4 text-[10px] font-bold border-none shrink-0',
-                          isHigher
-                            ? 'bg-red-500/10 text-red-600'
-                            : 'bg-blue-500/10 text-blue-600',
-                        )}
-                      >
-                        {isHigher ? '+' : ''}{diff.toFixed(1)}%
-                      </Badge>
-                    )}
-                  </div>
-
-                  {/* 오른쪽 (4): 인라인 병렬 막대 (오른쪽 여백 추가) */}
-                  <div className="col-span-4 flex flex-col gap-1.5 justify-center pr-6">
-                    {seoulVal !== undefined ? (
-                      (() => {
-                        const denom = categoryMax > 0 ? categoryMax : 1;
-                        const seoulPct = (seoulVal / denom) * 90;
-                        const cityPct = (cityVal / denom) * 90;
-                        return (
-                          <>
-                            <div className="w-full h-[12px] rounded-full bg-muted overflow-hidden">
-                              <div
-                                className="h-full rounded-full bg-slate-400"
-                                style={{ width: `${seoulPct}%` }}
-                              />
-                            </div>
-                            <div className="w-full h-[12px] rounded-full bg-muted overflow-hidden">
-                              <div
-                                className={cn(
-                                  'h-full rounded-full',
-                                  isHigher ? 'bg-red-400' : 'bg-blue-400',
-                                )}
-                                style={{ width: `${cityPct}%` }}
-                              />
-                            </div>
-                          </>
-                        );
-                      })()
-                    ) : (
-                      <div className="h-[25px]" />
-                    )}
-                  </div>
+      {/* 슬라이드 콘텐츠 */}
+      <AnimatePresence initial={false}>
+        {isOpen && (
+          <motion.div
+            key="content"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+            style={{ overflow: 'hidden' }}
+          >
+            <div className={cn('grid divide-border/50', innerGridClass, innerCols > 1 ? 'divide-x' : 'divide-y')}>
+              {entries.map(([key, cityVal]) => (
+                <div key={key} className={innerCols > 1 ? 'border-b border-border/50 last:border-b-0' : ''}>
+                  <ItemRow
+                    cityVal={cityVal}
+                    seoulVal={seoulData?.[key]}
+                    label={labels[key] ?? key}
+                    currency={currency}
+                    cityName={cityName}
+                    krwPerTarget={krwPerTarget}
+                  />
                 </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
 
-export function CostDetailTable({ data, isLoading, seoulLivingCost }: CostDetailTableProps) {
-  const [openSections, setOpenSections] = useState<Set<string>>(new Set(['eating_out']));
+// ── 메인 컴포넌트 ──────────────────────────────────────────────────────────────
+export function CostDetailTable({ data, isLoading, seoulLivingCost, krwPerTarget }: CostDetailTableProps) {
   const currency = data?.target.currency ?? 'USD';
   const cityName = data?.target.name ?? '도시';
   const lc = data?.living_cost;
 
-  const handleToggle = (key: string) => {
-    setOpenSections((prev) => {
-      const next = new Set(prev);
-      next.has(key) ? next.delete(key) : next.add(key);
-      return next;
-    });
-  };
+  // 마트/식료품은 독립 토글, 나머지 3개는 공유 토글
+  const [groceriesOpen, setGroceriesOpen] = useState(true);
+  const [bottomOpen, setBottomOpen] = useState(true);
+
+  const toggleBottom = () => setBottomOpen((v) => !v);
 
   return (
-    <div className="bg-card border border-border rounded-xl overflow-hidden">
-      <div className="px-4 py-3.5 border-b border-border flex items-center justify-between">
-        <span className="text-sm font-semibold text-foreground">
-          {cityName} 전체 물가표
-        </span>
+    <div className="flex flex-col gap-4">
+      {/* 섹션 헤더 */}
+      <div className="flex items-center justify-between">
+        <h2 className="text-sm font-bold text-foreground">{cityName} 전체 물가표</h2>
         {lc && (
-          <Badge className="text-xs bg-blue-500/10 text-blue-600 border-green-200 dark:border-green-800 px-2 py-0.5">
-            <DollarSign className="size-3 mr-0.5" />
+          <Badge className="text-xs bg-blue-500/10 text-blue-600 border-none px-2 py-0.5 gap-1">
+            <DollarSign className="size-3" />
             하루 예산 {lc.daily_budget.toFixed(1)} {currency}
           </Badge>
         )}
       </div>
 
+      {/* 범례 */}
+      <div className="flex items-center gap-4 text-[11px] text-muted-foreground px-1">
+        <span className="flex items-center gap-1.5">
+          <span className="w-3 h-2 rounded-full bg-blue-400 inline-block" />
+          대한민국 (서울)
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="w-3 h-2 rounded-full bg-red-400 inline-block" />
+          {cityName}
+        </span>
+      </div>
+
       {isLoading ? (
-        <div className="flex flex-col gap-2 p-4">
-          {CATEGORIES.map((c) => <Skeleton key={c.key} className="h-12 w-full" />)}
+        <div className="flex flex-col gap-4">
+          <Skeleton className="h-48 w-full rounded-xl" />
+          <div className="grid grid-cols-3 gap-4">
+            <Skeleton className="h-48 w-full rounded-xl" />
+            <Skeleton className="h-48 w-full rounded-xl" />
+            <Skeleton className="h-48 w-full rounded-xl" />
+          </div>
         </div>
       ) : lc ? (
         <>
-          {CATEGORIES.map(({ key, title, labels }) => (
-            <CategorySection
-              key={key}
-              title={title}
-              sectionKey={key}
-              cityData={lc[key] as Record<string, number>}
-              seoulData={seoulLivingCost?.[key] as Record<string, number> | undefined}
-              labels={labels}
+          {/* ── 행 1: 마트 및 식료품 (가로 전체, 내부 3열) ── */}
+          <CategoryCard
+            title="🛒 마트 및 식료품"
+            cityData={lc.groceries as Record<string, number>}
+            seoulData={seoulLivingCost?.groceries as Record<string, number> | undefined}
+            labels={GROCERIES_LABELS}
+            currency={currency}
+            cityName={cityName}
+            krwPerTarget={krwPerTarget}
+            isOpen={groceriesOpen}
+            onToggle={() => setGroceriesOpen((v) => !v)}
+            innerCols={3}
+          />
+
+          {/* ── 행 2: 나머지 3개 카드 (공유 토글) ── */}
+          <div className="grid grid-cols-3 gap-4 items-start">
+            <CategoryCard
+              title="🍴 외식 및 카페"
+              cityData={lc.eating_out as Record<string, number>}
+              seoulData={seoulLivingCost?.eating_out as Record<string, number> | undefined}
+              labels={EATING_OUT_LABELS}
               currency={currency}
               cityName={cityName}
-              isOpen={openSections.has(key)}
-              onToggle={handleToggle}
+              krwPerTarget={krwPerTarget}
+              isOpen={bottomOpen}
+              onToggle={toggleBottom}
             />
-          ))}
+            <CategoryCard
+              title="🚌 교통"
+              cityData={lc.transportation as Record<string, number>}
+              seoulData={seoulLivingCost?.transportation as Record<string, number> | undefined}
+              labels={TRANSPORT_LABELS}
+              currency={currency}
+              cityName={cityName}
+              krwPerTarget={krwPerTarget}
+              isOpen={bottomOpen}
+              onToggle={toggleBottom}
+            />
+            <CategoryCard
+              title="🎬 여가 및 기타"
+              cityData={lc.other as Record<string, number>}
+              seoulData={seoulLivingCost?.other as Record<string, number> | undefined}
+              labels={OTHER_LABELS}
+              currency={currency}
+              cityName={cityName}
+              krwPerTarget={krwPerTarget}
+              isOpen={bottomOpen}
+              onToggle={toggleBottom}
+            />
+          </div>
 
-          <div className="grid grid-cols-2 gap-4 px-4 py-4 border-t border-border bg-muted/30">
+          {/* 하단 요약 */}
+          <div className="grid grid-cols-2 gap-4 px-4 py-4 bg-card border border-border rounded-xl">
             <div className="flex items-center gap-2.5">
-              <DollarSign className="size-4 text-muted-foreground" />
+              <DollarSign className="size-4 text-muted-foreground shrink-0" />
               <div>
                 <p className="text-xs text-muted-foreground">세후 평균 월급</p>
                 <p className="text-sm font-semibold text-foreground">
@@ -246,7 +346,7 @@ export function CostDetailTable({ data, isLoading, seoulLivingCost }: CostDetail
               </div>
             </div>
             <div className="flex items-center gap-2.5">
-              <Users className="size-4 text-muted-foreground" />
+              <Users className="size-4 text-muted-foreground shrink-0" />
               <div>
                 <p className="text-xs text-muted-foreground">인구</p>
                 <p className="text-sm font-semibold text-foreground">
@@ -257,7 +357,7 @@ export function CostDetailTable({ data, isLoading, seoulLivingCost }: CostDetail
           </div>
         </>
       ) : (
-        <p className="text-base text-muted-foreground p-4">물가 데이터를 불러올 수 없습니다</p>
+        <p className="text-base text-muted-foreground">물가 데이터를 불러올 수 없습니다</p>
       )}
     </div>
   );
