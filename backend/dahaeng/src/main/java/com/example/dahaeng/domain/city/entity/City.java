@@ -33,4 +33,6 @@ public class City extends BaseEntity {
 
 	private Double lat;
 	private Double lng;
+
+	private Double news_penalty_score;
 }
