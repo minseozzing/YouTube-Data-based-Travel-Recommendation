@@ -6,14 +6,9 @@ import { HeroTextBlock } from "@/components/main/HeroTextBlock";
 import { StatBar } from "@/components/main/StatBar";
 import { GlobeContainer } from "@/components/globe/GlobeContainer";
 import { RightPanel } from "@/components/main/RightPanel";
-import maldivesBg from "@/assets/Maldive_beach_1.jpg";
-import { useUiStore } from "@/stores/uiStore";
 const MainPage = () => {
   // Activates TanStack Router search param subscription for this route
   useSearch({ from: "/_authenticated/main" });
-  const isRightPanelOpen = useUiStore((s) => s.isRightPanelOpen);
-  const selectedCityImgUrl = useUiStore((s) => s.selectedCityImgUrl);
-  const bgImage = selectedCityImgUrl ?? maldivesBg;
 
   return (
     <div
@@ -43,13 +38,7 @@ const MainPage = () => {
         오른쪽 패널이 열리면 패널 폭(300px) + 패널과의 간격(12px) + 여유 간격(12px)만큼 오른쪽 공간을 비워
         지구가 좌측 사이드바와 우측 패널 사이의 가운데 영역으로 오도록 합니다.
       */}
-      <GlobeContainer
-        className={[
-          "absolute top-[60px] left-[268px] bottom-3",
-          "transition-all duration-300 ease-in-out",
-          isRightPanelOpen ? "right-[312px]" : "right-3",
-        ].join(" ")}
-      />
+      <GlobeContainer className="absolute inset-0" />
 
       {/* Hero Text — overlaid on globe area, pointer-events-none */}
       <HeroTextBlock />

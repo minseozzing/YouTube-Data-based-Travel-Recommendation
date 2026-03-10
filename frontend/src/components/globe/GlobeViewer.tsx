@@ -137,7 +137,7 @@ const BaseLayer = React.memo(
               geography={geo}
               tabIndex={-1}
               fill={isSelected ? "#d4d4d4" : "#F1F5F9"}
-              stroke={showBorders && !isSelected ? "#626262" : "none"}
+              stroke={showBorders && !isSelected ? "#cfcfcf" : "none"}
               strokeWidth={showBorders && !isSelected ? 0.5 : 0}
               style={{
                 default: COUNTRY_STYLE_DEFAULT,
@@ -167,53 +167,113 @@ const BaseLayer = React.memo(
 
 // 모든 국가 GeoJSON이 mapshaper 5% simplify 처리됨
 function getAdminUrl(iso: string) {
-  return `/geo/${iso}.json`;
+  return `/geo_10m/countries/${iso}.topo.json`;
 }
 
-const ADMIN_STYLE = {
-  default: {
-    outline: "none",
-    pointerEvents: "none",
-    vectorEffect: "non-scaling-stroke" as const,
-  },
+function getAdminName(geo: GeoFeature) {
+  return (
+    geo.properties.shapeName ||
+    geo.properties.name ||
+    geo.properties.name_en ||
+    geo.properties.admin ||
+    geo.properties.postal ||
+    "unknown"
+  );
+}
+
+const ADMIN_AREA_STYLE = {
+  default: { outline: "none", cursor: "pointer" },
+  hover: { outline: "none", cursor: "pointer" },
+  pressed: { outline: "none" },
+} as const;
+
+const ADMIN_BORDER_STYLE = {
+  default: { outline: "none", pointerEvents: "none" },
   hover: { outline: "none" },
   pressed: { outline: "none" },
 } as const;
 
-// react-simple-maps가 URL 기반 fetch를 내부적으로 캐시하므로
-// 재클릭 시 네트워크 요청 없이 즉시 렌더됨
-const AdminLayer = React.memo(({ iso }: { iso: string }) => (
-  <Geographies geography={getAdminUrl(iso)}>
-    {({ geographies }: { geographies: GeoFeature[] }) =>
-      geographies
-        .filter((geo) => {
-          const bounds = getGeoBounds(geo);
-          if (!bounds) return false;
+const AdminLayer = React.memo(
+  ({
+    iso,
+    hoveredAdminKey,
+    onAdminEnter,
+    onAdminMove,
+    onAdminLeave,
+    onDeselect,
+  }: {
+    iso: string;
+    hoveredAdminKey: string | null;
+    onAdminEnter: (name: string, key: string, e: React.MouseEvent) => void;
+    onAdminMove: (name: string, key: string, e: React.MouseEvent) => void;
+    onAdminLeave: () => void;
+    onDeselect: () => void;
+  }) => (
+    <Geographies geography={getAdminUrl(iso)}>
+      {
+        (({
+          geographies,
+          borders,
+          outline,
+        }: {
+          geographies: GeoFeature[];
+          borders?: unknown;
+          outline?: unknown;
+        }) => (
+          <>
+            {geographies.map((geo: GeoFeature) => {
+              const adminName = getAdminName(geo);
+              const isHovered = hoveredAdminKey === geo.rsmKey;
 
-          // 지도 전체를 덮는 비정상 geometry 제거
-          if (bounds.width > 300 || bounds.height > 140) return false;
+              return (
+                <Geography
+                  key={geo.rsmKey}
+                  geography={geo}
+                  fill={
+                    isHovered
+                      ? "rgba(127, 239, 123, 0.35)"
+                      : "rgba(0,0,0,0.001)"
+                  }
+                  stroke="none"
+                  style={ADMIN_AREA_STYLE}
+                  onClick={onDeselect}
+                  onMouseEnter={(e) => onAdminEnter(adminName, geo.rsmKey, e)}
+                  onMouseMove={(e) => onAdminMove(adminName, geo.rsmKey, e)}
+                  onMouseLeave={onAdminLeave}
+                />
+              );
+            })}
 
-          return true;
-        })
-        .map((geo) => (
-          <Geography
-            key={geo.rsmKey}
-            geography={geo}
-            fill="none"
-            stroke="#334155"
-            strokeWidth={0.8}
-            style={ADMIN_STYLE}
-          />
-        ))
-    }
-  </Geographies>
-));
+            {outline && (
+              <Geography
+                geography={outline as never}
+                fill="none"
+                stroke="#334155"
+                strokeWidth={0.1}
+                style={ADMIN_BORDER_STYLE}
+              />
+            )}
+
+            {borders && (
+              <Geography
+                geography={borders as never}
+                fill="none"
+                stroke="#334155"
+                strokeWidth={0.1}
+                style={ADMIN_BORDER_STYLE}
+              />
+            )}
+          </>
+        )) as never
+      }
+    </Geographies>
+  ),
+);
 
 export function GlobeViewer({ width, height }: GlobeViewerProps) {
   const {
     openRightPanel,
     globeBudgetFilter,
-    globeRiskFilter,
     globeDuration,
     selectedCityCoords,
     isRecommendActive,
@@ -229,6 +289,10 @@ export function GlobeViewer({ width, height }: GlobeViewerProps) {
   } | null>(null);
   const [clickedIso, setClickedIso] = useState<string | null>(null);
   const [clickedName, setClickedName] = useState<string | null>(null);
+  const [clickedGeo, setClickedGeo] = useState<GeoFeature | null>(null);
+
+  const [hoveredAdminKey, setHoveredAdminKey] = useState<string | null>(null);
+
   // 1순위: 줌 애니메이션 중 admin 렌더 차단
   const [isZooming, setIsZooming] = useState(false);
 
@@ -271,21 +335,62 @@ export function GlobeViewer({ width, height }: GlobeViewerProps) {
     [handleTooltipMove],
   );
 
+  const handleAdminEnter = useCallback(
+    (name: string, key: string, e: React.MouseEvent) => {
+      setHoveredAdminKey(key);
+      setTooltip({
+        name,
+        x: e.clientX,
+        y: e.clientY,
+      });
+    },
+    [],
+  );
+
+  const handleAdminMove = useCallback(
+    (name: string, key: string, e: React.MouseEvent) => {
+      setHoveredAdminKey(key);
+      handleTooltipMove(name, e);
+    },
+    [handleTooltipMove],
+  );
+
+  const handleAdminLeave = useCallback(() => {
+    setHoveredAdminKey(null);
+    setTooltip(null);
+  }, []);
+
+  const handleDeselect = useCallback(() => {
+    setClickedIso(null);
+    setClickedName(null);
+    setClickedGeo(null);
+    setHoveredAdminKey(null);
+    setTooltip(null);
+  }, []);
+
   const handleCountryClick = useCallback(
     (geo: GeoFeature) => {
       const rawName = geo.properties.name ?? "";
+
       if (rawName === clickedNameRef.current) {
         setClickedIso(null);
         setClickedName(null);
+        setClickedGeo(null);
+        setHoveredAdminKey(null);
+        setTooltip(null);
         return;
       }
+
       const bounds = getGeoBounds(geo);
       if (!bounds) return;
+
       const iso = COUNTRY_NAME_ISO3[rawName];
       if (iso) setClickedIso(iso);
       setClickedName(rawName);
+      setClickedGeo(geo);
+      setHoveredAdminKey(null);
+      setTooltip(null);
 
-      // 1순위: 줌 시작 → admin 렌더 차단
       setIsZooming(true);
       if (zoomTimerRef.current) clearTimeout(zoomTimerRef.current);
       zoomTimerRef.current = setTimeout(() => setIsZooming(false), 700);
@@ -298,9 +403,11 @@ export function GlobeViewer({ width, height }: GlobeViewerProps) {
         width,
         height,
       );
+
       const currentLng = centerRef.current[0];
       const diff =
         ((((newCenter[0] - currentLng + 180) % 360) + 360) % 360) - 180;
+
       const targetCenter: [number, number] = [currentLng + diff, newCenter[1]];
       centerRef.current = targetCenter;
       zoomRef.current = newZoom;
@@ -340,17 +447,22 @@ export function GlobeViewer({ width, height }: GlobeViewerProps) {
       const withinBudget =
         adjustedBudget >= globeBudgetFilter[0] &&
         adjustedBudget <= globeBudgetFilter[1];
-      const withinRisk = city.riskLevel <= globeRiskFilter;
-      return withinBudget && withinRisk;
+      return withinBudget;
     });
     return new Set(matched.map((c) => c.cityId));
-  }, [
-    cities,
-    globeBudgetFilter,
-    globeRiskFilter,
-    globeDuration,
-    isRecommendActive,
-  ]);
+  }, [cities, globeBudgetFilter, globeDuration, isRecommendActive]);
+
+  // 추천 활성 시 상위 3개 도시 → cityId: rank(1|2|3) 매핑
+  const medalRankMap = useMemo<Map<number, 1 | 2 | 3>>(() => {
+    if (!isRecommendActive) return new Map();
+    const sorted = [...cities]
+      .filter((c) => matchedCityIds.has(c.cityId))
+      .sort((a, b) => (b.matchingScore ?? 0) - (a.matchingScore ?? 0))
+      .slice(0, 3);
+    const map = new Map<number, 1 | 2 | 3>();
+    sorted.forEach((c, i) => map.set(c.cityId, (i + 1) as 1 | 2 | 3));
+    return map;
+  }, [cities, matchedCityIds, isRecommendActive]);
 
   const worldWidth = (2 * Math.PI * width) / 7;
   const OFFSETS = [-1, 0, 1] as const;
@@ -369,7 +481,7 @@ export function GlobeViewer({ width, height }: GlobeViewerProps) {
           center={center}
           zoom={zoom}
           minZoom={0.8}
-          maxZoom={20}
+          maxZoom={80}
           translateExtent={[
             [-1e10, -1e10],
             [1e10, 1e10],
@@ -426,12 +538,24 @@ export function GlobeViewer({ width, height }: GlobeViewerProps) {
               )}
 
               {/* 행정구역 레이어 — 줌 완료 후에만 렌더 (isZooming=false 시) */}
-              {showAdmin && clickedIso && <AdminLayer iso={clickedIso} />}
+              {showAdmin && clickedIso && slotIndex === 1 && (
+                <AdminLayer
+                  iso={clickedIso}
+                  hoveredAdminKey={hoveredAdminKey}
+                  onAdminEnter={handleAdminEnter}
+                  onAdminMove={handleAdminMove}
+                  onAdminLeave={handleAdminLeave}
+                  onDeselect={handleDeselect}
+                />
+              )}
 
               {/* 도시 마커 */}
               {cities.map((city) => {
                 const isMatched =
                   !isRecommendActive || matchedCityIds.has(city.cityId);
+                const medalRank = medalRankMap.get(city.cityId);
+                const r = 5 / zoom;
+                const medalSize = 30 / zoom;
                 return (
                   <Marker
                     key={`${city.cityId}-${slotIndex}`}
@@ -444,14 +568,14 @@ export function GlobeViewer({ width, height }: GlobeViewerProps) {
                     }
                   >
                     <circle
-                      r={5 / zoom}
+                      r={r}
                       fill={
                         isMatched
                           ? getMarkerColor(city.matchingScore)
                           : "#CBD5E1"
                       }
                       stroke="#fff"
-                      strokeWidth={0.2}
+                      strokeWidth={1 / zoom}
                       style={{ cursor: "pointer" }}
                       onMouseEnter={(e) =>
                         setTooltip({
@@ -463,6 +587,16 @@ export function GlobeViewer({ width, height }: GlobeViewerProps) {
                       onMouseMove={(e) => handleTooltipMove(city.cityName, e)}
                       onMouseLeave={() => setTooltip(null)}
                     />
+                    {medalRank && (
+                      <image
+                        href={`/src/assets/medal${medalRank}.png`}
+                        x={-medalSize / 2}
+                        y={-(r + medalSize)}
+                        width={medalSize}
+                        height={medalSize}
+                        style={{ pointerEvents: "none" }}
+                      />
+                    )}
                   </Marker>
                 );
               })}

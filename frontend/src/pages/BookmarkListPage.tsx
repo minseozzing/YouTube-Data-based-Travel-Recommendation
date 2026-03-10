@@ -1,77 +1,165 @@
-import { useState, useMemo } from 'react';
-import { useSearch, Link } from '@tanstack/react-router';
-import { motion, type Variants } from 'framer-motion';
-import { ChevronRight, BookmarkX } from 'lucide-react';
-import { useBookmarkList } from '@/hooks/bookmark/useBookmarkList';
-import { useDeleteBookmark } from '@/hooks/bookmark/useDeleteBookmark';
-import LoadingSpinner from '@/components/common/LoadingSpinner';
-import QueryErrorFallback from '@/components/common/QueryErrorFallback';
-import { BookmarkCard } from '@/components/bookmark/BookmarkCard';
-import { AddCityCard } from '@/components/bookmark/AddCityCard';
-import { Pagination } from '@/components/common/Pagination';
+import { useState, useMemo } from "react";
+import { useSearch, Link } from "@tanstack/react-router";
+import { motion, type Variants } from "framer-motion";
+import { ChevronRight, BookmarkX } from "lucide-react";
+import { useBookmarkList } from "@/hooks/bookmark/useBookmarkList";
+import { useDeleteBookmark } from "@/hooks/bookmark/useDeleteBookmark";
+import LoadingSpinner from "@/components/common/LoadingSpinner";
+import QueryErrorFallback from "@/components/common/QueryErrorFallback";
+import { BookmarkCard } from "@/components/bookmark/BookmarkCard";
+import { AddCityCard } from "@/components/bookmark/AddCityCard";
+import { Pagination } from "@/components/common/Pagination";
 import {
   Select,
   SelectTrigger,
   SelectValue,
   SelectContent,
   SelectItem,
-} from '@/components/ui/select';
-import type { BookmarkListItem } from '@/schemas/bookmark.schema';
+} from "@/components/ui/select";
+import type { BookmarkListItem } from "@/schemas/bookmark.schema";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 const ITEMS_PER_PAGE = 8;
 
 type ContinentFilter =
-  | 'all'
-  | 'asia'
-  | 'europe'
-  | 'americas'
-  | 'oceania'
-  | 'middleeast_africa';
+  | "all"
+  | "asia"
+  | "europe"
+  | "americas"
+  | "oceania"
+  | "middleeast_africa";
 
 const FILTER_OPTIONS: { value: ContinentFilter; label: string }[] = [
-  { value: 'all', label: '전체' },
-  { value: 'asia', label: '아시아' },
-  { value: 'europe', label: '유럽' },
-  { value: 'americas', label: '아메리카' },
-  { value: 'oceania', label: '오세아니아' },
-  { value: 'middleeast_africa', label: '중동·아프리카' },
+  { value: "all", label: "전체" },
+  { value: "asia", label: "아시아" },
+  { value: "europe", label: "유럽" },
+  { value: "americas", label: "아메리카" },
+  { value: "oceania", label: "오세아니아" },
+  { value: "middleeast_africa", label: "중동·아프리카" },
 ];
 
 // Rough continent → filter mapping (client-side heuristic by countryName)
 const CONTINENT_KEYWORDS: Record<ContinentFilter, string[]> = {
   all: [],
   asia: [
-    'japan', 'china', 'korea', 'thailand', 'vietnam', 'indonesia', 'malaysia',
-    'singapore', 'philippines', 'india', 'taiwan', 'hong kong', 'cambodia',
-    'myanmar', 'laos', 'bangladesh', 'nepal', 'sri lanka', 'maldives',
-    '일본', '중국', '한국', '태국', '베트남', '인도네시아', '말레이시아',
-    '싱가포르', '필리핀', '인도', '대만', '홍콩',
+    "japan",
+    "china",
+    "korea",
+    "thailand",
+    "vietnam",
+    "indonesia",
+    "malaysia",
+    "singapore",
+    "philippines",
+    "india",
+    "taiwan",
+    "hong kong",
+    "cambodia",
+    "myanmar",
+    "laos",
+    "bangladesh",
+    "nepal",
+    "sri lanka",
+    "maldives",
+    "일본",
+    "중국",
+    "한국",
+    "태국",
+    "베트남",
+    "인도네시아",
+    "말레이시아",
+    "싱가포르",
+    "필리핀",
+    "인도",
+    "대만",
+    "홍콩",
   ],
   europe: [
-    'france', 'germany', 'italy', 'spain', 'uk', 'united kingdom', 'netherlands',
-    'switzerland', 'austria', 'portugal', 'greece', 'czech', 'poland', 'hungary',
-    'belgium', 'sweden', 'norway', 'denmark', 'finland', 'croatia', 'romania',
-    '프랑스', '독일', '이탈리아', '스페인', '영국', '네덜란드', '스위스',
+    "france",
+    "germany",
+    "italy",
+    "spain",
+    "uk",
+    "united kingdom",
+    "netherlands",
+    "switzerland",
+    "austria",
+    "portugal",
+    "greece",
+    "czech",
+    "poland",
+    "hungary",
+    "belgium",
+    "sweden",
+    "norway",
+    "denmark",
+    "finland",
+    "croatia",
+    "romania",
+    "프랑스",
+    "독일",
+    "이탈리아",
+    "스페인",
+    "영국",
+    "네덜란드",
+    "스위스",
   ],
   americas: [
-    'usa', 'united states', 'canada', 'mexico', 'brazil', 'argentina', 'peru',
-    'colombia', 'chile', 'cuba', 'costa rica',
-    '미국', '캐나다', '멕시코', '브라질', '아르헨티나',
+    "usa",
+    "united states",
+    "canada",
+    "mexico",
+    "brazil",
+    "argentina",
+    "peru",
+    "colombia",
+    "chile",
+    "cuba",
+    "costa rica",
+    "미국",
+    "캐나다",
+    "멕시코",
+    "브라질",
+    "아르헨티나",
   ],
   oceania: [
-    'australia', 'new zealand', 'fiji', 'papua', 'samoa',
-    '호주', '뉴질랜드', '피지',
+    "australia",
+    "new zealand",
+    "fiji",
+    "papua",
+    "samoa",
+    "호주",
+    "뉴질랜드",
+    "피지",
   ],
   middleeast_africa: [
-    'uae', 'dubai', 'saudi', 'qatar', 'jordan', 'israel', 'turkey', 'egypt',
-    'morocco', 'kenya', 'south africa', 'nigeria', 'ethiopia', 'tanzania',
-    '터키', '이집트', '이스라엘', '두바이', '사우디',
+    "uae",
+    "dubai",
+    "saudi",
+    "qatar",
+    "jordan",
+    "israel",
+    "turkey",
+    "egypt",
+    "morocco",
+    "kenya",
+    "south africa",
+    "nigeria",
+    "ethiopia",
+    "tanzania",
+    "터키",
+    "이집트",
+    "이스라엘",
+    "두바이",
+    "사우디",
   ],
 };
 
-function matchesContinent(item: BookmarkListItem, filter: ContinentFilter): boolean {
-  if (filter === 'all') return true;
+function matchesContinent(
+  item: BookmarkListItem,
+  filter: ContinentFilter,
+): boolean {
+  if (filter === "all") return true;
   const haystack = `${item.cityName} ${item.countryName}`.toLowerCase();
   return CONTINENT_KEYWORDS[filter].some((kw) => haystack.includes(kw));
 }
@@ -84,16 +172,17 @@ const containerVariants: Variants = {
 
 const cardVariants: Variants = {
   hidden: { opacity: 0, y: 16 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: 'easeOut' } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: "easeOut" } },
 };
 
 // ─── BookmarkListPage ─────────────────────────────────────────────────────────
 const BookmarkListPage = () => {
-  const { keyword } = useSearch({ from: '/_authenticated/bookmarks' });
+  const { keyword } = useSearch({ from: "/_authenticated/bookmarks" });
   const { data, isLoading, isError, error, refetch } = useBookmarkList(keyword);
   const { mutate: deleteBookmark } = useDeleteBookmark();
 
-  const [continentFilter, setContinentFilter] = useState<ContinentFilter>('all');
+  const [continentFilter, setContinentFilter] =
+    useState<ContinentFilter>("all");
   const [currentPage, setCurrentPage] = useState(1);
 
   // Client-side continent filtering
@@ -123,11 +212,14 @@ const BookmarkListPage = () => {
       className="min-h-screen bg-slate-50"
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35, ease: 'easeOut' }}
+      transition={{ duration: 0.35, ease: "easeOut" }}
     >
       <div className="mx-auto max-w-7xl px-6 py-8">
         {/* 브레드크럼 */}
-        <nav className="mb-6 flex items-center gap-1.5 text-sm text-slate-400" aria-label="브레드크럼">
+        <nav
+          className="mb-6 flex items-center gap-1.5 text-sm text-slate-400"
+          aria-label="브레드크럼"
+        >
           <Link
             to="/main"
             className="hover:text-slate-700 transition-colors no-underline"
@@ -142,7 +234,7 @@ const BookmarkListPage = () => {
         {/* 헤더 행 */}
         <div className="mb-6 flex items-center justify-between gap-4">
           <h1 className="text-2xl font-bold text-slate-900">
-            총 저장한 도시 :{' '}
+            총 저장한 도시 :{" "}
             <span className="text-blue-600">
               {data ? filteredData.length : 0}개
             </span>
@@ -175,7 +267,10 @@ const BookmarkListPage = () => {
         {/* 에러 상태 */}
         {isError && (
           <div className="mx-auto max-w-md">
-            <QueryErrorFallback error={error as Error} onRetry={() => refetch()} />
+            <QueryErrorFallback
+              error={error as Error}
+              onRetry={() => refetch()}
+            />
           </div>
         )}
 
@@ -204,7 +299,10 @@ const BookmarkListPage = () => {
                   animate="visible"
                 >
                   {pagedData.map((item) => (
-                    <motion.div key={item.bookmarkId ?? item.cityId} variants={cardVariants}>
+                    <motion.div
+                      key={item.bookmarkId ?? item.cityId}
+                      variants={cardVariants}
+                    >
                       <BookmarkCard item={item} onDelete={handleDelete} />
                     </motion.div>
                   ))}

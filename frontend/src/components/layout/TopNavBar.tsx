@@ -1,11 +1,21 @@
-import { useState, useCallback } from 'react';
-import { Link } from '@tanstack/react-router';
-import { AnimatePresence, motion } from 'framer-motion';
-import { useAuthStore } from '@/stores/authStore';
-import { useLogout } from '@/hooks/auth/useLogout';
-import { Button } from '@/components/ui/button';
-import { type LucideIcon, Loader2, LogOut, User, Menu, X, Globe, TrendingDown, Bookmark } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { useState, useCallback } from "react";
+import { Link } from "@tanstack/react-router";
+import { AnimatePresence, motion } from "framer-motion";
+import { useAuthStore } from "@/stores/authStore";
+import { useLogout } from "@/hooks/auth/useLogout";
+import { Button } from "@/components/ui/button";
+import {
+  type LucideIcon,
+  Loader2,
+  LogOut,
+  User,
+  Menu,
+  X,
+  Globe,
+  TrendingDown,
+  Bookmark,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
 // ─── 모바일 메뉴 애니메이션 variants ──────────────────────────────
 const overlayVariants = {
@@ -16,8 +26,12 @@ const overlayVariants = {
 
 const drawerVariants = {
   hidden: { opacity: 0, y: -8 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.25, ease: 'easeOut' } },
-  exit: { opacity: 0, y: -8, transition: { duration: 0.15, ease: 'easeIn' } },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.25, ease: "easeOut" },
+  },
+  exit: { opacity: 0, y: -8, transition: { duration: 0.15, ease: "easeIn" } },
 };
 
 const menuItemVariants = {
@@ -25,7 +39,7 @@ const menuItemVariants = {
   visible: (i: number) => ({
     opacity: 1,
     x: 0,
-    transition: { duration: 0.2, delay: i * 0.05, ease: 'easeOut' },
+    transition: { duration: 0.2, delay: i * 0.05, ease: "easeOut" },
   }),
 };
 
@@ -37,9 +51,9 @@ interface NavLink {
 }
 
 const AUTHENTICATED_LINKS: NavLink[] = [
-  { to: '/main', label: '메인', icon: Globe },
-  { to: '/cost', label: '물가', icon: TrendingDown },
-  { to: '/bookmarks', label: '북마크', icon: Bookmark },
+  { to: "/main", label: "메인", icon: Globe },
+  { to: "/cost", label: "물가", icon: TrendingDown },
+  { to: "/bookmarks", label: "북마크", icon: Bookmark },
 ];
 
 // ─── TopNavBar ────────────────────────────────────────────────────
@@ -66,11 +80,15 @@ const TopNavBar = () => {
       {/* ── 메인 네비게이션 바 ── */}
       <nav
         className={cn(
-          'fixed top-0 left-0 right-0 z-50 h-16 w-full',
-          'border-b border-white/10',
-          'transition-all duration-150 ease-in-out text-white',
+          "fixed top-0 left-0 right-0 z-50 h-16 w-full",
+          "border-b border-white/10",
+          "transition-all duration-150 ease-in-out text-white",
         )}
-        style={{ backdropFilter: 'blur(20px) saturate(180%)', WebkitBackdropFilter: 'blur(20px) saturate(180%)', backgroundColor: 'rgba(10, 17, 40, 0.55)' }}
+        style={{
+          backdropFilter: "blur(20px) saturate(180%)",
+          WebkitBackdropFilter: "blur(20px) saturate(180%)",
+          backgroundColor: "rgba(10, 17, 40, 0.55)",
+        }}
         aria-label="주요 네비게이션"
       >
         <div className="flex items-center justify-between w-full h-full px-4 sm:px-6 lg:px-8">
@@ -78,7 +96,7 @@ const TopNavBar = () => {
           <Link
             to="/"
             className="text-xl sm:text-2xl font-black !text-white hover:!text-white/80 transition-all no-underline tracking-tighter shrink-0"
-            style={{ color: 'white', fontWeight: 900 }}
+            style={{ color: "white", fontWeight: 900 }}
             aria-label="다행 홈으로 이동"
             onClick={closeMobileMenu}
           >
@@ -93,7 +111,7 @@ const TopNavBar = () => {
                   key={link.to}
                   to={link.to}
                   className="px-3 py-2 text-sm font-bold !text-white hover:!text-white/80 hover:bg-white/10 rounded-lg transition-all no-underline"
-                  style={{ color: 'white', fontWeight: 700 }}
+                  style={{ color: "white", fontWeight: 700 }}
                 >
                   {link.label}
                 </Link>
@@ -108,7 +126,7 @@ const TopNavBar = () => {
                 <Link
                   to="/mypage"
                   className="p-2 !text-white hover:!text-white/80 hover:bg-white/10 rounded-lg transition-all no-underline flex items-center"
-                  style={{ color: 'white' }}
+                  style={{ color: "white" }}
                   aria-label="마이페이지"
                 >
                   <User className="size-4" aria-hidden="true" />
@@ -122,12 +140,15 @@ const TopNavBar = () => {
                   className="text-white hover:text-white/80 hover:bg-white/10 font-bold"
                 >
                   {isPending ? (
-                    <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+                    <Loader2
+                      className="size-4 animate-spin"
+                      aria-hidden="true"
+                    />
                   ) : (
                     <LogOut className="size-4" aria-hidden="true" />
                   )}
                   <span className="hidden lg:inline ml-1 font-semibold">
-                    {isPending ? '로그아웃 중...' : '로그아웃'}
+                    {isPending ? "로그아웃 중..." : "로그아웃"}
                   </span>
                 </Button>
               </>
@@ -135,7 +156,11 @@ const TopNavBar = () => {
               <Link
                 to="/login"
                 className="no-underline inline-flex items-center justify-center rounded-full border border-white/30 px-6 py-1.5 text-sm font-bold transition-all hover:bg-white/30"
-                style={{ color: 'white', fontWeight: 700, background: 'rgba(255,255,255,0.2)' }}
+                style={{
+                  color: "white",
+                  fontWeight: 700,
+                  background: "rgba(255,255,255,0.2)",
+                }}
               >
                 로그인
               </Link>
@@ -147,7 +172,7 @@ const TopNavBar = () => {
             type="button"
             className="md:hidden p-2 rounded-lg text-white hover:text-white/80 hover:bg-white/10 transition-all"
             onClick={toggleMobileMenu}
-            aria-label={isMobileMenuOpen ? '메뉴 닫기' : '메뉴 열기'}
+            aria-label={isMobileMenuOpen ? "메뉴 닫기" : "메뉴 열기"}
             aria-expanded={isMobileMenuOpen}
             aria-controls="mobile-menu"
           >
@@ -186,7 +211,10 @@ const TopNavBar = () => {
             <motion.div
               key="overlay"
               className="fixed inset-0 top-16 z-40 bg-black/60 md:hidden"
-              style={{ backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)' }}
+              style={{
+                backdropFilter: "blur(4px)",
+                WebkitBackdropFilter: "blur(4px)",
+              }}
               variants={overlayVariants}
               initial="hidden"
               animate="visible"
@@ -201,11 +229,11 @@ const TopNavBar = () => {
               id="mobile-menu"
               className="fixed top-16 left-0 right-0 z-40 md:hidden"
               style={{
-                backdropFilter: 'blur(24px) saturate(180%)',
-                WebkitBackdropFilter: 'blur(24px) saturate(180%)',
-                backgroundColor: 'rgba(10, 17, 40, 0.92)',
-                borderBottom: '1px solid rgba(255,255,255,0.1)',
-                boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+                backdropFilter: "blur(24px) saturate(180%)",
+                WebkitBackdropFilter: "blur(24px) saturate(180%)",
+                backgroundColor: "rgba(10, 17, 40, 0.92)",
+                borderBottom: "1px solid rgba(255,255,255,0.1)",
+                boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
               }}
               variants={drawerVariants}
               initial="hidden"
@@ -233,7 +261,10 @@ const TopNavBar = () => {
                             className="flex items-center gap-3 px-4 py-3 rounded-xl text-white/80 hover:text-white hover:bg-white/10 transition-all no-underline font-semibold text-base"
                             onClick={closeMobileMenu}
                           >
-                            <Icon className="size-4 shrink-0" aria-hidden="true" />
+                            <Icon
+                              className="size-4 shrink-0"
+                              aria-hidden="true"
+                            />
                             {link.label}
                           </Link>
                         </motion.div>
@@ -281,11 +312,17 @@ const TopNavBar = () => {
                         aria-label="로그아웃"
                       >
                         {isPending ? (
-                          <Loader2 className="size-4 shrink-0 animate-spin" aria-hidden="true" />
+                          <Loader2
+                            className="size-4 shrink-0 animate-spin"
+                            aria-hidden="true"
+                          />
                         ) : (
-                          <LogOut className="size-4 shrink-0" aria-hidden="true" />
+                          <LogOut
+                            className="size-4 shrink-0"
+                            aria-hidden="true"
+                          />
                         )}
-                        {isPending ? '로그아웃 중...' : '로그아웃'}
+                        {isPending ? "로그아웃 중..." : "로그아웃"}
                       </button>
                     </motion.div>
                   </>
@@ -302,8 +339,9 @@ const TopNavBar = () => {
                       to="/login"
                       className="flex items-center justify-center gap-2 w-full px-6 py-3 rounded-2xl font-bold text-base no-underline text-white"
                       style={{
-                        background: 'linear-gradient(135deg, #f97316 0%, #ea580c 50%, #e11d48 100%)',
-                        boxShadow: '0 4px 16px rgba(234,88,12,0.35)',
+                        background:
+                          "linear-gradient(135deg, #f97316 0%, #ea580c 50%, #e11d48 100%)",
+                        boxShadow: "0 4px 16px rgba(234,88,12,0.35)",
                       }}
                       onClick={closeMobileMenu}
                     >
