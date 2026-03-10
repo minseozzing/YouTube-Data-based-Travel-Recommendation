@@ -3,7 +3,6 @@ package com.example.dahaeng.domain.exchange.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 import com.example.dahaeng.domain.exchange.enums.Currency;
 import com.example.dahaeng.global.entity.BaseEntity;
@@ -20,15 +19,17 @@ import lombok.*;
 public class Exchange extends BaseEntity {
 
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+
 	@Enumerated(EnumType.STRING)
 	private Currency currency;
 
 	@Column(name = "display_unit")
 	private Integer displayUnit;
 
-	@Enumerated(EnumType.STRING)
-	@Column(name = "display_symbol")
-	private Currency displaySymbol;
+	@Column(name = "display_symbol", length = 15)
+	private String displaySymbol;
 
 	@Column(name = "rate_1krw_to_cur")
 	private Double rate1krwToCur;
