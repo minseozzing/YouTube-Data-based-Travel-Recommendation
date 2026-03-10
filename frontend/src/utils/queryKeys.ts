@@ -19,12 +19,11 @@ export const queryKeys = {
   },
   flight: {
     all: ['flight'] as const,
-    monthly: (cityId: number, year: number, month: number) =>
-      ['flight', 'monthly', cityId, year, month] as const,
-    daily: (cityId: number, date: string) => ['flight', 'daily', cityId, date] as const,
-    info: (cityId: number) => ['flight', 'info', cityId] as const,
-    monthlyDaily: (cityId: number, year: number, month: number) =>
-      ['flight', 'monthly-daily', cityId, year, month] as const,
+    citySummary: (cityId: number, yearMonth: string) =>
+      ['flight', 'city-summary', cityId, yearMonth] as const,
+    calendar: (cityId: number, yearMonth: string) =>
+      ['flight', 'calendar', cityId, yearMonth] as const,
+    trend: (cityId: number) => ['flight', 'trend', cityId] as const,
   },
   news: {
     byCountry: (countryId: number) => ['news', countryId] as const,
