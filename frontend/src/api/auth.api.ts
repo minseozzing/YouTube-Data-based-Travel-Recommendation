@@ -21,9 +21,9 @@ export const authApi = {
     return GoogleLoginUrlApiSchema.parse(data).data;
   },
 
-  // GET /api/auth/google/callback?code=...
-  googleCallback: async (code: string) => {
-    const { data } = await axiosInstance.get(`/api/auth/google/callback?code=${code}`);
+  // POST /api/auth/exchange (토큰 교환)
+  exchangeCode: async (code: string) => {
+    const { data } = await axiosInstance.post('/api/auth/exchange', { code });
     return AuthCallbackApiSchema.parse(data).data;
   },
 
