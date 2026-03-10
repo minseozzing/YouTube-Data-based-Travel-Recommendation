@@ -1,12 +1,12 @@
 package com.example.dahaeng.domain.flight.service;
 
-import com.example.dahaeng.domain.flight.document.FlightPriceCalendar;
+// import com.example.dahaeng.domain.flight.document.FlightPriceCalendar; // TODO: 몽고DB 주석
 import com.example.dahaeng.domain.flight.dto.CalendarResponseDto;
 import com.example.dahaeng.domain.flight.dto.CitySummaryResponseDto;
 import com.example.dahaeng.domain.flight.dto.TrendResponseDto;
 import com.example.dahaeng.domain.city.entity.City;
 import com.example.dahaeng.domain.flight.entity.FlightSummary;
-import com.example.dahaeng.domain.flight.repository.FlightPriceCalendarRepository;
+// import com.example.dahaeng.domain.flight.repository.FlightPriceCalendarRepository; // TODO: 몽고DB 주석
 import com.example.dahaeng.domain.flight.repository.FlightSummaryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -25,88 +25,109 @@ import java.util.stream.Collectors;
 public class FlightService {
 
     private final FlightSummaryRepository flightSummaryRepository;
-    private final FlightPriceCalendarRepository flightPriceCalendarRepository;
+    // private final FlightPriceCalendarRepository flightPriceCalendarRepository; //
+    // TODO: 몽고DB 주석
 
     public CalendarResponseDto getCalendarWithHistory(Long cityId, String yearMonth) {
-        List<FlightPriceCalendar> calendars = flightPriceCalendarRepository
-                .findByCityIdAndYearMonthOrderByCollectedDateDesc(cityId, yearMonth, PageRequest.of(0, 15));
-
-        if (calendars.isEmpty()) {
-            return CalendarResponseDto.builder()
-                    .cityId(cityId)
-                    .yearMonth(yearMonth)
-                    .updatedAt(null)
-                    .outboundDailyPrices(Collections.emptyList())
-                    .inboundDailyPrices(Collections.emptyList())
-                    .build();
-        }
-
-        FlightPriceCalendar latest = calendars.get(0);
-        List<CalendarResponseDto.DailyPriceDto> outbound = buildDailyPricesWithHistory(calendars, true);
-        List<CalendarResponseDto.DailyPriceDto> inbound = buildDailyPricesWithHistory(calendars, false);
-
+        /*
+         * TODO: 몽고DB 셋업 후 주석 해제 (임시로 빈 DTO 리턴)
+         * List<FlightPriceCalendar> calendars = flightPriceCalendarRepository
+         * .findByCityIdAndYearMonthOrderByCollectedDateDesc(cityId, yearMonth,
+         * PageRequest.of(0, 15));
+         * 
+         * if (calendars.isEmpty()) {
+         * return CalendarResponseDto.builder()
+         * .cityId(cityId)
+         * .yearMonth(yearMonth)
+         * .updatedAt(null)
+         * .outboundDailyPrices(Collections.emptyList())
+         * .inboundDailyPrices(Collections.emptyList())
+         * .build();
+         * }
+         * 
+         * FlightPriceCalendar latest = calendars.get(0);
+         * List<CalendarResponseDto.DailyPriceDto> outbound =
+         * buildDailyPricesWithHistory(calendars, true);
+         * List<CalendarResponseDto.DailyPriceDto> inbound =
+         * buildDailyPricesWithHistory(calendars, false);
+         * 
+         * return CalendarResponseDto.builder()
+         * .cityId(cityId)
+         * .yearMonth(yearMonth)
+         * .updatedAt(latest.getCollectedDate() + "T00:00:00Z")
+         * .outboundDailyPrices(outbound)
+         * .inboundDailyPrices(inbound)
+         * .build();
+         */
         return CalendarResponseDto.builder()
                 .cityId(cityId)
                 .yearMonth(yearMonth)
-                .updatedAt(latest.getCollectedDate() + "T00:00:00Z")
-                .outboundDailyPrices(outbound)
-                .inboundDailyPrices(inbound)
+                .updatedAt(null)
+                .outboundDailyPrices(Collections.emptyList())
+                .inboundDailyPrices(Collections.emptyList())
                 .build();
     }
 
-    private List<CalendarResponseDto.DailyPriceDto> buildDailyPricesWithHistory(List<FlightPriceCalendar> calendars,
-            boolean isOutbound) {
-        FlightPriceCalendar latest = calendars.get(0);
-        List<FlightPriceCalendar.DailyPrice> basePrices = isOutbound ? latest.getOutboundDailyPrices()
-                : latest.getInboundDailyPrices();
-
-        if (basePrices == null)
-            return Collections.emptyList();
-
-        List<CalendarResponseDto.DailyPriceDto> result = new ArrayList<>();
-        LocalDate latestDateParsed = LocalDate.parse(latest.getCollectedDate());
-
-        for (int i = 0; i < basePrices.size(); i++) {
-            FlightPriceCalendar.DailyPrice daily = basePrices.get(i);
-            String date = daily.getDate();
-            Integer currentPrice = daily.getPrice();
-
-            List<CalendarResponseDto.PriceHistoryDto> history = new ArrayList<>();
-            for (FlightPriceCalendar cal : calendars) {
-                List<FlightPriceCalendar.DailyPrice> targetPrices = isOutbound ? cal.getOutboundDailyPrices()
-                        : cal.getInboundDailyPrices();
-                if (targetPrices != null && i < targetPrices.size() && targetPrices.get(i).getDate().equals(date)) {
-                    LocalDate targetParsed = LocalDate.parse(cal.getCollectedDate());
-                    long daysDiff = ChronoUnit.DAYS.between(targetParsed, latestDateParsed);
-
-                    history.add(CalendarResponseDto.PriceHistoryDto.builder()
-                            .collectedDate(cal.getCollectedDate())
-                            .price(targetPrices.get(i).getPrice())
-                            .label(determineLabel(daysDiff))
-                            .build());
-                }
-            }
-
-            result.add(CalendarResponseDto.DailyPriceDto.builder()
-                    .date(date)
-                    .price(currentPrice)
-                    .history(history)
-                    .build());
-        }
-        return result;
-    }
-
-    private String determineLabel(long daysDiff) {
-        if (daysDiff == 0)
-            return "오늘";
-        if (daysDiff == 1)
-            return "어제";
-        if (daysDiff >= 7 && daysDiff < 14)
-            return "1주 전";
-        if (daysDiff >= 14)
-            return "2주 전";
-        return daysDiff + "일 전";
-    }
+    /*
+     * TODO: 몽고DB 셋업 후 주석 해제
+     * private List<CalendarResponseDto.DailyPriceDto>
+     * buildDailyPricesWithHistory(List<FlightPriceCalendar> calendars,
+     * boolean isOutbound) {
+     * FlightPriceCalendar latest = calendars.get(0);
+     * List<FlightPriceCalendar.DailyPrice> basePrices = isOutbound ?
+     * latest.getOutboundDailyPrices()
+     * : latest.getInboundDailyPrices();
+     * 
+     * if (basePrices == null)
+     * return Collections.emptyList();
+     * 
+     * List<CalendarResponseDto.DailyPriceDto> result = new ArrayList<>();
+     * LocalDate latestDateParsed = LocalDate.parse(latest.getCollectedDate());
+     * 
+     * for (int i = 0; i < basePrices.size(); i++) {
+     * FlightPriceCalendar.DailyPrice daily = basePrices.get(i);
+     * String date = daily.getDate();
+     * Integer currentPrice = daily.getPrice();
+     * 
+     * List<CalendarResponseDto.PriceHistoryDto> history = new ArrayList<>();
+     * for (FlightPriceCalendar cal : calendars) {
+     * List<FlightPriceCalendar.DailyPrice> targetPrices = isOutbound ?
+     * cal.getOutboundDailyPrices()
+     * : cal.getInboundDailyPrices();
+     * if (targetPrices != null && i < targetPrices.size() &&
+     * targetPrices.get(i).getDate().equals(date)) {
+     * LocalDate targetParsed = LocalDate.parse(cal.getCollectedDate());
+     * long daysDiff = ChronoUnit.DAYS.between(targetParsed, latestDateParsed);
+     * 
+     * history.add(CalendarResponseDto.PriceHistoryDto.builder()
+     * .collectedDate(cal.getCollectedDate())
+     * .price(targetPrices.get(i).getPrice())
+     * .label(determineLabel(daysDiff))
+     * .build());
+     * }
+     * }
+     * 
+     * result.add(CalendarResponseDto.DailyPriceDto.builder()
+     * .date(date)
+     * .price(currentPrice)
+     * .history(history)
+     * .build());
+     * }
+     * return result;
+     * }
+     * 
+     * private String determineLabel(long daysDiff) {
+     * if (daysDiff == 0)
+     * return "오늘";
+     * if (daysDiff == 1)
+     * return "어제";
+     * if (daysDiff >= 7 && daysDiff < 14)
+     * return "1주 전";
+     * if (daysDiff >= 14)
+     * return "2주 전";
+     * return daysDiff + "일 전";
+     * }
+     */
 
     public TrendResponseDto getSixMonthTrend(Long cityId) {
         String currentYearMonth = YearMonth.now().toString();
