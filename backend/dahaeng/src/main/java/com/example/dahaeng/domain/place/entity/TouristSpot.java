@@ -26,4 +26,7 @@ public class TouristSpot extends BaseEntity {
 
     private Double lat;
     private Double lon;
+
+    @Column(columnDefinition = "TEXT")
+    private String description;
 }
