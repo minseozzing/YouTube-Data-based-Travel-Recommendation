@@ -241,9 +241,9 @@ export function CostDetailTable({ data, isLoading, seoulLivingCost, krwPerTarget
   const cityName = data?.target.name ?? '도시';
   const lc = data?.living_cost;
 
-  // 마트/식료품은 독립 토글, 나머지 3개는 공유 토글
-  const [groceriesOpen, setGroceriesOpen] = useState(true);
-  const [bottomOpen, setBottomOpen] = useState(true);
+  // 마트/식료품은 독립 토글, 나머지 3개는 공유 토글 (초기 상태: 닫힘)
+  const [groceriesOpen, setGroceriesOpen] = useState(false);
+  const [bottomOpen, setBottomOpen] = useState(false);
 
   const toggleBottom = () => setBottomOpen((v) => !v);
 
@@ -332,28 +332,6 @@ export function CostDetailTable({ data, isLoading, seoulLivingCost, krwPerTarget
               isOpen={bottomOpen}
               onToggle={toggleBottom}
             />
-          </div>
-
-          {/* 하단 요약 */}
-          <div className="grid grid-cols-2 gap-4 px-4 py-4 bg-card border border-border rounded-xl">
-            <div className="flex items-center gap-2.5">
-              <DollarSign className="size-4 text-muted-foreground shrink-0" />
-              <div>
-                <p className="text-xs text-muted-foreground">세후 평균 월급</p>
-                <p className="text-sm font-semibold text-foreground">
-                  {lc.monthly_salary_after_tax.toLocaleString()} {currency}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2.5">
-              <Users className="size-4 text-muted-foreground shrink-0" />
-              <div>
-                <p className="text-xs text-muted-foreground">인구</p>
-                <p className="text-sm font-semibold text-foreground">
-                  {(lc.population / 10000).toFixed(0)}만 명
-                </p>
-              </div>
-            </div>
           </div>
         </>
       ) : (

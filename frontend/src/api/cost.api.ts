@@ -78,10 +78,10 @@ export const costApi = {
     }
   },
 
-  // GET /api/exchange-rate/history?target_currency=XXX&type=d|w|m
+  // GET /api/exchange-rate/history?target_currency=XXX&type=D|W|M
   getExchangeRateHistory: async (
     targetCurrency: string,
-    type: 'd' | 'w' | 'm',
+    type: 'D' | 'W' | 'M',
   ): Promise<ExchangeRateHistory> => {
     try {
       const { data } = await axiosInstance.get('/api/exchange-rate/history', {
@@ -90,7 +90,7 @@ export const costApi = {
       return ExchangeRateHistorySchema.parse(data);
     } catch (err) {
       console.warn('[cost.api] using dummy data for getExchangeRateHistory', err);
-      return DUMMY_HISTORY_MAP[type];
+      return DUMMY_HISTORY_MAP[type.toLowerCase() as 'd' | 'w' | 'm'];
     }
   },
 
@@ -110,10 +110,16 @@ export const costApi = {
     }
   },
 
-  // GET /api/cost/compare/{city_id}
-  getCostCompare: async (cityId: number): Promise<CostCompare> => {
+  // GET /api/cost/compare?target_type=CITY&base_id=1&target_id=2
+  getCostCompare: async (
+    targetType: 'COUNTRY' | 'CITY',
+    baseId: number,
+    targetId: number,
+  ): Promise<CostCompare> => {
     try {
-      const { data } = await axiosInstance.get(`/api/cost/compare/${cityId}`);
+      const { data } = await axiosInstance.get('/api/cost/compare', {
+        params: { target_type: targetType, base_id: baseId, target_id: targetId },
+      });
       return CostCompareSchema.parse(data);
     } catch (err) {
       console.warn('[cost.api] using dummy data for getCostCompare', err);
