@@ -19,7 +19,7 @@ export function UnifiedNavBar() {
   const [query, setQuery] = useState('');
   const [searchOpen, setSearchOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const { openRightPanel } = useUiStore();
+  const { openRightPanel, isCityModalOpen } = useUiStore();
   const { data: cities } = useCityList();
 
   const fallbackCities = useMemo(() => Object.values(DUMMY_CITY_DETAILS), []);
@@ -69,7 +69,7 @@ export function UnifiedNavBar() {
       }}
       style={{
         position: 'fixed',
-        zIndex: 50,
+        zIndex: isCityModalOpen ? -1 : 50,
         backdropFilter: 'blur(20px) saturate(180%)',
         WebkitBackdropFilter: 'blur(20px) saturate(180%)',
         boxShadow: isFloating ? '0 4px 20px rgba(0,0,0,0.08)' : 'none',

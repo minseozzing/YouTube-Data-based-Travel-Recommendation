@@ -1,4 +1,4 @@
-import { motion, type Variants } from 'framer-motion';
+import { motion, type Variants } from "framer-motion";
 import {
   Mountain,
   Building2,
@@ -9,12 +9,12 @@ import {
   ArrowRight,
   Check,
   Circle,
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { TagCategorySection } from '@/components/preference/TagCategorySection';
-import { usePreferenceStore } from '@/stores/preferenceStore';
-import { useSubmitPreference } from '@/hooks/auth/usePreference';
-import { cn } from '@/lib/utils';
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { TagCategorySection } from "@/components/preference/TagCategorySection";
+import { usePreferenceStore } from "@/stores/preferenceStore";
+import { useSubmitPreference } from "@/hooks/auth/usePreference";
+import { cn } from "@/lib/utils";
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -22,39 +22,39 @@ import { cn } from '@/lib/utils';
 
 const TAG_CATEGORIES = [
   {
-    category: '자연 & 아웃도어',
+    category: "자연 & 아웃도어",
     icon: Mountain,
-    tags: ['자연', '해변', '산', '트레킹', '캠핑'],
+    tags: ["자연", "해변", "산", "트레킹", "캠핑"],
   },
   {
-    category: '도시 & 문화',
+    category: "도시 & 문화",
     icon: Building2,
-    tags: ['도시', '역사', '문화', '건축', '박물관'],
+    tags: ["도시", "역사", "문화", "건축", "박물관"],
   },
   {
-    category: '음식 & 쇼핑',
+    category: "음식 & 쇼핑",
     icon: UtensilsCrossed,
-    tags: ['음식', '쇼핑', '야시장', '카페', '길거리음식'],
+    tags: ["음식", "쇼핑", "야시장", "카페", "길거리음식"],
   },
   {
-    category: '여행 스타일',
+    category: "여행 스타일",
     icon: Sparkles,
-    tags: ['럭셔리', '배낭여행', '가족여행', '커플여행', '혼자여행'],
+    tags: ["럭셔리", "배낭여행", "가족여행", "커플여행", "혼자여행"],
   },
   {
-    category: '액티비티',
+    category: "액티비티",
     icon: Zap,
-    tags: ['액티비티', '다이빙', '서핑', '스키', '번지점프'],
+    tags: ["액티비티", "다이빙", "서핑", "스키", "번지점프"],
   },
 ] as const;
 
 const STEPS = [
-  { label: '로그인 완료', status: 'completed' as const },
-  { label: '취향 선택', status: 'active' as const },
-  { label: '여행 시작', status: 'pending' as const },
+  { label: "로그인 완료", status: "completed" as const },
+  { label: "취향 선택", status: "active" as const },
+  { label: "여행 시작", status: "pending" as const },
 ] as const;
 
-type StepStatus = 'completed' | 'active' | 'pending';
+type StepStatus = "completed" | "active" | "pending";
 
 const POSITIVE_THRESHOLD = 5;
 
@@ -67,7 +67,7 @@ const pageVariants: Variants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.35, ease: 'easeOut' },
+    transition: { duration: 0.35, ease: "easeOut" },
   },
 };
 
@@ -76,7 +76,7 @@ const sidebarVariants: Variants = {
   visible: {
     opacity: 1,
     x: 0,
-    transition: { duration: 0.4, ease: 'easeOut', delay: 0.1 },
+    transition: { duration: 0.4, ease: "easeOut", delay: 0.1 },
   },
 };
 
@@ -85,7 +85,7 @@ const contentVariants: Variants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.4, ease: 'easeOut', delay: 0.15 },
+    transition: { duration: 0.4, ease: "easeOut", delay: 0.15 },
   },
 };
 
@@ -101,7 +101,7 @@ const categoryItemVariants: Variants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.3, ease: 'easeOut' },
+    transition: { duration: 0.3, ease: "easeOut" },
   },
 };
 
@@ -122,19 +122,18 @@ function StepIndicator({ label, status, isLast }: StepIndicatorProps) {
         {/* Icon */}
         <span
           className={cn(
-            'flex items-center justify-center size-7 rounded-full border-2 shrink-0 transition-colors',
-            status === 'completed' &&
-              'bg-blue-600 border-blue-600 text-white',
-            status === 'active' &&
-              'bg-blue-600/20 border-blue-500 text-blue-400',
-            status === 'pending' &&
-              'bg-slate-800 border-slate-600 text-slate-500',
+            "flex items-center justify-center size-7 rounded-full border-2 shrink-0 transition-colors",
+            status === "completed" && "bg-blue-600 border-blue-600 text-white",
+            status === "active" &&
+              "bg-blue-600/20 border-blue-500 text-blue-400",
+            status === "pending" &&
+              "bg-slate-800 border-slate-600 text-slate-500",
           )}
           aria-hidden="true"
         >
-          {status === 'completed' ? (
+          {status === "completed" ? (
             <Check className="size-3.5" />
-          ) : status === 'active' ? (
+          ) : status === "active" ? (
             <span className="size-2 rounded-full bg-blue-400" />
           ) : (
             <Circle className="size-3 opacity-50" />
@@ -144,10 +143,10 @@ function StepIndicator({ label, status, isLast }: StepIndicatorProps) {
         {/* Label */}
         <span
           className={cn(
-            'text-sm font-medium',
-            status === 'completed' && 'text-slate-400 line-through',
-            status === 'active' && 'text-blue-300 font-semibold',
-            status === 'pending' && 'text-slate-500',
+            "text-sm font-medium",
+            status === "completed" && "text-slate-400 line-through",
+            status === "active" && "text-blue-300 font-semibold",
+            status === "pending" && "text-slate-500",
           )}
         >
           {label}
@@ -158,8 +157,8 @@ function StepIndicator({ label, status, isLast }: StepIndicatorProps) {
       {!isLast && (
         <div
           className={cn(
-            'w-px h-6 ml-3.5 mt-0.5',
-            status === 'completed' ? 'bg-blue-600/50' : 'bg-slate-700',
+            "w-px h-6 ml-3.5 mt-0.5",
+            status === "completed" ? "bg-blue-600/50" : "bg-slate-700",
           )}
           aria-hidden="true"
         />
@@ -180,10 +179,10 @@ function SelectionCounter({ count }: SelectionCounterProps) {
       <span className="text-sm text-slate-400">선택된 취향</span>
       <span
         className={cn(
-          'text-sm font-bold tabular-nums transition-colors',
-          count === 0 && 'text-slate-500',
-          count > 0 && !isPositive && 'text-blue-300',
-          isPositive && 'text-emerald-400',
+          "text-sm font-bold tabular-nums transition-colors",
+          count === 0 && "text-slate-500",
+          count > 0 && !isPositive && "text-blue-300",
+          isPositive && "text-emerald-400",
         )}
       >
         {count}개
@@ -229,10 +228,10 @@ const PreferencePage = () => {
           initial="hidden"
           animate="visible"
           className={cn(
-            'w-64 shrink-0 flex flex-col justify-between',
-            'px-6 py-8',
-            'border-r border-slate-700/60',
-            'bg-slate-900/60 backdrop-blur-sm',
+            "w-64 shrink-0 flex flex-col justify-between",
+            "px-6 py-8",
+            "border-r border-slate-700/60",
+            "bg-slate-900/60 backdrop-blur-sm",
           )}
           aria-label="단계 안내 사이드바"
         >
@@ -288,7 +287,7 @@ const PreferencePage = () => {
                     어떤 여행을 좋아하시나요?
                   </h1>
                   <p className="mt-2 text-sm text-slate-400">
-                    관심 있는 여행 스타일을 모두 선택해 주세요{' '}
+                    관심 있는 여행 스타일을 모두 선택해 주세요{" "}
                     <span className="text-slate-500">(최소 1개)</span>
                   </p>
                 </div>
@@ -313,7 +312,7 @@ const PreferencePage = () => {
                   animate={{
                     width: `${Math.min((selectedTags.length / 25) * 100, 100)}%`,
                   }}
-                  transition={{ duration: 0.3, ease: 'easeOut' }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
                 />
               </div>
             </header>
@@ -360,22 +359,22 @@ const PreferencePage = () => {
                   disabled={isPending || selectedTags.length === 0}
                   size="lg"
                   className={cn(
-                    'order-1 sm:order-2 min-w-[160px]',
-                    'bg-blue-600 hover:bg-blue-500 text-white',
-                    'disabled:opacity-40 disabled:cursor-not-allowed',
-                    'transition-all duration-200',
-                    selectedTags.length > 0 &&
-                      'shadow-lg shadow-blue-900/50',
+                    "order-1 sm:order-2 min-w-[160px]",
+                    "bg-blue-600 hover:bg-blue-500 text-white",
+                    "disabled:opacity-40 disabled:cursor-not-allowed",
+                    "transition-all duration-200",
+                    selectedTags.length > 0 && "shadow-lg shadow-blue-900/50",
                   )}
                   aria-label={
-                    isPending
-                      ? '선호도 저장 중'
-                      : '선택 완료 후 여행 시작'
+                    isPending ? "선호도 저장 중" : "선택 완료 후 여행 시작"
                   }
                 >
                   {isPending ? (
                     <>
-                      <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+                      <Loader2
+                        className="size-4 animate-spin"
+                        aria-hidden="true"
+                      />
                       저장 중...
                     </>
                   ) : (

@@ -212,6 +212,9 @@ const BookmarkListPage = () => {
       className="min-h-screen bg-slate-50"
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
+      style={{
+        background: "linear-gradient(135deg, #93C5FD 0%, #93C5FD 100%)",
+      }}
       transition={{ duration: 0.35, ease: "easeOut" }}
     >
       <div className="mx-auto max-w-7xl px-3 pt-24 pb-6">
@@ -293,6 +296,7 @@ const BookmarkListPage = () => {
               <>
                 {/* 카드 그리드 */}
                 <motion.div
+                  key={continentFilter}
                   className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
                   variants={containerVariants}
                   initial="hidden"

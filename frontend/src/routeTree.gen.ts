@@ -20,6 +20,7 @@ import { Route as AuthenticatedCostRouteImport } from './routes/_authenticated/c
 import { Route as AuthenticatedBookmarksRouteImport } from './routes/_authenticated/bookmarks'
 import { Route as AuthV1RouteImport } from './routes/_auth.v1'
 import { Route as AuthLoginRouteImport } from './routes/_auth/login'
+import { Route as AuthenticatedCostIndexRouteImport } from './routes/_authenticated/cost.index'
 import { Route as AuthenticatedBookmarksIndexRouteImport } from './routes/_authenticated/bookmarks.index'
 import { Route as AuthenticatedCostCountryIdRouteImport } from './routes/_authenticated/cost.$countryId'
 import { Route as AuthenticatedBookmarksIdRouteImport } from './routes/_authenticated/bookmarks.$id'
@@ -77,6 +78,11 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
   path: '/login',
   getParentRoute: () => AuthRoute,
 } as any)
+const AuthenticatedCostIndexRoute = AuthenticatedCostIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedCostRoute,
+} as any)
 const AuthenticatedBookmarksIndexRoute =
   AuthenticatedBookmarksIndexRouteImport.update({
     id: '/',
@@ -109,19 +115,20 @@ export interface FileRoutesByFullPath {
   '/bookmarks/$id': typeof AuthenticatedBookmarksIdRoute
   '/cost/$countryId': typeof AuthenticatedCostCountryIdRoute
   '/bookmarks/': typeof AuthenticatedBookmarksIndexRoute
+  '/cost/': typeof AuthenticatedCostIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof AuthIndexRoute
   '/preference': typeof PreferenceRoute
   '/login': typeof AuthLoginRoute
   '/v1': typeof AuthV1Route
-  '/cost': typeof AuthenticatedCostRouteWithChildren
   '/main': typeof AuthenticatedMainRoute
   '/mypage': typeof AuthenticatedMypageRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/bookmarks/$id': typeof AuthenticatedBookmarksIdRoute
   '/cost/$countryId': typeof AuthenticatedCostCountryIdRoute
   '/bookmarks': typeof AuthenticatedBookmarksIndexRoute
+  '/cost': typeof AuthenticatedCostIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -139,6 +146,7 @@ export interface FileRoutesById {
   '/_authenticated/bookmarks/$id': typeof AuthenticatedBookmarksIdRoute
   '/_authenticated/cost/$countryId': typeof AuthenticatedCostCountryIdRoute
   '/_authenticated/bookmarks/': typeof AuthenticatedBookmarksIndexRoute
+  '/_authenticated/cost/': typeof AuthenticatedCostIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -155,19 +163,20 @@ export interface FileRouteTypes {
     | '/bookmarks/$id'
     | '/cost/$countryId'
     | '/bookmarks/'
+    | '/cost/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/preference'
     | '/login'
     | '/v1'
-    | '/cost'
     | '/main'
     | '/mypage'
     | '/auth/callback'
     | '/bookmarks/$id'
     | '/cost/$countryId'
     | '/bookmarks'
+    | '/cost'
   id:
     | '__root__'
     | '/_auth'
@@ -184,6 +193,7 @@ export interface FileRouteTypes {
     | '/_authenticated/bookmarks/$id'
     | '/_authenticated/cost/$countryId'
     | '/_authenticated/bookmarks/'
+    | '/_authenticated/cost/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -272,6 +282,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLoginRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_authenticated/cost/': {
+      id: '/_authenticated/cost/'
+      path: '/'
+      fullPath: '/cost/'
+      preLoaderRoute: typeof AuthenticatedCostIndexRouteImport
+      parentRoute: typeof AuthenticatedCostRoute
+    }
     '/_authenticated/bookmarks/': {
       id: '/_authenticated/bookmarks/'
       path: '/'
@@ -328,10 +345,12 @@ const AuthenticatedBookmarksRouteWithChildren =
 
 interface AuthenticatedCostRouteChildren {
   AuthenticatedCostCountryIdRoute: typeof AuthenticatedCostCountryIdRoute
+  AuthenticatedCostIndexRoute: typeof AuthenticatedCostIndexRoute
 }
 
 const AuthenticatedCostRouteChildren: AuthenticatedCostRouteChildren = {
   AuthenticatedCostCountryIdRoute: AuthenticatedCostCountryIdRoute,
+  AuthenticatedCostIndexRoute: AuthenticatedCostIndexRoute,
 }
 
 const AuthenticatedCostRouteWithChildren =
