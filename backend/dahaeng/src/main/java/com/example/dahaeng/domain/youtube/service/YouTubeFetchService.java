@@ -23,12 +23,12 @@ public class YouTubeFetchService {
     private final RestTemplate restTemplate = new RestTemplate();
 
     public YouTubeApiResponse<YouTubePlaylistResponse> fetchPlaylists(String accessToken) {
-        String url = YOUTUBE_API_BASE_URL + "/playlists?part=snippet,status&mine=true&maxResults=50";
+        String url = YOUTUBE_API_BASE_URL + "/playlists?part=snippet,status&mine=true&maxResults=30";
         return callYouTubeApi(url, accessToken, YouTubePlaylistResponse.class);
     }
 
     public YouTubeApiResponse<YouTubePlaylistItemResponse> fetchPlaylistItems(String accessToken, String playlistId) {
-        String url = YOUTUBE_API_BASE_URL + "/playlistItems?part=snippet,contentDetails&playlistId=" + playlistId + "&maxResults=50";
+        String url = YOUTUBE_API_BASE_URL + "/playlistItems?part=snippet,contentDetails&playlistId=" + playlistId + "&maxResults=20";
         return callYouTubeApi(url, accessToken, YouTubePlaylistItemResponse.class);
     }
 
