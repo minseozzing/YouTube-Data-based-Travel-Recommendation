@@ -19,38 +19,44 @@ public class RawInterestSignalCollector {
         List<RawInterestSignal> result = new ArrayList<>();
 
         rawSignalRepository.findPlaylistTitles(accountId)
-                .forEach(t -> result.add(RawInterestSignal.builder()
-                        .rawText(t)
+                .forEach(r -> result.add(RawInterestSignal.builder()
+                        .rawText(r.text)
+                        .signalTime(r.time)
                         .sourceType(InterestSourceType.PLAYLIST_TITLE)
                         .build()));
 
         rawSignalRepository.findPlaylistVideoTitles(accountId)
-                .forEach(t -> result.add(RawInterestSignal.builder()
-                        .rawText(t)
+                .forEach(r -> result.add(RawInterestSignal.builder()
+                        .rawText(r.text)
+                        .signalTime(r.time)
                         .sourceType(InterestSourceType.PLAYLIST_VIDEO_TITLE)
                         .build()));
 
         rawSignalRepository.findPlaylistVideoTags(accountId)
-                .forEach(t -> result.add(RawInterestSignal.builder()
-                        .rawText(t)
+                .forEach(r -> result.add(RawInterestSignal.builder()
+                        .rawText(r.text)
+                        .signalTime(r.time)
                         .sourceType(InterestSourceType.PLAYLIST_VIDEO_TAG)
                         .build()));
 
         rawSignalRepository.findLikedVideoTitles(accountId)
-                .forEach(t -> result.add(RawInterestSignal.builder()
-                        .rawText(t)
+                .forEach(r -> result.add(RawInterestSignal.builder()
+                        .rawText(r.text)
+                        .signalTime(r.time)
                         .sourceType(InterestSourceType.LIKED_VIDEO_TITLE)
                         .build()));
 
         rawSignalRepository.findLikedVideoTags(accountId)
-                .forEach(t -> result.add(RawInterestSignal.builder()
-                        .rawText(t)
+                .forEach(r -> result.add(RawInterestSignal.builder()
+                        .rawText(r.text)
+                        .signalTime(r.time)
                         .sourceType(InterestSourceType.LIKED_VIDEO_TAG)
                         .build()));
 
         rawSignalRepository.findSubscriptionTitles(accountId)
-                .forEach(t -> result.add(RawInterestSignal.builder()
-                        .rawText(t)
+                .forEach(r -> result.add(RawInterestSignal.builder()
+                        .rawText(r.text)
+                        .signalTime(r.time)
                         .sourceType(InterestSourceType.SUBSCRIPTION_TITLE)
                         .build()));
 

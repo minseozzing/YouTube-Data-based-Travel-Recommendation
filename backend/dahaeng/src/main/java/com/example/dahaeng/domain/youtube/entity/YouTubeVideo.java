@@ -16,13 +16,13 @@ public class YouTubeVideo extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "youtube_video_id", length = 100, nullable = false, unique = true)
+    @Column(name = "youtube_video_id", length = 50, nullable = false, unique = true)
     private String youtubeVideoId;
 
-    @Column(name = "title", length = 255)
+    @Column(length = 255)
     private String title;
 
-    @Column(name = "channel_title", length = 255)
+    @Column(name = "channel_title", length = 100)
     private String channelTitle;
 
     @Column(name = "category_id", length = 20)

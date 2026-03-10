@@ -11,12 +11,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(
-        name = "youtube_liked_video",
-        uniqueConstraints = {
-                @UniqueConstraint(name = "uk_account_video", columnNames = {"account_id", "video_id"})
-        }
-)
+@Table(name = "youtube_liked_video")
 public class YouTubeLikedVideo extends BaseEntity {
 
     @Id

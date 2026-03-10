@@ -1,5 +1,0 @@
-{"type":"FeatureCollection", "features": [
-{"type":"Feature","geometry":null,"properties":{"shapeName":"Nui","shapeID":"17741764B90379454256238","shapeGroup":"TUV","shapeType":"ADM1"}},
-{"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[178.68439503275874,-7.478460687706268],[178.69395671103948,-7.492636721342426],[178.6954553,-7.4838155],[178.68439503275874,-7.478460687706268]]]},"properties":{"shapeName":"Vaitupu","shapeID":"17741764B83632895409465","shapeGroup":"TUV","shapeType":"ADM1"}},
-{"type":"Feature","geometry":null,"properties":{"shapeName":"Nukufetau","shapeID":"17741764B30576374901893","shapeGroup":"TUV","shapeType":"ADM1"}}
-]}

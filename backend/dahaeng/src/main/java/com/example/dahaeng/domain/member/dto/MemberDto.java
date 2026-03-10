@@ -1,11 +1,11 @@
 package com.example.dahaeng.domain.member.dto;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class MemberDto {
     private Long id;

@@ -1,7 +1,9 @@
 package com.example.dahaeng.domain.auth.dto;
 
 import com.example.dahaeng.domain.member.dto.MemberDto;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -10,11 +12,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-@RequiredArgsConstructor
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class CustomOAuth2User implements OAuth2User {
 
-    private final MemberDto memberDto;
-    private final Map<String, Object> attributes;
+    private MemberDto memberDto;
+    private Map<String, Object> attributes;
 
     @Override
     public Map<String, Object> getAttributes() {
@@ -50,9 +54,4 @@ public class CustomOAuth2User implements OAuth2User {
     public String getRole() {
         return memberDto.getRole();
     }
-
-    public MemberDto getMemberDto() {
-        return memberDto;
-    }
-
 }

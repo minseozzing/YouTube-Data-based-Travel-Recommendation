@@ -1,12 +1,8 @@
 package com.example.dahaeng.domain.youtube.service;
 
-import com.example.dahaeng.domain.youtube.dto.response.YouTubeChannelResponse;
-import com.example.dahaeng.domain.youtube.dto.response.YouTubePlaylistItemResponse;
-import com.example.dahaeng.domain.youtube.dto.response.YouTubePlaylistResponse;
-import com.example.dahaeng.domain.youtube.dto.response.YouTubeSubscriptionResponse;
-import com.example.dahaeng.domain.youtube.dto.response.YouTubeVideoResponse;
 import com.example.dahaeng.global.exception.CustomException;
 import com.example.dahaeng.global.exception.ErrorCode;
+import com.example.dahaeng.domain.youtube.dto.response.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;

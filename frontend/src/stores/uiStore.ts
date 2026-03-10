@@ -20,8 +20,9 @@ interface UiState {
 
   // 글로브 필터
   globeBudgetFilter: [number, number];
-  globeRiskFilter: number;
   globeDuration: number;
+  globeTravelYear: number;
+  globeTravelMonth: number;
 
   // 액션
   openRightPanel: (
@@ -34,8 +35,8 @@ interface UiState {
   closeCityModal: () => void;
   setActiveCityTab: (tab: CityDetailTab) => void;
   setGlobeBudgetFilter: (range: [number, number]) => void;
-  setGlobeRiskFilter: (level: number) => void;
   setGlobeDuration: (days: number) => void;
+  setGlobeTravelMonth: (year: number, month: number) => void;
   setRecommendActive: (v: boolean) => void;
 }
 
@@ -47,7 +48,6 @@ export const useUiStore = create<UiState>((set) => ({
   isCityModalOpen: false,
   activeCityTab: "recommend",
   globeBudgetFilter: [0, 5_000_000],
-  globeRiskFilter: 5,
 
   openRightPanel: (cityId, imgUrl, coords) =>
     set({
@@ -64,9 +64,11 @@ export const useUiStore = create<UiState>((set) => ({
     set({ isCityModalOpen: false, activeCityTab: "recommend" }),
   setActiveCityTab: (tab) => set({ activeCityTab: tab }),
   globeDuration: 2,
+  globeTravelYear: new Date().getFullYear(),
+  globeTravelMonth: new Date().getMonth() + 1,
   setGlobeBudgetFilter: (range) => set({ globeBudgetFilter: range }),
-  setGlobeRiskFilter: (level) => set({ globeRiskFilter: level }),
   setGlobeDuration: (days) => set({ globeDuration: days }),
+  setGlobeTravelMonth: (year, month) => set({ globeTravelYear: year, globeTravelMonth: month }),
   isRecommendActive: false,
   setRecommendActive: (v) => set({ isRecommendActive: v }),
 }));

@@ -1,11 +1,5 @@
 package com.example.dahaeng.domain.youtube.service;
 
-import com.example.dahaeng.domain.youtube.repository.YouTubeAccountRepository;
-import com.example.dahaeng.domain.youtube.repository.YouTubeLikedVideoRepository;
-import com.example.dahaeng.domain.youtube.repository.YouTubePlaylistRepository;
-import com.example.dahaeng.domain.youtube.repository.YouTubePlaylistVideoRepository;
-import com.example.dahaeng.domain.youtube.repository.YouTubeSubscriptionRepository;
-import com.example.dahaeng.domain.youtube.repository.YouTubeVideoTagRepository;
 import com.example.dahaeng.global.exception.CustomException;
 import com.example.dahaeng.global.exception.ErrorCode;
 import com.example.dahaeng.domain.youtube.dto.YouTubePlaylistDto;
@@ -14,6 +8,7 @@ import com.example.dahaeng.domain.youtube.dto.YouTubeVideoDto;
 import com.example.dahaeng.domain.youtube.entity.YouTubeAccount;
 import com.example.dahaeng.domain.youtube.entity.YouTubePlaylist;
 import com.example.dahaeng.domain.youtube.entity.YouTubePlaylistVideo;
+import com.example.dahaeng.domain.youtube.entity.YouTubeVideoTag;
 import com.example.dahaeng.domain.youtube.enums.SyncStatus;
 import com.example.dahaeng.domain.youtube.repository.*;
 import lombok.RequiredArgsConstructor;

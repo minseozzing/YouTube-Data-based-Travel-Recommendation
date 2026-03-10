@@ -10,5 +10,6 @@ public enum InterestCategory {
     SPORTS_FOOTBALL,
     ANIME_SUBCULTURE,
     MOBILITY_AUTO,
-    TRAVEL_GENERAL
+    TRAVEL_GENERAL,
+    TECHNOLOGY // 기술/개발 카테고리 추가
 }

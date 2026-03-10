@@ -1,36 +1,42 @@
 package com.example.dahaeng.domain.auth.dto;
 
-import lombok.RequiredArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.Map;
 
-@RequiredArgsConstructor
-public class GoogleResponse implements OAuth2Response{
+@Getter
+@NoArgsConstructor
+public class GoogleResponse implements OAuth2Response {
 
-    private final Map<String, Object> attributes;
+    private Map<String, Object> attribute;
+
+    public GoogleResponse(Map<String, Object> attribute) {
+        this.attribute = attribute;
+    }
 
     @Override
-    public String getProvider() { return "google"; }
+    public String getProvider() {
+        return "google";
+    }
 
     @Override
     public String getProviderId() {
-        return attributes.get("sub").toString();
+        return attribute.get("sub").toString();
     }
 
     @Override
     public String getEmail() {
-        return attributes.get("email").toString();
+        return attribute.get("email").toString();
     }
 
     @Override
     public String getName() {
-        return attributes.get("name").toString();
+        return attribute.get("name").toString();
     }
 
     @Override
     public String getProfileImageUrl() {
-        Object v = attributes.get("picture");
-        return v == null ? null : v.toString();
+        return attribute.get("picture").toString();
     }
-
 }

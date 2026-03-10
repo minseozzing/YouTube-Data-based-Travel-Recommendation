@@ -9,12 +9,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(
-        name = "youtube_video_tag",
-        uniqueConstraints = {
-                @UniqueConstraint(name = "uk_video_tag", columnNames = {"video_id", "tag_name"})
-        }
-)
+@Table(name = "youtube_video_tag")
 public class YouTubeVideoTag extends BaseEntity {
 
     @Id

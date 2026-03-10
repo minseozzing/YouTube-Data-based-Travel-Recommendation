@@ -6,6 +6,7 @@ import com.example.dahaeng.domain.auth.dto.OAuth2Response;
 import com.example.dahaeng.domain.member.dto.MemberDto;
 import com.example.dahaeng.domain.member.entity.Member;
 import com.example.dahaeng.domain.member.repository.MemberRepository;
+import com.example.dahaeng.domain.youtube.service.YouTubeSaveService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -25,6 +26,7 @@ import java.time.ZoneId;
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private final MemberRepository memberRepository;
+    private final YouTubeSaveService youtubeSaveService;
 
     @Override
     @Transactional
@@ -41,7 +43,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             throw new OAuth2AuthenticationException("Unsupported provider: " + registrationId);
         }
 
-        // 구글 액세스 토큰/만료 정보 추출
         String googleAccessToken = userRequest.getAccessToken().getTokenValue();
         Instant expiresAtInstant = userRequest.getAccessToken().getExpiresAt();
         LocalDateTime expiresAt = LocalDateTime.ofInstant(
@@ -66,14 +67,12 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                     .build();
             log.info("[CustomOAuth2UserService] 신규 회원 생성: socialId={}", socialId);
         } else {
-            // 기존 회원 프로필 갱신
             member.updateProfile(nickname, profileImageUrl);
             log.info("[CustomOAuth2UserService] 기존 회원 프로필 갱신: socialId={}", socialId);
         }
 
-        // 구글 토큰 갱신 (refresh_token은 SuccessHandler에서 별도 처리 필요)
-        member.updateGoogleTokens(googleAccessToken, null, expiresAt);
-        memberRepository.save(member);
+        member = memberRepository.save(member);
+        youtubeSaveService.upsertAccount(member, null, email, googleAccessToken, null, expiresAt);
 
         MemberDto memberDto = MemberDto.builder()
                 .id(member.getId())

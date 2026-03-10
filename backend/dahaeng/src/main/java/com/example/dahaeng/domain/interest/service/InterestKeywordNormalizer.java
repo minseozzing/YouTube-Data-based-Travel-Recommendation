@@ -2,13 +2,11 @@ package com.example.dahaeng.domain.interest.service;
 
 import com.example.dahaeng.domain.interest.dto.InterestKeywordCandidate;
 import com.example.dahaeng.domain.interest.dto.TokenizedSignal;
+import com.example.dahaeng.domain.interest.enums.InterestSourceType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -24,15 +22,17 @@ public class InterestKeywordNormalizer {
                 continue;
             }
             String trimmed = raw.trim();
-            String key = trimmed.toLowerCase(Locale.ROOT);
-            String normalized = synonymMap.getOrDefault(trimmed, synonymMap.getOrDefault(key, trimmed));
+            String normalized = synonymMap.getOrDefault(trimmed, trimmed);
 
-            // 국가/도시/고유명사는 normalized keyword 레벨에서 관리
             result.add(InterestKeywordCandidate.builder()
                     .rawKeyword(trimmed)
                     .normalizedKeyword(normalized)
                     .sourceType(token.getSourceType())
-                    .score(0.0)
+                    .sourceTypes(Set.of(token.getSourceType()))
+                    .latestSignalTime(token.getSignalTime())
+                    .totalScore(0.0)
+                    .totalCount(1)
+                    .distinctSourceCount(1)
                     .build());
         }
         return result;
