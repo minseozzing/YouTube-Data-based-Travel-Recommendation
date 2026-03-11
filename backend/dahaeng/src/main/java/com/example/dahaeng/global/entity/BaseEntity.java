@@ -29,4 +29,8 @@ public abstract class BaseEntity {
     public void delete() {
         this.isDeleted = true;
     }
+
+    public void updateTime() {
+        this.updatedAt = LocalDateTime.now();
+    }
 }

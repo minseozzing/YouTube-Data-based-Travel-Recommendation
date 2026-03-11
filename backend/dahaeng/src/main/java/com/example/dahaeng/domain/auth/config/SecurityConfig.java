@@ -90,7 +90,8 @@ public class SecurityConfig {
                                 "/api/auth/google/login-url",
                                 "/api/auth/exchange",
                                   "/api/cost/**",
-                            "/api/exchange-rate/**"
+                            "/api/exchange-rate/**",
+                            "/api/city/view-history"
                         ).permitAll()
                         .anyRequest().authenticated());
 
