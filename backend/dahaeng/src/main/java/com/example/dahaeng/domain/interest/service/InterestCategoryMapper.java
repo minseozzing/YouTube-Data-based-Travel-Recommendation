@@ -1,3 +1,4 @@
+// [FILE_DELETE_CANDIDATE] - 더 이상 사용하지 않는 카테고리 매핑 로직
 package com.example.dahaeng.domain.interest.service;
 
 import com.example.dahaeng.domain.interest.dto.InterestKeywordCandidate;

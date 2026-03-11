@@ -1,14 +1,17 @@
 package com.example.dahaeng.domain.interest.service;
 
-import com.example.dahaeng.domain.interest.constant.TravelTagCatalog;
 import com.example.dahaeng.domain.interest.dto.InterestKeywordCandidate;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
+@RequiredArgsConstructor
 public class TravelTagPromptFactory {
+
+    private final TravelTagProvider tagProvider;
 
     public String createSystemPrompt() {
         return String.format("""
@@ -31,7 +34,7 @@ public class TravelTagPromptFactory {
                 [출력 규칙]
                 - score(연관도)와 confidence(확신도)는 반드시 0.0 ~ 1.0 사이의 실수로 작성하세요.
                 - 결과는 반드시 JSON 형식으로 반환하세요.
-                """).replace("%%s", TravelTagCatalog.getAllowedTagsPrompt());
+                """).replace("%%s", tagProvider.getAllowedTagsPrompt());
     }
 
     public String createUserPrompt(List<InterestKeywordCandidate> keywords) {

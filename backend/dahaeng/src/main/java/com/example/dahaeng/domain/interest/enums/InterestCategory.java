@@ -1,3 +1,4 @@
+// [FILE_DELETE_CANDIDATE] - 사용하지 않는 관심 카테고리 Enum
 package com.example.dahaeng.domain.interest.enums;
 
 public enum InterestCategory {
