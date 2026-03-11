@@ -14,10 +14,23 @@ import { COUNTRY_NAME_KO } from "@/data/countryNameKo";
 import { COUNTRY_NAME_ISO3 } from "@/data/countryNameIso3";
 import React from "react";
 
-// 베이스 지도: CDN 50m (world-atlas — 안티메리디안 처리 완벽)
+// 베이스 지도: 로컬 50m (public/geo/ — CDN 대신 로컬 서버에서 로드)
 // admin-1: 클릭된 나라의 /geo/{ISO3}.json (10m, lazy load)
-const GEO_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-50m.json";
-const LAND_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/land-50m.json";
+const GEO_URL = "/geo/countries-50m.json";
+const LAND_URL = "/geo/land-50m.json";
+
+// ── 모듈 레벨 캐시 ────────────────────────────────────────────────────────────
+// 컴포넌트가 언마운트되어도 이 변수는 살아있음 → 재마운트 시 즉시 사용
+const geoCache = new Map<string, object>();
+
+async function fetchGeoWithCache(url: string): Promise<object> {
+  const cached = geoCache.get(url);
+  if (cached) return cached;
+  const res = await fetch(url);
+  const data = await res.json();
+  geoCache.set(url, data);
+  return data;
+}
 
 // 줌 임계값
 const ZOOM_SHOW_BORDERS = 1.5; // 이상: 나라 경계선 표시 (나라 미선택 시)
@@ -112,6 +125,7 @@ const COUNTRY_STYLE_PRESSED = { outline: "none" };
 
 const BaseLayer = React.memo(
   ({
+    geography,
     clickedName,
     showBorders,
     onCountryClick,
@@ -119,6 +133,7 @@ const BaseLayer = React.memo(
     onMove,
     onLeave,
   }: {
+    geography: string | object;
     clickedName: string | null;
     showBorders: boolean;
     onCountryClick: (geo: GeoFeature) => void;
@@ -126,7 +141,7 @@ const BaseLayer = React.memo(
     onMove: (name: string, e: React.MouseEvent) => void;
     onLeave: () => void;
   }) => (
-    <Geographies geography={GEO_URL}>
+    <Geographies geography={geography}>
       {({ geographies }: { geographies: GeoFeature[] }) =>
         geographies.map((geo) => {
           const rawName = geo.properties.name ?? "";
@@ -278,6 +293,16 @@ export function GlobeViewer({ width, height }: GlobeViewerProps) {
     selectedCityCoords,
     isRecommendActive,
   } = useUiStore();
+
+  // ── 지도 데이터 캐시 state ─────────────────────────────
+  // 모듈 캐시에 이미 있으면 즉시 사용 (재마운트 시 fetch 없이 바로 렌더)
+  const [geoData, setGeoData] = useState<object | null>(() => geoCache.get(GEO_URL) ?? null);
+  const [landData, setLandData] = useState<object | null>(() => geoCache.get(LAND_URL) ?? null);
+
+  useEffect(() => {
+    if (!geoData) fetchGeoWithCache(GEO_URL).then(setGeoData);
+    if (!landData) fetchGeoWithCache(LAND_URL).then(setLandData);
+  }, []);
 
   // ── state ──────────────────────────────────────────────
   const [center, setCenter] = useState<[number, number]>([0, 20]);
@@ -507,6 +532,7 @@ export function GlobeViewer({ width, height }: GlobeViewerProps) {
             >
               {/* 나라 채우기 + 경계선 레이어 (10m) */}
               <BaseLayer
+                geography={geoData ?? GEO_URL}
                 clickedName={clickedName}
                 showBorders={showBorders}
                 onCountryClick={handleCountryClick}
@@ -517,7 +543,7 @@ export function GlobeViewer({ width, height }: GlobeViewerProps) {
 
               {/* 대륙 외곽선 — 줌 1.5 미만에서만 (나라 선택 여부 무관) */}
               {zoom < ZOOM_SHOW_BORDERS && (
-                <Geographies geography={LAND_URL}>
+                <Geographies geography={landData ?? LAND_URL}>
                   {({ geographies }: { geographies: GeoFeature[] }) =>
                     geographies.map((geo) => (
                       <Geography
