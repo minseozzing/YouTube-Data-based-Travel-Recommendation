@@ -127,26 +127,33 @@ export function FlightTab({ city }: FlightTabProps) {
             }
           }}
         >
-          {/* 6개월 추이 차트 + 호버 시 오버레이 */}
-          <div className="relative">
-            <TrendSection isLoading={trendLoading} trend={trend} />
-
-            <AnimatePresence>
-              {activeDay && (
+          {/* 6개월 추이 차트 vs 날짜 히스토리 스왑 레이아웃 */}
+          <div className="flex-1 relative overflow-hidden rounded-xl border border-border/50 bg-card/50 min-h-[380px] flex flex-col">
+            <AnimatePresence mode="wait">
+              {activeDay ? (
                 <motion.div
-                  key="glass-overlay"
-                  className="absolute inset-0 z-50 flex items-center justify-center rounded-xl"
-                  style={{ backdropFilter: 'blur(4px)', background: 'rgba(2,6,23,0.55)' }}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.18, ease: 'easeOut' }}
+                  key="history-overlay"
+                  className="flex-1 flex flex-col items-center justify-center p-0 bg-slate-500/5"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2, ease: 'easeOut' }}
                 >
                   <DateHistoryPanel
                     selectedDay={activeDay}
                     yearMonth={selectedYearMonth}
-                    containerRef={rightColRef}
                   />
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="trend-section"
+                  className="flex-1 p-5"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <TrendSection isLoading={trendLoading} trend={trend} />
                 </motion.div>
               )}
             </AnimatePresence>
@@ -413,72 +420,54 @@ function FlightCalendarGrid({
 function DateHistoryPanel({
   selectedDay,
   yearMonth,
-  containerRef,
 }: {
   selectedDay: SelectedDay;
   yearMonth: string;
-  containerRef: React.RefObject<HTMLDivElement | null>;
 }) {
   return (
-    <LiquidGlass
-      mouseContainer={containerRef}
-      mode="prominent"
-      cornerRadius={20}
-      blurAmount={0.18}
-      displacementScale={60}
-      saturation={140}
-      aberrationIntensity={1.5}
-      overLight={false}
-    >
-      <div style={{ width: 320 }} className="flex flex-col justify-center gap-5 p-6">
-        {/*
-          key={selectedDay.day} → 날짜 이동 시 콘텐츠만 페이드 전환.
-          글라스 패널(LiquidGlass)은 그대로 유지되므로 깜빡임 없음.
-        */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={selectedDay.day}
-            className="flex flex-col gap-5"
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.15, ease: 'easeOut' }}
-          >
-            {/* 헤더 */}
-            <div className="border-b border-white/25 pb-3">
-              <p className="text-base font-black text-white tracking-tight drop-shadow">
-                {dayjs(`${yearMonth}-${String(selectedDay.day).padStart(2, '0')}`).format('M월 D일 (ddd)')}
-              </p>
-              <p className="text-[11px] text-white/70 mt-0.5">수집 시점별 가격 히스토리</p>
-            </div>
+    <div className="flex flex-col justify-center gap-4 p-4 w-[380px] max-w-full">
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={selectedDay.day}
+          className="flex flex-col gap-4"
+          initial={{ opacity: 0, scale: 0.98 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.98 }}
+          transition={{ duration: 0.12, ease: 'easeOut' }}
+        >
+          {/* 헤더 */}
+          <div className="border-b border-border pb-3">
+            <p className="text-2xl font-black text-foreground tracking-tight">
+              {dayjs(`${yearMonth}-${String(selectedDay.day).padStart(2, '0')}`).format('M월 D일 (ddd)')}
+            </p>
+            <p className="text-xs text-muted-foreground mt-1 font-medium">수집 시점별 항공권 가격 변화</p>
+          </div>
 
-            {/* 가는편 / 오는편 */}
-            <div className="grid grid-cols-2 gap-4">
-              <HistoryCard label="가는편" entry={selectedDay.outbound} />
-              <HistoryCard label="오는편" entry={selectedDay.inbound} />
-            </div>
+          {/* 가는편 / 오는편 */}
+          <div className="grid grid-cols-2 gap-3">
+            <HistoryCard label="가는편" entry={selectedDay.outbound} />
+            <HistoryCard label="오는편" entry={selectedDay.inbound} />
+          </div>
 
-            {/* 왕복 합계 */}
-            {selectedDay.outbound && selectedDay.inbound && (
-              <div className="flex items-center justify-between rounded-xl px-4 py-3 border border-blue-300/40 bg-blue-400/20">
-                <span className="text-xs font-bold text-white/80">왕복 합계</span>
-                <span className="text-lg font-black text-blue-200 drop-shadow">
-                  {(selectedDay.outbound.price + selectedDay.inbound.price).toLocaleString()}원
-                </span>
-              </div>
-            )}
-          </motion.div>
-        </AnimatePresence>
-      </div>
-    </LiquidGlass>
+          {/* 왕복 합계 */}
+          {selectedDay.outbound && selectedDay.inbound && (
+            <div className="flex items-center justify-between rounded-xl px-5 py-3.5 bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 shadow-sm">
+              <span className="text-sm font-bold opacity-80">왕복 합계</span>
+              <span className="text-2xl font-black">
+                {(selectedDay.outbound.price + selectedDay.inbound.price).toLocaleString()}원
+              </span>
+            </div>
+          )}
+        </motion.div>
+      </AnimatePresence>
+    </div>
   );
 }
 
 function HistoryCard({ label, entry }: { label: string; entry: DailyPriceEntry | undefined }) {
   if (!entry) {
     return (
-      <div className="rounded-xl p-3 text-[10px] text-white/50 text-center border border-dashed border-white/20"
-        style={{ background: 'rgba(255,255,255,0.05)' }}>
+      <div className="rounded-xl p-3 text-[10px] text-muted-foreground text-center border border-dashed border-border bg-muted/20">
         데이터 없음
       </div>
     );
@@ -491,22 +480,20 @@ function HistoryCard({ label, entry }: { label: string; entry: DailyPriceEntry |
   const isUp = diff > 0;
 
   return (
-    <div className="rounded-xl p-3 flex flex-col gap-2 border border-white/20"
-      style={{ background: 'rgba(255,255,255,0.1)' }}>
+    <div className="rounded-xl p-3.5 flex flex-col gap-2.5 border border-border bg-card shadow-sm">
       {/* 라벨 + 현재가 */}
-      <div className="flex items-center justify-between">
-        <span className="text-[11px] font-black text-white/80">{label}</span>
-        <span className="text-sm font-black text-white drop-shadow">{entry.price.toLocaleString()}원</span>
+      <div className="flex flex-col gap-0.5">
+        <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{label}</span>
+        <span className="text-xl font-black text-foreground">{entry.price.toLocaleString()}원</span>
       </div>
 
       {/* 히스토리 행 */}
       {history.length > 0 && (
-        <div className="flex flex-col gap-1 rounded-lg p-2"
-          style={{ background: 'rgba(0,0,0,0.15)' }}>
+        <div className="flex flex-col gap-1.5 rounded-lg p-2.5 bg-muted/40">
           {history.map((h, idx) => (
-            <div key={h.collected_date} className="flex items-center justify-between text-[10px]">
-              <span className={cn('font-medium', idx === 0 ? 'text-white/90' : 'text-white/55')}>{h.label}</span>
-              <span className={cn('font-bold', idx === 0 ? 'text-white' : 'text-white/55')}>{h.price.toLocaleString()}원</span>
+            <div key={h.collected_date} className="flex items-center justify-between text-xs">
+              <span className={cn('font-medium', idx === 0 ? 'text-foreground' : 'text-muted-foreground/80')}>{h.label}</span>
+              <span className={cn('font-bold', idx === 0 ? 'text-foreground' : 'text-muted-foreground/80')}>{h.price.toLocaleString()}원</span>
             </div>
           ))}
         </div>
@@ -515,18 +502,18 @@ function HistoryCard({ label, entry }: { label: string; entry: DailyPriceEntry |
       {/* 2주 전 대비 변동 */}
       {oldest && (
         <div className={cn(
-          'flex items-center gap-1 text-[10px] font-bold pt-1 border-t border-white/15',
-          isDown && 'text-emerald-300',
-          isUp && 'text-red-300',
-          !isDown && !isUp && 'text-white/60',
+          'flex items-center gap-1 text-xs font-bold pt-2 border-t border-border',
+          isDown && 'text-emerald-600',
+          isUp && 'text-rose-600',
+          !isDown && !isUp && 'text-muted-foreground',
         )}>
-          {isDown && <TrendingDown className="size-3 shrink-0" />}
-          {isUp && <TrendingUp className="size-3 shrink-0" />}
-          {!isDown && !isUp && <Minus className="size-3 shrink-0" />}
-          <span>
-            {isDown && `2주 전보다 ${Math.abs(diff).toLocaleString()}원 저렴`}
-            {isUp && `2주 전보다 ${Math.abs(diff).toLocaleString()}원 상승`}
-            {!isDown && !isUp && '2주 전과 동일'}
+          {isDown && <TrendingDown className="size-3.5 shrink-0" />}
+          {isUp && <TrendingUp className="size-3.5 shrink-0" />}
+          {!isDown && !isUp && <Minus className="size-3.5 shrink-0" />}
+          <span className="truncate">
+            {isDown && `저렴`}
+            {isUp && `상승`}
+            {!isDown && !isUp && '동일'}
           </span>
         </div>
       )}
