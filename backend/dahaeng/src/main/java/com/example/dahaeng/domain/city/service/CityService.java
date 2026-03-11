@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.dahaeng.domain.city.dto.response.CityListResponse;
+import com.example.dahaeng.domain.city.dto.response.CityResponse;
 import com.example.dahaeng.domain.city.entity.City;
 import com.example.dahaeng.domain.city.repository.CityRepository;
 
@@ -17,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 public class CityService {
 	private final CityRepository cityRepository;
 
-	public List<CityListResponse> list(Long countryId) {
+	public List<CityResponse> list(Long countryId) {
 		if (countryId == null) {
 			List<City> cities = cityRepository.findAllByIsDeletedFalse();
 			return parseToCityListResponseList(cities);
@@ -27,10 +27,10 @@ public class CityService {
 		}
 	}
 
-	private List<CityListResponse> parseToCityListResponseList(List<City> cities) {
+	private List<CityResponse> parseToCityListResponseList(List<City> cities) {
 		return cities
 			.stream()
-			.map(CityListResponse::from)
+			.map(CityResponse::from)
 			.toList();
 	}
 }
