@@ -122,9 +122,12 @@ export function RightPanel() {
                   <Skeleton className="h-4 w-12" />
                 ) : (
                   <span className="text-xs font-bold text-slate-800 text-center">
-                    {city?.dailyCost
-                      ? `₩${(city.dailyCost / 10000).toFixed(0)}만`
-                      : '-'}
+                    {(() => {
+                      const cost = city?.livingCostFor1Day 
+                        ? (city.livingCostFor1Day.accommodation + city.livingCostFor1Day.food + city.livingCostFor1Day.transportation)
+                        : city?.dailyCost;
+                      return cost ? `₩${(cost / 10000).toFixed(0)}만` : '-';
+                    })()}
                   </span>
                 )}
               </div>
@@ -137,9 +140,12 @@ export function RightPanel() {
                   <Skeleton className="h-4 w-12" />
                 ) : (
                   <span className="text-xs font-bold text-slate-800 text-center">
-                    {city?.flightPrice
-                      ? `₩${(city.flightPrice / 10000).toFixed(0)}만~`
-                      : '-'}
+                    {(() => {
+                      const price = city?.airTicket 
+                        ? (city.airTicket.departAirTicket + city.airTicket.arriveAirTicket)
+                        : city?.flightPrice;
+                      return price ? `₩${(price / 10000).toFixed(0)}만~` : '-';
+                    })()}
                   </span>
                 )}
               </div>

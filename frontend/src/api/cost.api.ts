@@ -23,6 +23,7 @@ import {
   DUMMY_SEOUL_COST_DETAIL,
   DUMMY_COST_COMPARE,
 } from '@/data/cost.dummy';
+import { z } from 'zod';
 
 export const SEOUL_CITY_ID = 1;
 
@@ -31,12 +32,17 @@ const DUMMY_HISTORY_MAP = {
   w: DUMMY_EXCHANGE_RATE_HISTORY_W,
   m: DUMMY_EXCHANGE_RATE_HISTORY_M,
 };
-import { z } from 'zod';
 
+// ── API 응답 스키마 정의 (공통 래퍼 적용) ───────────────────────────────────
 const CountryCostApiSchema = ApiResponseSchema(CountryCostSchema);
 const CountryCostSummaryApiSchema = ApiResponseSchema(CountryCostSummarySchema);
 const CityCostSummaryListApiSchema = ApiResponseSchema(z.array(CityCostSummarySchema));
 const ExchangeRateApiSchema = ApiResponseSchema(ExchangeRateSchema);
+
+const ExchangeRateNewApiSchema = ApiResponseSchema(ExchangeRateNewSchema);
+const ExchangeRateHistoryApiSchema = ApiResponseSchema(ExchangeRateHistorySchema);
+const CostDetailApiSchema = ApiResponseSchema(CostDetailSchema);
+const CostCompareApiSchema = ApiResponseSchema(CostCompareSchema);
 
 export const costApi = {
   // ── Legacy endpoints ───────────────────────────────────────────────────────
@@ -71,7 +77,7 @@ export const costApi = {
       const { data } = await axiosInstance.get('/api/exchange-rate', {
         params: { currency },
       });
-      return ExchangeRateNewSchema.parse(data);
+      return ExchangeRateNewApiSchema.parse(data).data;
     } catch (err) {
       console.warn('[cost.api] using dummy data for getExchangeRateNew', err);
       return DUMMY_EXCHANGE_RATE;
@@ -87,7 +93,7 @@ export const costApi = {
       const { data } = await axiosInstance.get('/api/exchange-rate/history', {
         params: { target_currency: targetCurrency, type },
       });
-      return ExchangeRateHistorySchema.parse(data);
+      return ExchangeRateHistoryApiSchema.parse(data).data;
     } catch (err) {
       console.warn('[cost.api] using dummy data for getExchangeRateHistory', err);
       return DUMMY_HISTORY_MAP[type.toLowerCase() as 'd' | 'w' | 'm'];
@@ -103,7 +109,7 @@ export const costApi = {
       const { data } = await axiosInstance.get('/api/cost/detail', {
         params: { target_type: targetType, target_id: targetId },
       });
-      return CostDetailSchema.parse(data);
+      return CostDetailApiSchema.parse(data).data;
     } catch (err) {
       console.warn('[cost.api] using dummy data for getCostDetail', err);
       return targetId === SEOUL_CITY_ID ? DUMMY_SEOUL_COST_DETAIL : DUMMY_COST_DETAIL;
@@ -120,10 +126,17 @@ export const costApi = {
       const { data } = await axiosInstance.get('/api/cost/compare', {
         params: { target_type: targetType, base_id: baseId, target_id: targetId },
       });
-      return CostCompareSchema.parse(data);
+      return CostCompareApiSchema.parse(data).data;
     } catch (err) {
       console.warn('[cost.api] using dummy data for getCostCompare', err);
-      return DUMMY_COST_COMPARE;
+      // 더미 데이터의 ID를 현재 요청한 ID로 동적 변경하여 유효성 검사 통과
+      return {
+        ...DUMMY_COST_COMPARE,
+        target: {
+          ...DUMMY_COST_COMPARE.target,
+          id: targetId,
+        },
+      };
     }
   },
 };

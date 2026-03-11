@@ -1,4 +1,7 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useCallback } from 'react';
+import type React from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import LiquidGlass from 'liquid-glass-react';
 import {
   LineChart,
   Line,
@@ -8,7 +11,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
-import { Plane, Clock, Hotel, TrendingUp, TrendingDown, Minus, AlertCircle, X } from 'lucide-react';
+import { Plane, Clock, Hotel, TrendingUp, TrendingDown, Minus, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
@@ -39,7 +42,26 @@ const MONTH_TABS = buildMonthTabs();
 
 export function FlightTab({ city }: FlightTabProps) {
   const [selectedYearMonth, setSelectedYearMonth] = useState(MONTH_TABS[0].yearMonth);
+  const [activeDay, setActiveDay] = useState<SelectedDay | null>(null);
   const cityId = city.cityId;
+
+  // LiquidGlass mouseContainer 기준 (오른쪽 컬럼 전체)
+  const rightColRef = useRef<HTMLDivElement>(null);
+
+
+  // 디바운스: 셀 이동 시 패널이 즉시 사라지지 않도록
+  const clearTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const debouncedSetActiveDay = useCallback((day: SelectedDay | null) => {
+    if (clearTimerRef.current) {
+      clearTimeout(clearTimerRef.current);
+      clearTimerRef.current = null;
+    }
+    if (day !== null) {
+      setActiveDay(day);
+    } else {
+      clearTimerRef.current = setTimeout(() => setActiveDay(null), 180);
+    }
+  }, []);
 
   const { data: summary, isLoading: summaryLoading } = useCitySummary(cityId, selectedYearMonth);
   const { data: calendar, isLoading: calendarLoading } = useFlightCalendar(cityId, selectedYearMonth);
@@ -50,8 +72,8 @@ export function FlightTab({ city }: FlightTabProps) {
   const isOffSeason = summary?.off_season_months.includes(selectedMonth) ?? false;
 
   return (
-    <div className="flex flex-col gap-6 p-6">
-      {/* 월 선택 탭 (최상단으로 이동) */}
+    <div className="flex flex-col gap-6 p-6 h-full overflow-y-auto relative">
+      {/* 월 선택 탭 */}
       <div className="flex gap-2.5 flex-wrap" role="tablist" aria-label="월 선택">
         {MONTH_TABS.map((tab) => {
           const active = tab.yearMonth === selectedYearMonth;
@@ -63,50 +85,74 @@ export function FlightTab({ city }: FlightTabProps) {
               key={tab.yearMonth}
               role="tab"
               aria-selected={active}
-              onClick={() => setSelectedYearMonth(tab.yearMonth)}
+              onClick={() => { setSelectedYearMonth(tab.yearMonth); setActiveDay(null); }}
               className={cn(
                 'px-4 py-2 rounded-xl text-lg font-bold transition-colors relative',
-                'focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/50',
                 active
                   ? 'bg-slate-800 text-white dark:bg-slate-200 dark:text-slate-900'
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400',
               )}
             >
               {tab.label}
-              {peak && (
-                <span className="absolute -top-1 -right-1 size-2.5 bg-red-400 rounded-full border-2 border-background" />
-              )}
-              {off && (
-                <span className="absolute -top-1 -right-1 size-2.5 bg-blue-400 rounded-full border-2 border-background" />
-              )}
+              {peak && <span className="absolute -top-1 -right-1 size-2.5 bg-red-400 rounded-full border-2 border-background" />}
+              {off && <span className="absolute -top-1 -right-1 size-2.5 bg-blue-400 rounded-full border-2 border-background" />}
             </button>
           );
         })}
-        {summary && (
-          <div className="flex items-center gap-3 ml-2">
-            <span className="text-base text-muted-foreground flex items-center gap-1.5">
-              <span className="size-2 bg-red-400 rounded-full" /> 성수기
-            </span>
-            <span className="text-base text-muted-foreground flex items-center gap-1.5">
-              <span className="size-2 bg-blue-400 rounded-full" /> 비수기
-            </span>
-          </div>
-        )}
       </div>
 
       <SummarySection isLoading={summaryLoading} summary={summary} />
 
-      {/* 섹션 2: 달력형 일별 가격 + 날짜 클릭 히스토리 */}
-      <FlightCalendarGrid
-        isLoading={calendarLoading}
-        calendar={calendar}
-        yearMonth={selectedYearMonth}
-        isPeakSeason={isPeakSeason}
-        isOffSeason={isOffSeason}
-      />
+      {/* 좌: 달력  /  우: 6개월 추이 + 호버 히스토리 오버레이 */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 min-h-0">
+        <div className="flex flex-col gap-4">
+          <FlightCalendarGrid
+            isLoading={calendarLoading}
+            calendar={calendar}
+            yearMonth={selectedYearMonth}
+            isPeakSeason={isPeakSeason}
+            isOffSeason={isOffSeason}
+            activeDay={activeDay}
+            onHoverDay={debouncedSetActiveDay}
+          />
+        </div>
 
-      {/* 섹션 3: 6개월 추이 차트 */}
-      <TrendSection isLoading={trendLoading} trend={trend} />
+        <div
+          ref={rightColRef}
+          className="flex flex-col gap-4"
+          onMouseEnter={() => {
+            if (clearTimerRef.current) {
+              clearTimeout(clearTimerRef.current);
+              clearTimerRef.current = null;
+            }
+          }}
+        >
+          {/* 6개월 추이 차트 + 호버 시 오버레이 */}
+          <div className="relative">
+            <TrendSection isLoading={trendLoading} trend={trend} />
+
+            <AnimatePresence>
+              {activeDay && (
+                <motion.div
+                  key="glass-overlay"
+                  className="absolute inset-0 z-50 flex items-center justify-center rounded-xl"
+                  style={{ backdropFilter: 'blur(4px)', background: 'rgba(2,6,23,0.55)' }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.18, ease: 'easeOut' }}
+                >
+                  <DateHistoryPanel
+                    selectedDay={activeDay}
+                    yearMonth={selectedYearMonth}
+                    containerRef={rightColRef}
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -119,46 +165,36 @@ function SummarySection({ isLoading, summary }: { isLoading: boolean; summary: C
 
   return (
     <section aria-label="도시 요약 정보">
-      <div className="bg-card border border-border rounded-xl px-6 py-5 flex items-center justify-between shadow-sm">
-        {/* 평균 항공권 */}
+      <div className="bg-card border border-border rounded-xl px-6 py-4 flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-3 flex-1 justify-center">
           <Plane className="size-5 text-blue-500 shrink-0" />
           <div className="flex flex-col">
-            <span className="text-sm font-medium text-muted-foreground">항공권</span>
-            <span className="text-lg font-black text-foreground">{summary.avg_flight_price.toLocaleString()}원</span>
+            <span className="text-xs font-medium text-muted-foreground">항공권</span>
+            <span className="text-base font-black text-foreground">{summary.avg_flight_price.toLocaleString()}원</span>
           </div>
         </div>
-
-        <div className="w-px h-10 bg-border mx-2" />
-
-        {/* 평균 숙박비 */}
+        <div className="w-px h-8 bg-border mx-2" />
         <div className="flex items-center gap-3 flex-1 justify-center">
           <Hotel className="size-5 text-emerald-500 shrink-0" />
           <div className="flex flex-col">
-            <span className="text-sm font-medium text-muted-foreground">숙박비</span>
-            <span className="text-lg font-black text-foreground">{summary.avg_hotel_price.toLocaleString()}원</span>
+            <span className="text-xs font-medium text-muted-foreground">숙박비</span>
+            <span className="text-base font-black text-foreground">{summary.avg_hotel_price.toLocaleString()}원</span>
           </div>
         </div>
-
-        <div className="w-px h-10 bg-border mx-2" />
-
-        {/* 경유 정보 */}
+        <div className="w-px h-8 bg-border mx-2" />
         <div className="flex items-center gap-3 flex-1 justify-center text-center">
           <Plane className="size-5 text-slate-400 shrink-0" />
           <div className="flex flex-col">
-            <span className="text-sm font-medium text-muted-foreground">경유</span>
-            <span className="text-lg font-black text-slate-700 dark:text-slate-300">{summary.typical_stops_text}</span>
+            <span className="text-xs font-medium text-muted-foreground">경유</span>
+            <span className="text-base font-black text-slate-700 dark:text-slate-300">{summary.typical_stops_text}</span>
           </div>
         </div>
-
-        <div className="w-px h-10 bg-border mx-2" />
-
-        {/* 비행 시간 */}
+        <div className="w-px h-8 bg-border mx-2" />
         <div className="flex items-center gap-3 flex-1 justify-center text-center">
           <Clock className="size-5 text-slate-400 shrink-0" />
           <div className="flex flex-col">
-            <span className="text-sm font-medium text-muted-foreground">비행</span>
-            <span className="text-lg font-black text-slate-700 dark:text-slate-300">{summary.avg_duration_text}</span>
+            <span className="text-xs font-medium text-muted-foreground">비행</span>
+            <span className="text-base font-black text-slate-700 dark:text-slate-300">{summary.avg_duration_text}</span>
           </div>
         </div>
       </div>
@@ -192,15 +228,18 @@ function FlightCalendarGrid({
   yearMonth,
   isPeakSeason,
   isOffSeason,
+  activeDay,
+  onHoverDay,
 }: {
   isLoading: boolean;
   calendar: FlightCalendar | undefined;
   yearMonth: string;
   isPeakSeason: boolean;
   isOffSeason: boolean;
+  activeDay: SelectedDay | null;
+  onHoverDay: (day: SelectedDay | null) => void;
 }) {
   const [priceView, setPriceView] = useState<PriceView>('outbound');
-  const [selectedDay, setSelectedDay] = useState<SelectedDay | null>(null);
 
   const { cells, outboundMap, inboundMap, cheapestDate, today } = useMemo(() => {
     const base = dayjs(yearMonth + '-01');
@@ -243,44 +282,37 @@ function FlightCalendarGrid({
     };
   }, [calendar, yearMonth, priceView]);
 
-  const handleDayClick = (day: number) => {
+  const handleDayHover = (day: number | null) => {
+    if (day === null) {
+      onHoverDay(null);
+      return;
+    }
     const out = outboundMap.get(day);
     const inn = inboundMap.get(day);
     if (!out && !inn) return;
-    if (selectedDay?.day === day) { setSelectedDay(null); return; }
-    setSelectedDay({ day, outbound: out, inbound: inn });
+    onHoverDay({ day, outbound: out, inbound: inn });
   };
 
-  if (isLoading) return (
-    <section aria-label="일별 항공권 가격">
-      <Skeleton className="w-full h-80 rounded-xl" />
-    </section>
-  );
+  if (isLoading) return <Skeleton className="w-full h-80 rounded-xl" />;
 
   return (
-    <section aria-label="일별 항공권 가격">
-      <div className="flex items-center justify-between mb-4 px-1">
-        <div className="flex items-center gap-3">
-          <h3 className="text-xl font-black text-foreground">
+    <section aria-label="일별 항공권 가격" className="h-full flex flex-col">
+      <div className="flex items-center justify-between mb-3 px-1">
+        <div className="flex items-center gap-2">
+          <h3 className="text-lg font-black text-foreground">
             {dayjs(yearMonth + '-01').format('YYYY년 M월')}
           </h3>
-          {isPeakSeason && (
-            <Badge className="text-sm px-2 py-0.5 h-6 bg-red-100 text-red-600 dark:bg-red-950/40 dark:text-red-400 border-0 font-bold">성수기</Badge>
-          )}
-          {isOffSeason && (
-            <Badge className="text-sm px-2 py-0.5 h-6 bg-blue-100 text-blue-600 dark:bg-blue-950/40 dark:text-red-400 border-0 font-bold">비성수기</Badge>
-          )}
+          {isPeakSeason && <Badge className="text-[10px] px-1.5 py-0 h-5 bg-red-100 text-red-600 border-0 font-bold">성수기</Badge>}
+          {isOffSeason && <Badge className="text-[10px] px-1.5 py-0 h-5 bg-blue-100 text-blue-600 border-0 font-bold">비성수기</Badge>}
         </div>
-        <div className="flex rounded-lg overflow-hidden border-2 border-border text-base font-bold">
+        <div className="flex rounded-lg overflow-hidden border border-border text-xs font-bold">
           {(['outbound', 'inbound', 'total'] as PriceView[]).map((v) => (
             <button
               key={v}
-              onClick={() => { setPriceView(v); setSelectedDay(null); }}
+              onClick={() => { setPriceView(v); onHoverDay(null); }}
               className={cn(
-                'px-3.5 py-1.5 transition-colors',
-                priceView === v
-                  ? 'bg-slate-800 text-white dark:bg-slate-200 dark:text-slate-900'
-                  : 'bg-card text-muted-foreground hover:bg-muted',
+                'px-2.5 py-1 transition-colors',
+                priceView === v ? 'bg-slate-800 text-white' : 'bg-card text-muted-foreground hover:bg-muted',
               )}
             >
               {PRICE_VIEW_LABELS[v]}
@@ -289,12 +321,12 @@ function FlightCalendarGrid({
         </div>
       </div>
 
-      <div className="bg-card border border-border rounded-xl overflow-hidden shadow-sm">
+      <div className="bg-card border border-border rounded-xl overflow-hidden shadow-sm flex-1">
         {/* 요일 헤더 */}
         <div className="grid grid-cols-7 border-b border-border bg-muted/10">
           {['일', '월', '화', '수', '목', '금', '토'].map((d, i) => (
             <div key={d} className={cn(
-              'py-2.5 text-center text-base font-black',
+              'py-1.5 text-center text-xs font-black',
               i === 0 ? 'text-red-500' : i === 6 ? 'text-blue-500' : 'text-slate-600',
             )}>
               {d}
@@ -302,10 +334,13 @@ function FlightCalendarGrid({
           ))}
         </div>
 
-        {/* 날짜 셀 */}
-        <div className="grid grid-cols-7">
+        {/* 날짜 셀 — onMouseLeave는 그리드 컨테이너에만 걸어 셀 이동 시 깜빡임 방지 */}
+        <div
+          className="grid grid-cols-7"
+          onMouseLeave={() => handleDayHover(null)}
+        >
           {cells.map((day, idx) => {
-            if (day === null) return <div key={`e-${idx}`} className="py-4" />;
+            if (day === null) return <div key={`e-${idx}`} className="py-2" />;
 
             const out = outboundMap.get(day);
             const inn = inboundMap.get(day);
@@ -316,43 +351,41 @@ function FlightCalendarGrid({
 
             const isCheapest = day === cheapestDate && price !== undefined;
             const isToday = day === today;
-            const isSelected = selectedDay?.day === day;
+            const isSelected = activeDay?.day === day;
             const hasPrice = price !== undefined;
             const dow = idx % 7;
 
             return (
               <button
                 key={day}
-                onClick={() => handleDayClick(day)}
+                onMouseEnter={() => handleDayHover(day)}
                 disabled={!hasPrice}
                 className={cn(
-                  'flex flex-col items-center justify-start py-3 gap-1.5 min-h-[80px] border-r border-b border-border/50 last:border-r-0 transition-colors',
+                  'flex flex-col items-center justify-center py-1.5 gap-0.5 min-h-[56px] border-r border-b border-border/40 last:border-r-0 transition-colors',
                   hasPrice && 'cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50',
-                  !hasPrice && 'cursor-default opacity-50',
+                  !hasPrice && 'cursor-default opacity-40',
                   isSelected && 'bg-slate-100 dark:bg-slate-800',
                   !isSelected && isCheapest && 'bg-orange-50 dark:bg-orange-950/30',
                 )}
               >
                 <span className={cn(
-                  'text-lg font-black w-8 h-8 flex items-center justify-center rounded-full',
-                  isToday && 'bg-blue-600 text-white shadow-md',
-                  isSelected && !isToday && 'ring-2 ring-slate-400 dark:ring-slate-500',
-                  !isToday && isCheapest && 'text-orange-600 dark:text-orange-400',
-                  !isToday && !isCheapest && dow === 0 && 'text-red-500',
-                  !isToday && !isCheapest && dow === 6 && 'text-blue-500',
-                  !isToday && !isCheapest && dow !== 0 && dow !== 6 && 'text-foreground',
+                  'text-base font-black w-7 h-7 flex items-center justify-center rounded-full transition-all',
+                  isToday && 'bg-blue-600 text-white shadow-sm',
+                  isSelected && !isToday && 'ring-2 ring-slate-400',
+                  !isToday && isCheapest && 'text-orange-600',
+                  !isToday && !isCheapest && (dow === 0 ? 'text-red-500' : dow === 6 ? 'text-blue-500' : 'text-foreground'),
                 )}>
                   {day}
                 </span>
                 {price !== undefined ? (
                   <span className={cn(
-                    'text-sm leading-none font-black',
-                    isCheapest ? 'text-orange-600 dark:text-orange-400 underline underline-offset-2' : 'text-muted-foreground',
+                    'text-[10px] leading-none font-black',
+                    isCheapest ? 'text-orange-600 underline underline-offset-1' : 'text-muted-foreground',
                   )}>
                     {formatWan(price)}
                   </span>
                 ) : (
-                  <span className="text-sm leading-none text-transparent select-none">-</span>
+                  <span className="text-[10px] leading-none text-transparent select-none">-</span>
                 )}
               </button>
             );
@@ -360,29 +393,17 @@ function FlightCalendarGrid({
         </div>
 
         {/* 범례 */}
-        <div className="flex items-center gap-4 px-4 py-3 border-t border-border bg-muted/5">
-          <div className="flex items-center gap-1.5">
-            <div className="size-3.5 rounded bg-orange-100 dark:bg-orange-950/50 border border-orange-300" />
-            <span className="text-base font-bold text-muted-foreground">최저가</span>
+        <div className="flex items-center gap-3 px-3 py-2 border-t border-border bg-muted/5">
+          <div className="flex items-center gap-1">
+            <div className="size-2.5 rounded bg-orange-100 border border-orange-300" />
+            <span className="text-[10px] font-bold text-muted-foreground">최저가</span>
           </div>
-          <div className="flex items-center gap-1.5">
-            <div className="size-3.5 rounded-full bg-blue-600" />
-            <span className="text-base font-bold text-muted-foreground">오늘</span>
+          <div className="flex items-center gap-1">
+            <div className="size-2.5 rounded-full bg-blue-600" />
+            <span className="text-[10px] font-bold text-muted-foreground">오늘</span>
           </div>
-          {priceView === 'total' && (
-            <span className="text-sm font-medium text-muted-foreground ml-auto">* 가는편+오는편 모두 있는 날만 표시</span>
-          )}
         </div>
       </div>
-
-      {/* 날짜 클릭 시 히스토리 패널 */}
-      {selectedDay && (
-        <DateHistoryPanel
-          selectedDay={selectedDay}
-          yearMonth={yearMonth}
-          onClose={() => setSelectedDay(null)}
-        />
-      )}
     </section>
   );
 }
@@ -392,45 +413,73 @@ function FlightCalendarGrid({
 function DateHistoryPanel({
   selectedDay,
   yearMonth,
-  onClose,
+  containerRef,
 }: {
   selectedDay: SelectedDay;
   yearMonth: string;
-  onClose: () => void;
+  containerRef: React.RefObject<HTMLDivElement | null>;
 }) {
-  const dateLabel = dayjs(`${yearMonth}-${String(selectedDay.day).padStart(2, '0')}`).format('M월 D일 (ddd)');
-
   return (
-    <div className="mt-4 bg-card border-2 border-border rounded-xl p-6 flex flex-col gap-4 shadow-lg animate-in fade-in slide-in-from-top-4 duration-300">
-      <div className="flex items-center justify-between border-b border-border pb-3">
-        <p className="text-xl font-black text-foreground">{dateLabel} 상세 가격 히스토리</p>
-        <button onClick={onClose} className="p-1 rounded-full hover:bg-muted text-muted-foreground hover:text-foreground transition-all">
-          <X className="size-5" />
-        </button>
-      </div>
+    <LiquidGlass
+      mouseContainer={containerRef}
+      mode="prominent"
+      cornerRadius={20}
+      blurAmount={0.18}
+      displacementScale={60}
+      saturation={140}
+      aberrationIntensity={1.5}
+      overLight={false}
+    >
+      <div style={{ width: 320 }} className="flex flex-col justify-center gap-5 p-6">
+        {/*
+          key={selectedDay.day} → 날짜 이동 시 콘텐츠만 페이드 전환.
+          글라스 패널(LiquidGlass)은 그대로 유지되므로 깜빡임 없음.
+        */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={selectedDay.day}
+            className="flex flex-col gap-5"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.15, ease: 'easeOut' }}
+          >
+            {/* 헤더 */}
+            <div className="border-b border-white/25 pb-3">
+              <p className="text-base font-black text-white tracking-tight drop-shadow">
+                {dayjs(`${yearMonth}-${String(selectedDay.day).padStart(2, '0')}`).format('M월 D일 (ddd)')}
+              </p>
+              <p className="text-[11px] text-white/70 mt-0.5">수집 시점별 가격 히스토리</p>
+            </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <HistoryCard label="가는편" entry={selectedDay.outbound} />
-        <HistoryCard label="오는편" entry={selectedDay.inbound} />
-      </div>
+            {/* 가는편 / 오는편 */}
+            <div className="grid grid-cols-2 gap-4">
+              <HistoryCard label="가는편" entry={selectedDay.outbound} />
+              <HistoryCard label="오는편" entry={selectedDay.inbound} />
+            </div>
 
-      {selectedDay.outbound && selectedDay.inbound && (
-        <div className="flex items-center justify-between bg-blue-50 dark:bg-blue-950/20 rounded-xl p-4 border border-blue-100 dark:border-blue-900">
-          <span className="text-base font-bold text-slate-600 dark:text-slate-400">총 합계 (왕복)</span>
-          <span className="text-xl font-black text-blue-600 dark:text-blue-400">
-            {(selectedDay.outbound.price + selectedDay.inbound.price).toLocaleString()}원
-          </span>
-        </div>
-      )}
-    </div>
+            {/* 왕복 합계 */}
+            {selectedDay.outbound && selectedDay.inbound && (
+              <div className="flex items-center justify-between rounded-xl px-4 py-3 border border-blue-300/40 bg-blue-400/20">
+                <span className="text-xs font-bold text-white/80">왕복 합계</span>
+                <span className="text-lg font-black text-blue-200 drop-shadow">
+                  {(selectedDay.outbound.price + selectedDay.inbound.price).toLocaleString()}원
+                </span>
+              </div>
+            )}
+          </motion.div>
+        </AnimatePresence>
+      </div>
+    </LiquidGlass>
   );
 }
 
 function HistoryCard({ label, entry }: { label: string; entry: DailyPriceEntry | undefined }) {
   if (!entry) {
     return (
-      <div className="bg-muted/50 rounded-xl p-6 flex items-center justify-center border border-dashed border-border">
-        <p className="text-base font-bold text-muted-foreground italic">데이터 정보 없음</p>
+      <div className="rounded-xl p-3 text-[10px] text-white/50 text-center border border-dashed border-white/20"
+        style={{ background: 'rgba(255,255,255,0.05)' }}>
+        데이터 없음
       </div>
     );
   }
@@ -439,47 +488,53 @@ function HistoryCard({ label, entry }: { label: string; entry: DailyPriceEntry |
   const oldest = history[history.length - 1];
   const diff = oldest ? entry.price - oldest.price : 0;
   const isDown = diff < 0;
+  const isUp = diff > 0;
 
   return (
-    <div className="bg-muted/30 rounded-xl p-5 flex flex-col gap-3 border border-border">
+    <div className="rounded-xl p-3 flex flex-col gap-2 border border-white/20"
+      style={{ background: 'rgba(255,255,255,0.1)' }}>
+      {/* 라벨 + 현재가 */}
       <div className="flex items-center justify-between">
-        <span className="text-lg font-black text-slate-700 dark:text-slate-300">{label}</span>
-        <span className="text-xl font-black text-foreground">{entry.price.toLocaleString()}원</span>
+        <span className="text-[11px] font-black text-white/80">{label}</span>
+        <span className="text-sm font-black text-white drop-shadow">{entry.price.toLocaleString()}원</span>
       </div>
 
+      {/* 히스토리 행 */}
       {history.length > 0 && (
-        <>
-          <div className="flex flex-col gap-2 bg-background/50 rounded-lg p-3">
-            {history.map((h) => (
-              <div key={h.collected_date} className="flex items-center justify-between">
-                <span className="text-base font-medium text-muted-foreground">{h.label}</span>
-                <span className="text-base font-bold text-muted-foreground">{h.price.toLocaleString()}원</span>
-              </div>
-            ))}
-          </div>
+        <div className="flex flex-col gap-1 rounded-lg p-2"
+          style={{ background: 'rgba(0,0,0,0.15)' }}>
+          {history.map((h, idx) => (
+            <div key={h.collected_date} className="flex items-center justify-between text-[10px]">
+              <span className={cn('font-medium', idx === 0 ? 'text-white/90' : 'text-white/55')}>{h.label}</span>
+              <span className={cn('font-bold', idx === 0 ? 'text-white' : 'text-white/55')}>{h.price.toLocaleString()}원</span>
+            </div>
+          ))}
+        </div>
+      )}
 
-          {oldest && diff !== 0 && (
-            <div className={cn(
-              'flex items-center gap-2 text-base font-black pt-2 border-t border-border/60',
-              isDown ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400',
-            )}>
-              {isDown ? <TrendingDown className="size-4" /> : <TrendingUp className="size-4" />}
-              <span>2주 전 대비 {Math.abs(diff).toLocaleString()}원 {isDown ? '하락' : '상승'}</span>
-            </div>
-          )}
-          {diff === 0 && oldest && (
-            <div className="flex items-center gap-2 text-base font-black text-muted-foreground pt-2 border-t border-border/60">
-              <Minus className="size-4" />
-              <span>2주 전 가격과 동일</span>
-            </div>
-          )}
-        </>
+      {/* 2주 전 대비 변동 */}
+      {oldest && (
+        <div className={cn(
+          'flex items-center gap-1 text-[10px] font-bold pt-1 border-t border-white/15',
+          isDown && 'text-emerald-300',
+          isUp && 'text-red-300',
+          !isDown && !isUp && 'text-white/60',
+        )}>
+          {isDown && <TrendingDown className="size-3 shrink-0" />}
+          {isUp && <TrendingUp className="size-3 shrink-0" />}
+          {!isDown && !isUp && <Minus className="size-3 shrink-0" />}
+          <span>
+            {isDown && `2주 전보다 ${Math.abs(diff).toLocaleString()}원 저렴`}
+            {isUp && `2주 전보다 ${Math.abs(diff).toLocaleString()}원 상승`}
+            {!isDown && !isUp && '2주 전과 동일'}
+          </span>
+        </div>
       )}
     </div>
   );
 }
 
-// ─── 섹션 3: 6개월 추이 차트 (토글 + 스마트 Y축) ─────────────────────────────
+// ─── 섹션 3: 6개월 추이 차트 ────────────────────────────────────────────────
 
 type TrendView = 'flight' | 'hotel';
 
@@ -506,83 +561,55 @@ function TrendSection({ isLoading, trend }: { isLoading: boolean; trend: FlightT
 
   const lineColor = trendView === 'flight' ? '#3b82f6' : '#10b981';
 
+  if (isLoading) return <Skeleton className="w-full h-80 rounded-xl" />;
+
   return (
-    <section aria-label="6개월 가격 추이">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-xl font-black text-foreground">6개월 가격 추이</h3>
-        <div className="flex items-center gap-3">
-          {cheapestMonth && trendView === 'flight' && (
-            <div className="inline-flex items-center gap-1.5 bg-blue-500 text-white text-sm font-bold rounded-full px-3 py-1 shadow-sm">
-              <span>최저 {dayjs(cheapestMonth.year_month + '-01').format('M월')}</span>
-              <span>{cheapestMonth.avg_flight_price.toLocaleString()}원</span>
-            </div>
-          )}
-          <div className="flex rounded-lg overflow-hidden border-2 border-border text-base font-bold">
-            <button
-              onClick={() => setTrendView('flight')}
-              className={cn(
-                'px-3.5 py-1.5 transition-colors flex items-center gap-1.5',
-                trendView === 'flight' ? 'bg-blue-600 text-white' : 'bg-card text-muted-foreground hover:bg-muted',
-              )}
-            >
-              <Plane className="size-4" /> 항공권
-            </button>
-            <button
-              onClick={() => setTrendView('hotel')}
-              className={cn(
-                'px-3.5 py-1.5 transition-colors flex items-center gap-1.5',
-                trendView === 'hotel' ? 'bg-emerald-600 text-white' : 'bg-card text-muted-foreground hover:bg-muted',
-              )}
-            >
-              <Hotel className="size-4" /> 숙박비
-            </button>
-          </div>
+    <section aria-label="6개월 가격 추이" className="h-full flex flex-col">
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-lg font-black text-foreground">6개월 가격 추이</h3>
+        <div className="flex gap-1 bg-muted p-0.5 rounded-lg text-[10px]">
+          <button
+            onClick={() => setTrendView('flight')}
+            className={cn('px-2 py-1 rounded-md transition-all', trendView === 'flight' ? 'bg-white shadow-sm font-bold' : 'text-muted-foreground')}
+          >
+            항공권
+          </button>
+          <button
+            onClick={() => setTrendView('hotel')}
+            className={cn('px-2 py-1 rounded-md transition-all', trendView === 'hotel' ? 'bg-white shadow-sm font-bold' : 'text-muted-foreground')}
+          >
+            숙박비
+          </button>
         </div>
       </div>
 
-      {isLoading ? (
-        <Skeleton className="w-full h-56 rounded-xl" />
-      ) : chartData.length === 0 ? (
-        <EmptyState message="추이 데이터가 없습니다." />
-      ) : (
-        <div className="bg-card border border-border rounded-xl p-4 shadow-sm">
-          <ResponsiveContainer width="100%" height={220}>
-            <LineChart data={chartData} margin={{ top: 10, right: 10, left: -5, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-              <XAxis 
-                dataKey="month" 
-                tick={{ fontSize: 13, fontWeight: 600, fill: '#64748b' }} 
-                tickLine={false}
-                axisLine={false}
-                dy={10}
-              />
+      <div className="bg-card border border-border rounded-xl p-4 shadow-sm flex-1 flex flex-col justify-center">
+        {cheapestMonth && trendView === 'flight' && (
+          <div className="mb-3 text-[11px] font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full self-start">
+            최저: {dayjs(cheapestMonth.year_month + '-01').format('M월')} ({cheapestMonth.avg_flight_price.toLocaleString()}원)
+          </div>
+        )}
+        <div className="h-[240px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={chartData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+              <XAxis dataKey="month" tick={{ fontSize: 11, fontWeight: 600, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
               <YAxis
-                tick={{ fontSize: 13, fontWeight: 600, fill: '#64748b' }}
+                tick={{ fontSize: 11, fontWeight: 600, fill: '#94a3b8' }}
                 domain={domain}
                 tickFormatter={(v) => `${Math.round(Number(v) / 10000)}만`}
-                tickLine={false}
                 axisLine={false}
-                dx={-5}
+                tickLine={false}
               />
               <Tooltip
-                contentStyle={{ fontSize: 14, borderRadius: 12, fontWeight: 600, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', border: 'none' }}
-                formatter={(value) => [
-                  typeof value === 'number' ? `${value.toLocaleString()}원` : String(value),
-                  trendView === 'flight' ? '항공권' : '숙박비',
-                ]}
+                contentStyle={{ fontSize: 12, borderRadius: 12, border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                formatter={(v) => [`${Number(v).toLocaleString()}원`, trendView === 'flight' ? '항공권' : '숙박비']}
               />
-              <Line
-                type="monotone"
-                dataKey="가격"
-                stroke={lineColor}
-                strokeWidth={3}
-                dot={{ r: 5, fill: lineColor, strokeWidth: 0 }}
-                activeDot={{ r: 8, strokeWidth: 2, stroke: '#fff' }}
-              />
+              <Line type="monotone" dataKey="가격" stroke={lineColor} strokeWidth={3} dot={{ r: 4, fill: lineColor, strokeWidth: 0 }} activeDot={{ r: 6 }} />
             </LineChart>
           </ResponsiveContainer>
         </div>
-      )}
+      </div>
     </section>
   );
 }
