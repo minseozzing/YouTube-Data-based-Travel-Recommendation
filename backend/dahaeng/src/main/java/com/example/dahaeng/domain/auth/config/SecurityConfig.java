@@ -1,11 +1,14 @@
 package com.example.dahaeng.domain.auth.config;
 
+import com.example.dahaeng.domain.auth.jwt.JwtExceptionFilter;
 import com.example.dahaeng.domain.auth.jwt.JwtFilter;
 import com.example.dahaeng.domain.auth.jwt.JwtProperties;
 import com.example.dahaeng.domain.auth.jwt.JwtUtil;
 import com.example.dahaeng.domain.auth.oauth2.CustomSuccessHandler;
 import com.example.dahaeng.domain.auth.service.CustomOAuth2UserService;
 import com.example.dahaeng.domain.member.repository.MemberRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -35,6 +38,7 @@ public class SecurityConfig {
     private final JwtUtil jwtUtil;
     private final MemberRepository memberRepository;
     private final ClientRegistrationRepository clientRegistrationRepository;
+    private final ObjectMapper objectMapper;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -69,6 +73,8 @@ public class SecurityConfig {
         // 3. JwtFilter 추가 (UsernamePasswordAuthenticationFilter 이전에 실행)
         http
                 .addFilterBefore(new JwtFilter(jwtUtil, memberRepository), UsernamePasswordAuthenticationFilter.class);
+        http
+                .addFilterBefore(new JwtExceptionFilter(objectMapper), JwtFilter.class);
 
         // 4. OAuth2 로그인 설정
         http
