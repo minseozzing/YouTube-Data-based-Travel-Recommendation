@@ -91,7 +91,8 @@ public class SecurityConfig {
                                 "/api/auth/exchange",
                                   "/api/cost/**",
                             "/api/exchange-rate/**",
-                                "/api/city"
+                                "/api/city",
+                                "/api/city/*"
                         ).permitAll()
                         .anyRequest().authenticated());
 
