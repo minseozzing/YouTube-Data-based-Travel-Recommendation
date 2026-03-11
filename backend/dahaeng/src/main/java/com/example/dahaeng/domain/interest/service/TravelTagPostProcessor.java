@@ -1,7 +1,7 @@
 package com.example.dahaeng.domain.interest.service;
 
-import com.example.dahaeng.domain.interest.constant.TravelTagCatalog;
 import com.example.dahaeng.domain.interest.dto.TravelTagScore;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -10,8 +10,11 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class TravelTagPostProcessor {
 
+    private final TravelTagProvider tagProvider;
+    
     // 임계값을 낮추어 더 많은 추론 결과를 수용합니다.
     private static final double MIN_CONFIDENCE_THRESHOLD = 0.3; 
     private static final double MIN_SCORE_THRESHOLD = 0.3;      
@@ -32,7 +35,7 @@ public class TravelTagPostProcessor {
             String category = t.getCategory().trim();
             String tag = t.getTag().trim();
             
-            if (!TravelTagCatalog.isValid(category, tag)) {
+            if (!tagProvider.isValid(category, tag)) {
                 log.info(">>> [REJECT] Tag '{}' in category '{}' is not in our allowed catalog.", tag, category);
                 continue;
             }

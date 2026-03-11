@@ -29,14 +29,18 @@ import java.util.Map;
 public class InterestResultSaver {
 
     private final YouTubeAccountRepository accountRepository;
+    // [DELETE_START] (아래 1줄 삭제)
     private final YoutubeInterestRepository interestRepository;
+    // [DELETE_END]
     private final YoutubeInterestKeywordRepository keywordRepository;
     private final YouTubeTravelTagRepository travelTagRepository;
 
     @Transactional
     public void save(Long accountId,
                      List<InterestKeywordCandidate> keywords,
+                     // [DELETE_START] (아래 1줄 삭제)
                      Map<InterestCategory, Double> categories,
+                     // [DELETE_END]
                      List<TravelTagScore> travelTags) {
 
         // 1. 연동 계정 조회
@@ -45,7 +49,9 @@ public class InterestResultSaver {
 
         // 2. 기존 분석 결과 초기화 (삭제 후 재삽입)
         keywordRepository.deleteByAccount_Id(accountId);
-        interestRepository.deleteByAccount_Id(accountId);
+        // [DELETE_START] (아래 1줄 삭제)
+        // interestRepository.deleteByAccount_Id(accountId); // 단계적 폐쇄를 위해 주석 처리
+        // [DELETE_END]
         travelTagRepository.deleteByAccount_Id(accountId);
 
         LocalDateTime now = LocalDateTime.now();
@@ -66,6 +72,8 @@ public class InterestResultSaver {
         }
 
         // 4. 관심 카테고리(Category) 점수 기반 정렬 및 저장
+        // [DELETE_START] (아래 블록 전체 삭제)
+        /* 단계적 폐쇄를 위해 주석 처리
         if (categories != null) {
             List<Map.Entry<InterestCategory, Double>> sorted = categories.entrySet().stream()
                     .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
@@ -84,6 +92,8 @@ public class InterestResultSaver {
                 interestRepository.save(interest);
             }
         }
+        */
+        // [DELETE_END]
 
         // 5. [신규] 여행 취향 태그(Travel Tags) 저장
         if (travelTags != null && !travelTags.isEmpty()) {
