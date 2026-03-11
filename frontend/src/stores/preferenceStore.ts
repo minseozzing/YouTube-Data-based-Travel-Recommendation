@@ -5,11 +5,13 @@ interface PreferenceState {
   duration: number | null;
   selectedTags: string[];
   riskSensitivity: number;
+  youtubeAutoSelected: boolean;
 
   setBudget: (v: number) => void;
   setDuration: (v: number) => void;
   toggleTag: (tag: string) => void;
   setRiskSensitivity: (v: number) => void;
+  setYoutubeAutoSelected: (v: boolean) => void;
   reset: () => void;
 }
 
@@ -18,6 +20,7 @@ const initialState = {
   duration: null,
   selectedTags: [] as string[],
   riskSensitivity: 3,
+  youtubeAutoSelected: false,
 };
 
 export const usePreferenceStore = create<PreferenceState>((set, get) => ({
@@ -31,5 +34,6 @@ export const usePreferenceStore = create<PreferenceState>((set, get) => ({
     });
   },
   setRiskSensitivity: (v) => set({ riskSensitivity: v }),
+  setYoutubeAutoSelected: (v) => set({ youtubeAutoSelected: v }),
   reset: () => set(initialState),
 }));

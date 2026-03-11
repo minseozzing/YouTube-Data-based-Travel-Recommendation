@@ -10,6 +10,7 @@ interface AuthenticatedLayoutProps {
 const AuthenticatedLayout = ({ children }: AuthenticatedLayoutProps) => {
   const pathname = useLocation({ select: (l) => l.pathname });
   const isMain = pathname === "/main";
+  const isMyPage = pathname === "/mypage";
 
   return (
     <div
@@ -17,7 +18,7 @@ const AuthenticatedLayout = ({ children }: AuthenticatedLayoutProps) => {
     >
       <UnifiedNavBar />
       <main style={{ flex: 1 }}>{children}</main>
-      {!isMain && <Footer />}
+      {!isMain && !isMyPage && <Footer />}
     </div>
   );
 };

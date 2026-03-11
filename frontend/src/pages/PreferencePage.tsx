@@ -9,11 +9,12 @@ import {
   ArrowRight,
   Check,
   Circle,
+  RefreshCw,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TagCategorySection } from "@/components/preference/TagCategorySection";
 import { usePreferenceStore } from "@/stores/preferenceStore";
-import { useSubmitPreference } from "@/hooks/auth/usePreference";
+import { useSubmitPreference, useUpdatePreference } from "@/hooks/auth/usePreference";
 import { cn } from "@/lib/utils";
 
 // ---------------------------------------------------------------------------
@@ -204,12 +205,14 @@ function SelectionCounter({ count }: SelectionCounterProps) {
 // Main Page
 // ---------------------------------------------------------------------------
 
-const PreferencePage = () => {
-  const { selectedTags, toggleTag } = usePreferenceStore();
-  const { mutate: submit, isPending } = useSubmitPreference();
+const PreferencePage = ({ isEdit = false }: { isEdit?: boolean }) => {
+  const { selectedTags, toggleTag, youtubeAutoSelected } = usePreferenceStore();
+  const submitResult = useSubmitPreference();
+  const updateResult = useUpdatePreference();
+  const { mutate, isPending } = isEdit ? updateResult : submitResult;
 
   const handleSubmit = () => {
-    submit(selectedTags);
+    mutate(selectedTags);
   };
 
   return (
@@ -316,6 +319,30 @@ const PreferencePage = () => {
                 />
               </div>
             </header>
+
+            {/* YouTube 자동 선택 배너 */}
+            {youtubeAutoSelected && (
+              <div className="mb-6 flex items-center gap-3 p-3.5 rounded-xl bg-slate-800/80 border border-slate-700">
+                <div className="size-9 rounded-full bg-red-500 flex items-center justify-center shrink-0">
+                  <svg viewBox="0 0 24 24" className="size-4 fill-white" aria-hidden="true">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-sm font-medium text-white">
+                      YouTube 활동을 바탕으로 일부 태그가 자동 선택되었습니다.
+                    </p>
+                    <button type="button" className="flex items-center gap-1 text-xs text-white/50 hover:text-white/80 transition-colors shrink-0">
+                      <RefreshCw className="size-3" /> 업데이트하기
+                    </button>
+                  </div>
+                  <p className="text-xs text-white/50 mt-0.5">
+                    사용자의 시청 기록을 분석하여 취향을 반영했습니다. 자유롭게 수정 가능합니다.
+                  </p>
+                </div>
+              </div>
+            )}
 
             {/* Tag Category Sections */}
             <motion.div

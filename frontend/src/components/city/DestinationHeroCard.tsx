@@ -16,6 +16,8 @@ import {
 } from "lucide-react";
 import { useUiStore } from "@/stores/uiStore";
 import { useCreateBookmark } from "@/hooks/bookmark/useCreateBookmark";
+import { useDeleteBookmark } from "@/hooks/bookmark/useDeleteBookmark";
+import { useBookmarkList } from "@/hooks/bookmark/useBookmarkList";
 import { cn } from "@/lib/utils";
 import type { CityDetail } from "@/schemas/city.schema";
 
@@ -42,22 +44,67 @@ function getKeywordIcon(keyword: string): LucideIcon {
   return Tag;
 }
 
+interface BookmarkButtonProps {
+  city: CityDetail;
+}
+
+function BookmarkButton({ city }: BookmarkButtonProps) {
+  const { mutate: createBookmark, isPending: isCreating } = useCreateBookmark();
+  const { mutate: deleteBookmark, isPending: isDeleting } = useDeleteBookmark();
+  const { data: bookmarkList } = useBookmarkList();
+
+  const bookmarkedItem = bookmarkList?.find((b) => b.cityId === city.cityId);
+  const isBookmarked = !!bookmarkedItem;
+  const isPending = isCreating || isDeleting;
+
+  const handleToggle = () => {
+    if (isBookmarked && bookmarkedItem?.bookmarkId !== undefined) {
+      deleteBookmark(bookmarkedItem.bookmarkId);
+    } else {
+      createBookmark({
+        country: city.countryName,
+        city: city.cityName,
+        json: JSON.stringify(city),
+      });
+    }
+  };
+
+  return (
+    <button
+      onClick={handleToggle}
+      disabled={isPending}
+      aria-label={isBookmarked ? "저장 취소" : "저장하기"}
+      className={cn(
+        "w-14 h-14 rounded-full border-[3px] bg-blue-500/20",
+        "flex items-center justify-center shrink-0",
+        "active:scale-95 transition-all duration-150",
+        "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300/60",
+        isBookmarked
+          ? "border-pink-400/80 hover:bg-pink-500/30"
+          : "border-blue-400/80 hover:bg-blue-500/40",
+        isPending && "opacity-70 cursor-not-allowed",
+      )}
+    >
+      {isPending ? (
+        <Loader2 className="size-5 text-white animate-spin" />
+      ) : (
+        <Heart
+          className={cn(
+            "size-5 text-white transition-all",
+            isBookmarked && "fill-white",
+          )}
+        />
+      )}
+    </button>
+  );
+}
+
 interface MatchCardProps {
   score: number;
   city: CityDetail;
 }
 
 function MatchCard({ score, city }: MatchCardProps) {
-  const { mutate: createBookmark, isPending } = useCreateBookmark();
-
-  const handleSave = () => {
-    createBookmark({
-      country: city.countryName,
-      city: city.cityName,
-      json: JSON.stringify(city),
-    });
-  };
-
   return (
     <div className="backdrop-blur-md bg-white/10 border border-white/20 rounded-xl p-3.5 flex items-center justify-between gap-3">
       <div className="flex flex-col gap-0.5">
@@ -68,24 +115,7 @@ function MatchCard({ score, city }: MatchCardProps) {
           {score}%
         </span>
       </div>
-      <button
-        onClick={handleSave}
-        disabled={isPending}
-        aria-label="저장하기"
-        className={cn(
-          "w-14 h-14 rounded-full border-[3px] border-blue-400/80 bg-blue-500/20",
-          "flex items-center justify-center shrink-0",
-          "hover:bg-blue-500/40 active:scale-95 transition-all duration-150",
-          "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300/60",
-          isPending && "opacity-70 cursor-not-allowed",
-        )}
-      >
-        {isPending ? (
-          <Loader2 className="size-5 text-white animate-spin" />
-        ) : (
-          <Heart className="size-5 text-white" />
-        )}
-      </button>
+      <BookmarkButton city={city} />
     </div>
   );
 }
@@ -192,9 +222,13 @@ export function DestinationHeroCard({
           <p className="text-sm text-white/70 mt-1">{city.countryName}</p>
         </div>
 
-        {/* Glassmorphism matching score card */}
-        {city.matchingScore !== undefined && (
+        {/* 매칭 스코어 + 하트 버튼 */}
+        {city.matchingScore !== undefined ? (
           <MatchCard score={city.matchingScore} city={city} />
+        ) : (
+          <div className="flex justify-end">
+            <BookmarkButton city={city} />
+          </div>
         )}
 
         {/* Glassmorphism keyword tags */}

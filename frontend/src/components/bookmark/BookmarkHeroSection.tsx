@@ -1,5 +1,5 @@
-import type { BookmarkDetail } from '@/schemas/bookmark.schema';
-import { MatchScoreBadge } from './MatchScoreBadge';
+import type { BookmarkDetail } from "@/schemas/bookmark.schema";
+import { MatchScoreBadge } from "./MatchScoreBadge";
 
 interface BookmarkHeroSectionProps {
   data: BookmarkDetail;
@@ -7,7 +7,10 @@ interface BookmarkHeroSectionProps {
 
 export function BookmarkHeroSection({ data }: BookmarkHeroSectionProps) {
   return (
-    <section className="relative h-[400px] w-full overflow-hidden" aria-label="도시 히어로 섹션">
+    <section
+      className="relative h-[300px] w-full overflow-hidden"
+      aria-label="도시 히어로 섹션"
+    >
       {/* 배경 이미지 */}
       <img
         src={data.imgUrl}
@@ -30,7 +33,7 @@ export function BookmarkHeroSection({ data }: BookmarkHeroSectionProps) {
 
       {/* 우상단 매칭 점수 배지 */}
       {data.matchingScore !== undefined && (
-        <div className="absolute right-8 top-8">
+        <div className="absolute right-8 bottom-8">
           <MatchScoreBadge score={data.matchingScore} />
         </div>
       )}
