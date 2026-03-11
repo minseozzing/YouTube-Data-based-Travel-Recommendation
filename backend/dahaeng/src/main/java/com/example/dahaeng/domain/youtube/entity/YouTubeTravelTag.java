@@ -1,0 +1,42 @@
+package com.example.dahaeng.domain.youtube.entity;
+
+import com.example.dahaeng.global.entity.BaseEntity;
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.time.LocalDateTime;
+
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
+@Entity
+@Table(name = "youtube_travel_tag")
+public class YouTubeTravelTag extends BaseEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "account_id", nullable = false)
+    private YouTubeAccount account;
+
+    @Column(name = "tag_name", length = 50, nullable = false)
+    private String tagName;
+
+    @Column(name = "category_name", length = 50, nullable = false)
+    private String categoryName;
+
+    @Column(name = "score", nullable = false)
+    private Double score;
+
+    @Column(name = "confidence", nullable = false)
+    private Double confidence;
+
+    @Column(name = "reason", length = 500)
+    private String reason;
+
+    @Column(name = "analyzed_at", nullable = false)
+    private LocalDateTime analyzedAt;
+}

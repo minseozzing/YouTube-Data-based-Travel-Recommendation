@@ -15,4 +15,5 @@ public class InterestAnalysisResult {
     private Long accountId;
     private List<InterestKeywordCandidate> keywords;
     private Map<InterestCategory, Double> categories;
+    private List<TravelTagScore> travelTags;
 }

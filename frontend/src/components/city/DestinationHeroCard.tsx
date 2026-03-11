@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { motion } from "framer-motion";
 import {
   ArrowLeft,
   Heart,
@@ -10,6 +11,7 @@ import {
   Compass,
   BookOpen,
   Tag,
+  AlertTriangle,
   type LucideIcon,
 } from "lucide-react";
 import { useUiStore } from "@/stores/uiStore";
@@ -118,6 +120,11 @@ export function DestinationHeroCard({
   const [imgError, setImgError] = useState(false);
   const { closeCityModal } = useUiStore();
 
+  // API의 tags(객체 배열)를 우선 사용하고, 없으면 keywords(문자열 배열) 사용
+  const displayKeywords = city.tags 
+    ? city.tags.map(t => t.name) 
+    : (city.keywords ?? []);
+
   return (
     <div
       className={cn(
@@ -142,20 +149,34 @@ export function DestinationHeroCard({
       {/* Gradient overlay — stronger at bottom for readability */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-black/10" />
 
-      {/* Back button */}
-      <div className="relative z-10 flex items-start p-4">
-        <button
-          onClick={closeCityModal}
-          aria-label="뒤로 가기"
-          className={cn(
-            "flex items-center gap-1.5 text-xs text-white/80 hover:text-white",
-            "backdrop-blur-md bg-black/20 hover:bg-black/40 border border-white/10 rounded-lg px-2.5 py-1.5",
-            "transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50",
-          )}
-        >
-          <ArrowLeft className="size-3" />
-          뒤로가기
-        </button>
+      {/* Top section: Back button & Danger Info */}
+      <div className="relative z-10 flex flex-col p-4 gap-3">
+        <div className="flex items-start">
+          <button
+            onClick={closeCityModal}
+            aria-label="뒤로 가기"
+            className={cn(
+              "flex items-center gap-1.5 text-xs text-white/80 hover:text-white",
+              "backdrop-blur-md bg-black/20 hover:bg-black/40 border border-white/10 rounded-lg px-2.5 py-1.5",
+              "transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50",
+            )}
+          >
+            <ArrowLeft className="size-3" />
+            뒤로가기
+          </button>
+        </div>
+
+        {/* Danger Alert Section */}
+        {city.danger && (
+          <motion.div 
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="flex items-center gap-2 px-3 py-2 bg-amber-500/20 backdrop-blur-md border border-amber-500/40 rounded-xl text-amber-200"
+          >
+            <AlertTriangle className="size-4 shrink-0 text-amber-400" />
+            <span className="text-xs font-bold leading-tight">{city.danger}</span>
+          </motion.div>
+        )}
       </div>
 
       {/* Spacer */}
@@ -177,8 +198,8 @@ export function DestinationHeroCard({
         )}
 
         {/* Glassmorphism keyword tags */}
-        {city.keywords && city.keywords.length > 0 && (
-          <KeywordTags keywords={city.keywords} />
+        {displayKeywords.length > 0 && (
+          <KeywordTags keywords={displayKeywords} />
         )}
       </div>
     </div>
