@@ -4,9 +4,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.stream.Collectors;
 
@@ -72,6 +74,45 @@ public class GlobalExceptionHandler {
                         message,
                         path
                 ));
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNoResourceFoundException(
+        Exception e,
+        HttpServletRequest request
+    ) {
+        ErrorCode code = ErrorCode.NOT_FOUND;
+        String path = request.getRequestURI();
+
+        log.error("[UNHANDLED] code={} path={}", code.name(), path, e);
+
+        return ResponseEntity.status(code.getStatus())
+            .body(ErrorResponse.of(
+                code.getStatus().value(),
+                code.name(),
+                "잘못된 요청 경로입니다.",
+                path
+            ));
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ErrorResponse> handleHttpRequestMethodNotSupportedException(
+        Exception e,
+        HttpServletRequest request
+    ) {
+
+        ErrorCode code = ErrorCode.METHOD_NOT_ALLOWED;
+        String path = request.getRequestURI();
+
+        log.error("[UNHANDLED] code={} path={}", code.name(), path, e);
+
+        return ResponseEntity.status(code.getStatus())
+            .body(ErrorResponse.of(
+                code.getStatus().value(),
+                code.name(),
+                code.getDefaultMessage(),
+                path
+            ));
     }
 
     // 그 외 모든 예외
