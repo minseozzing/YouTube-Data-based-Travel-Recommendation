@@ -22,4 +22,26 @@ public interface LivingCostOfCityRepository extends JpaRepository<LivingCostOfCi
 		"""
 	)
 	List<LivingCostOfCity> findAllInCities(List<City> cities);
+
+	@Query(
+		"""
+		select lcc
+		from LivingCostOfCity lcc join fetch lcc.city join fetch lcc.city.country
+		where lcc.isDeleted = false
+			and lower(lcc.city.country.countryName) like concat('%', :keyword, '%') 
+		order by lcc.dailyBudget asc
+		"""
+	)
+	List<LivingCostOfCity> findAllByCountryKeywordOrderByDailyBudgetAsc(String keyword);
+
+	@Query(
+		"""
+		select lcc
+		from LivingCostOfCity lcc join fetch lcc.city join fetch lcc.city.country
+		where lcc.isDeleted = false
+			and lower(lcc.city.country.countryName) like concat('%', :keyword, '%') 
+		order by lcc.dailyBudget desc
+		"""
+	)
+	List<LivingCostOfCity> findAllByCountryKeywordOrderByDailyBudgetDesc(String keyword);
 }

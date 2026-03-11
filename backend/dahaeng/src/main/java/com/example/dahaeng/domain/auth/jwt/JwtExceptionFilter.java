@@ -18,11 +18,22 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
 @RequiredArgsConstructor
 public class JwtExceptionFilter extends OncePerRequestFilter {
 
 	private final ObjectMapper objectMapper;
+	private final RequestMatcher publicPathMatcher;
+
+	@Override
+	protected boolean shouldNotFilter(HttpServletRequest request) {
+		if (HttpMethod.OPTIONS.matches(request.getMethod())) {
+			return true;
+		}
+		return publicPathMatcher.matches(request);
+	}
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,

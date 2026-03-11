@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 
 import com.example.dahaeng.domain.city.entity.City;
 
-public record CityListResponse(
+public record CityResponse(
 	Long cityId,
 	String cityName,
 	Long countryId,
@@ -13,8 +13,8 @@ public record CityListResponse(
 	BigDecimal lat,
 	BigDecimal lon
 ) {
-	public static CityListResponse from(City city) {
-		return new CityListResponse(
+	public static CityResponse from(City city) {
+		return new CityResponse(
 			city.getId(),
 			city.getCityName(),
 			city.getCountry().getId(),
