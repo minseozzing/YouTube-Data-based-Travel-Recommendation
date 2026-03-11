@@ -353,8 +353,9 @@ const LoginCardContent = () => {
     setUser({
       id: 1,
       email: "dev@dahaeng.com",
-      name: "개발자",
-      profileImageUrl: "",
+      nickname: "개발자",
+      profileImageUrl: null,
+      role: "ROLE_USER",
     });
     setHasCompletedPreference(true);
     navigate({ to: "/main" });

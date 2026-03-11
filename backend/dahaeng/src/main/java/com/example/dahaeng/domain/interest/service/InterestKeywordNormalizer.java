@@ -30,7 +30,7 @@ public class InterestKeywordNormalizer {
                     .sourceType(token.getSourceType())
                     .sourceTypes(Set.of(token.getSourceType()))
                     .latestSignalTime(token.getSignalTime())
-                    .totalScore(0.0)
+                    .score(0.0)
                     .totalCount(1)
                     .distinctSourceCount(1)
                     .build());

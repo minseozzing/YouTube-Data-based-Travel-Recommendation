@@ -16,9 +16,10 @@ import lombok.*;
 public class LivingCostOfCity extends BaseEntity {
 
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@OneToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "city_id", nullable = false)
 	private City city;
 

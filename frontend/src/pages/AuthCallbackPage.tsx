@@ -12,20 +12,14 @@ const AuthCallbackPage = () => {
   const { setAccessToken, setUser, setHasCompletedPreference } = useAuthStore();
 
   const { mutate: processCallback, isError, error } = useMutation({
-    mutationFn: (authCode: string) => authApi.googleCallback(authCode),
-    onSuccess: ({ accessToken, user }) => {
+    mutationFn: (authCode: string) => authApi.exchangeCode(authCode),
+    onSuccess: (data) => {
+      const { accessToken, member } = data;
       setAccessToken(accessToken);
-      setUser({
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        profileImageUrl: user.profileImageUrl,
-      });
-      setHasCompletedPreference(user.hasCompletedPreference);
-
-      navigate({
-        to: user.hasCompletedPreference ? '/main' : '/preference',
-      });
+      setUser(member);
+      
+      // 현재 백엔드 사양에는 취향 완료 여부가 포함되지 않으므로 /main으로 이동
+      navigate({ to: '/main' });
     },
     onError: () => {
       navigate({ to: '/login' });
