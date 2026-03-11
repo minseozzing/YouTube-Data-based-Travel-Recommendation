@@ -23,7 +23,9 @@ public class InterestAnalysisService {
     private final KeywordExtractionEngine extractionEngine;
     private final TravelTagInferenceClient aiClient;
     private final TravelTagValidator validator;
+    // [DELETE_START] (아래 1줄 삭제)
     private final InterestCategoryMapper categoryMapper;
+    // [DELETE_END]
     private final InterestResultSaver saver;
 
     public InterestAnalysisResult analyze(Long accountId) {
@@ -45,14 +47,21 @@ public class InterestAnalysisService {
         return InterestAnalysisResult.builder()
                 .accountId(accountId)
                 .keywords(features.getAllKeywords())
+                // [DELETE_START] (아래 1줄 삭제)
                 .categories(categoryMapper.map(features.getAllKeywords()))
+                // [DELETE_END]
                 .travelTags(validatedTags)
                 .build();
     }
 
     private void saveFinalResults(ExtractedInterestFeatures features, List<TravelTagScore> validatedTags) {
+        // [DELETE_START] (아래 2줄 삭제)
         Map<InterestCategory, Double> categoryScores = categoryMapper.map(features.getAllKeywords());
         saver.save(features.getAccountId(), features.getAllKeywords(), categoryScores, validatedTags);
+        // [DELETE_END]
+        // [REPLACE_WITH] (위 삭제 후 아래 코드로 대체)
+        // saver.save(features.getAccountId(), features.getAllKeywords(), null, validatedTags);
+        
         log.info(">>> [Phase 3] All results successfully persisted to DB.");
     }
 }
