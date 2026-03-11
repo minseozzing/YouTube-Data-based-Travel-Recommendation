@@ -25,7 +25,7 @@ import {
 } from '@/data/cost.dummy';
 import { z } from 'zod';
 
-export const SEOUL_CITY_ID = 1;
+export const SEOUL_CITY_ID = 12;
 
 const DUMMY_HISTORY_MAP = {
   d: DUMMY_EXCHANGE_RATE_HISTORY_D,
@@ -73,15 +73,9 @@ export const costApi = {
 
   // GET /api/exchange-rate?currency=XXX
   getExchangeRateNew: async (currency: string): Promise<ExchangeRateNew> => {
-    try {
-      const { data } = await axiosInstance.get('/api/exchange-rate', {
-        params: { currency },
-      });
-      return ExchangeRateNewApiSchema.parse(data).data;
-    } catch (err) {
-      console.warn('[cost.api] using dummy data for getExchangeRateNew', err);
-      return DUMMY_EXCHANGE_RATE;
-    }
+    // 서버가 없으므로 즉시 더미 반환
+    console.log('[cost.api] (Offline Mode) returning dummy for getExchangeRateNew');
+    return { ...DUMMY_EXCHANGE_RATE, target: currency };
   },
 
   // GET /api/exchange-rate/history?target_currency=XXX&type=D|W|M
@@ -89,15 +83,9 @@ export const costApi = {
     targetCurrency: string,
     type: 'D' | 'W' | 'M',
   ): Promise<ExchangeRateHistory> => {
-    try {
-      const { data } = await axiosInstance.get('/api/exchange-rate/history', {
-        params: { target_currency: targetCurrency, type },
-      });
-      return ExchangeRateHistoryApiSchema.parse(data).data;
-    } catch (err) {
-      console.warn('[cost.api] using dummy data for getExchangeRateHistory', err);
-      return DUMMY_HISTORY_MAP[type.toLowerCase() as 'd' | 'w' | 'm'];
-    }
+    console.log('[cost.api] (Offline Mode) returning dummy for getExchangeRateHistory');
+    const dummy = DUMMY_HISTORY_MAP[type.toLowerCase() as 'd' | 'w' | 'm'];
+    return { ...dummy, targetCurrency };
   },
 
   // GET /api/cost/detail?target_type=city|country&target_id=XXX
@@ -105,15 +93,13 @@ export const costApi = {
     targetType: 'country' | 'city',
     targetId: number,
   ): Promise<CostDetail> => {
-    try {
-      const { data } = await axiosInstance.get('/api/cost/detail', {
-        params: { target_type: targetType, target_id: targetId },
-      });
-      return CostDetailApiSchema.parse(data).data;
-    } catch (err) {
-      console.warn('[cost.api] using dummy data for getCostDetail', err);
-      return targetId === SEOUL_CITY_ID ? DUMMY_SEOUL_COST_DETAIL : DUMMY_COST_DETAIL;
-    }
+    console.log('[cost.api] (Offline Mode) returning dummy for getCostDetail');
+    if (targetId === SEOUL_CITY_ID) return DUMMY_SEOUL_COST_DETAIL;
+    
+    return {
+      ...DUMMY_COST_DETAIL,
+      target: { ...DUMMY_COST_DETAIL.target, id: targetId },
+    };
   },
 
   // GET /api/cost/compare?target_type=CITY&base_id=1&target_id=2
@@ -122,21 +108,13 @@ export const costApi = {
     baseId: number,
     targetId: number,
   ): Promise<CostCompare> => {
-    try {
-      const { data } = await axiosInstance.get('/api/cost/compare', {
-        params: { target_type: targetType, base_id: baseId, target_id: targetId },
-      });
-      return CostCompareApiSchema.parse(data).data;
-    } catch (err) {
-      console.warn('[cost.api] using dummy data for getCostCompare', err);
-      // 더미 데이터의 ID를 현재 요청한 ID로 동적 변경하여 유효성 검사 통과
-      return {
-        ...DUMMY_COST_COMPARE,
-        target: {
-          ...DUMMY_COST_COMPARE.target,
-          id: targetId,
-        },
-      };
-    }
+    console.log('[cost.api] (Offline Mode) returning dummy for getCostCompare');
+    return {
+      ...DUMMY_COST_COMPARE,
+      target: {
+        ...DUMMY_COST_COMPARE.target,
+        id: targetId,
+      },
+    };
   },
 };
