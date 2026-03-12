@@ -12,19 +12,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/city")
 @RequiredArgsConstructor
 public class CityController {
     private final CityService cityService;
 
-    @GetMapping("/city")
-    public ResponseEntity<List<AllCitiesResponse>> getCities() {
+    @GetMapping
+    public ResponseEntity<List<AllCitiesResponse>> getAllCities() {
         List<AllCitiesResponse> list = new ArrayList<>();
         list = cityService.getAllCities();
         return ResponseEntity.ok(list);
     }
 
-    @GetMapping("/city/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<?> getCityDetail(
             @PathVariable Long id,
             @RequestParam Boolean recommend
@@ -37,6 +37,8 @@ public class CityController {
             return ResponseEntity.ok(notRecommendCityDetailResponse);
         }
     }
+
+
 
 
 }

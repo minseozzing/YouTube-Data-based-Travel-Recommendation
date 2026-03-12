@@ -92,7 +92,8 @@ public class SecurityConfig {
                                   "/api/cost/**",
                             "/api/exchange-rate/**",
                                 "/api/city",
-                                "/api/city/*"
+                                "/api/city/*",
+                                "/api/recommend"
                         ).permitAll()
                         .anyRequest().authenticated());
 

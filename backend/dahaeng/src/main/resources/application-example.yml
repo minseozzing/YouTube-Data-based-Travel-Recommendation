@@ -54,3 +54,11 @@
 # 앱 커스텀 설정
 app:
   front-callback-url: ${FRONT_CALLBACK_URL:http://localhost:8080/}
+
+external:
+  newsapi:
+    key: ${NEWS_API_KEY}
+    base-url: ${NEWS_API_BASE_URL:https://newsapi.org}
+  google-places:
+    key: ${GOOGLE_PLACES_API_KEY}
+    base-url: ${GOOGLE_PLACES_BASE_URL:https://places.googleapis.com}
