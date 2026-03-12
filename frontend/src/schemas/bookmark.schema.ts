@@ -1,15 +1,26 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 // 북마크 목록 아이템
 export const BookmarkListItemSchema = z.object({
+  id: z.number(),
   cityId: z.number(),
   cityName: z.string(),
   countryName: z.string(),
-  imgUrl: z.string().url(),
-  createdAt: z.string().datetime(),
-  bookmarkId: z.number().optional(),
+  imgUrl: z.string().url().nullable(),
+  createdAt: z.string().datetime({ offset: false }),
 });
 export type BookmarkListItem = z.infer<typeof BookmarkListItemSchema>;
+
+// 북마크 목록 페이지네이션 응답
+export const BookmarkPageSchema = z.object({
+  content: z.array(BookmarkListItemSchema),
+  page: z.number(),
+  size: z.number(),
+  totalElements: z.number(),
+  totalPages: z.number(),
+  hasNext: z.boolean(),
+});
+export type BookmarkPage = z.infer<typeof BookmarkPageSchema>;
 
 // 저장 당시 환율 스냅샷
 export const ExchangeAtSavedSchema = z.object({

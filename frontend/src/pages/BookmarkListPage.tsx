@@ -178,7 +178,7 @@ const cardVariants: Variants = {
 // ─── BookmarkListPage ─────────────────────────────────────────────────────────
 const BookmarkListPage = () => {
   const { keyword } = useSearch({ from: "/_authenticated/bookmarks/" });
-  const { data, isLoading, isError, error, refetch } = useBookmarkList(keyword);
+  const { data, isLoading, isError, error, refetch } = useBookmarkList({ keyword });
   const { mutate: deleteBookmark } = useDeleteBookmark();
 
   const [continentFilter, setContinentFilter] =
@@ -188,7 +188,7 @@ const BookmarkListPage = () => {
   // Client-side continent filtering
   const filteredData = useMemo(() => {
     if (!data) return [];
-    return data.filter((item) => matchesContinent(item, continentFilter));
+    return data.content.filter((item) => matchesContinent(item, continentFilter));
   }, [data, continentFilter]);
 
   // Pagination
@@ -304,7 +304,7 @@ const BookmarkListPage = () => {
                 >
                   {pagedData.map((item) => (
                     <motion.div
-                      key={item.bookmarkId ?? item.cityId}
+                      key={item.id}
                       variants={cardVariants}
                     >
                       <BookmarkCard item={item} onDelete={handleDelete} />

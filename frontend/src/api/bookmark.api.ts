@@ -1,35 +1,48 @@
-import { axiosInstance } from './axiosInstance';
-import { ApiResponseSchema } from '@/schemas/common.schema';
+import { axiosInstance } from "./axiosInstance";
+import { ApiResponseSchema } from "@/schemas/common.schema";
 import {
-  BookmarkListItemSchema,
+  BookmarkPageSchema,
   BookmarkDetailSchema,
   CreateBookmarkRequestSchema,
-} from '@/schemas/bookmark.schema';
-import type { CreateBookmarkRequest } from '@/schemas/bookmark.schema';
-import { z } from 'zod';
+} from "@/schemas/bookmark.schema";
+import type { CreateBookmarkRequest } from "@/schemas/bookmark.schema";
 
-const BookmarkListApiSchema = ApiResponseSchema(z.array(BookmarkListItemSchema));
 const BookmarkDetailApiSchema = ApiResponseSchema(BookmarkDetailSchema);
 
+export interface BookmarkListParams {
+  keyword?: string;
+  page?: number;
+  size?: number;
+  sort?: string;
+}
+
 export const bookmarkApi = {
-  // GET /api/bookmarks?keyword=...
-  getList: async (keyword?: string) => {
-    const { data } = await axiosInstance.get('/api/bookmarks', {
-      params: keyword ? { keyword } : undefined,
+  // GET /api/bookmarks?keyword=&page=0&size=10&sort=id,desc
+  getList: async ({
+    keyword,
+    page = 0,
+    size = 10,
+    sort = "id,desc",
+  }: BookmarkListParams = {}) => {
+    const { data } = await axiosInstance.get("/api/bookmarks", {
+      params: { ...(keyword ? { keyword } : {}), page, size, sort },
     });
-    return BookmarkListApiSchema.parse(data).data;
+    console.log(data);
+
+    return BookmarkPageSchema.parse(data);
   },
 
   // GET /api/bookmarks/{bookmarkId}
   getDetail: async (bookmarkId: number) => {
     const { data } = await axiosInstance.get(`/api/bookmarks/${bookmarkId}`);
+    console.log(data);
     return BookmarkDetailApiSchema.parse(data).data;
   },
 
   // POST /api/bookmarks
   create: async (body: CreateBookmarkRequest) => {
     CreateBookmarkRequestSchema.parse(body);
-    const { data } = await axiosInstance.post('/api/bookmarks', body);
+    const { data } = await axiosInstance.post("/api/bookmarks", body);
     return data;
   },
 

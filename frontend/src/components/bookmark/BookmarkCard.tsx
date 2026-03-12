@@ -35,16 +35,12 @@ export function BookmarkCard({ item, onDelete }: BookmarkCardProps) {
   const [imgError, setImgError] = useState(false);
 
   const handleCardClick = () => {
-    if (item.bookmarkId !== undefined) {
-      void navigate({ to: '/bookmarks/$id', params: { id: item.bookmarkId } });
-    }
+    void navigate({ to: '/bookmarks/$id', params: { id: item.id } });
   };
 
   const handleDelete = (e: MouseEvent) => {
     e.stopPropagation();
-    if (item.bookmarkId !== undefined) {
-      onDelete(item.bookmarkId);
-    }
+    onDelete(item.id);
   };
 
   const continentLabel =
@@ -64,7 +60,7 @@ export function BookmarkCard({ item, onDelete }: BookmarkCardProps) {
     >
       {/* 이미지 영역 */}
       <div className="relative h-56 w-full overflow-hidden bg-slate-100">
-        {!imgError ? (
+        {item.imgUrl && !imgError ? (
           <img
             src={item.imgUrl}
             alt={item.cityName}
@@ -78,8 +74,7 @@ export function BookmarkCard({ item, onDelete }: BookmarkCardProps) {
         )}
 
         {/* 삭제 버튼 — hover 시 표시 */}
-        {item.bookmarkId !== undefined && (
-          <button
+        <button
             className={cn(
               'absolute right-2 top-2 flex size-7 items-center justify-center rounded-full',
               'bg-black/50 text-white opacity-0 transition-opacity duration-200',
@@ -90,7 +85,6 @@ export function BookmarkCard({ item, onDelete }: BookmarkCardProps) {
           >
             <X className="size-3.5" aria-hidden="true" />
           </button>
-        )}
       </div>
 
       {/* 텍스트 영역 */}
