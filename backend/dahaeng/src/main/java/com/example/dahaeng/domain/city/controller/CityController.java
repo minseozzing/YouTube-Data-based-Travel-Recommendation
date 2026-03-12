@@ -1,10 +1,12 @@
 package com.example.dahaeng.domain.city.controller;
 
 import com.example.dahaeng.domain.city.dto.response.AllCitiesResponse;
+import com.example.dahaeng.domain.city.dto.response.CityResponse;
 import com.example.dahaeng.domain.city.dto.response.NotRecommendCityDetailResponse;
 import com.example.dahaeng.domain.city.dto.response.RecommendCityDetailResponse;
 import com.example.dahaeng.domain.city.service.CityService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,7 +40,11 @@ public class CityController {
         }
     }
 
-
-
-
+    @GetMapping("/list")
+        public ResponseEntity<List<CityResponse>> list(@Param("countryId") Long countryId) {
+            return ResponseEntity.ok(cityService.list(countryId));
+        }
 }
+
+
+

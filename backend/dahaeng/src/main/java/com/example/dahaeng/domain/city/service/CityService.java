@@ -1,6 +1,7 @@
 package com.example.dahaeng.domain.city.service;
 
 import com.example.dahaeng.domain.city.dto.response.AllCitiesResponse;
+import com.example.dahaeng.domain.city.dto.response.CityResponse;
 import com.example.dahaeng.domain.city.dto.response.NotRecommendCityDetailResponse;
 import com.example.dahaeng.domain.city.dto.response.RecommendCityDetailResponse;
 import com.example.dahaeng.domain.city.entity.City;
@@ -19,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -136,4 +136,23 @@ public class CityService {
                 list
         );
     }
+
+    public List<CityResponse> list(Long countryId) {
+		if (countryId == null) {
+			List<City> cities = cityRepository.findAllByIsDeletedFalse();
+			return parseToCityListResponseList(cities);
+		} else {
+			List<City> cities = cityRepository.findAllByCountryIdAndIsDeletedFalse(countryId);
+			return parseToCityListResponseList(cities);
+		}
+	}
+
+	private List<CityResponse> parseToCityListResponseList(List<City> cities) {
+		return cities
+			.stream()
+			.map(CityResponse::from)
+			.toList();
+	}
 }
+
+

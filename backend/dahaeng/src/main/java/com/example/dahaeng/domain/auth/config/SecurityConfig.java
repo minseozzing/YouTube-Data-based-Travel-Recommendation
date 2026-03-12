@@ -1,11 +1,13 @@
 package com.example.dahaeng.domain.auth.config;
 
+import com.example.dahaeng.domain.auth.jwt.JwtExceptionFilter;
 import com.example.dahaeng.domain.auth.jwt.JwtFilter;
 import com.example.dahaeng.domain.auth.jwt.JwtProperties;
 import com.example.dahaeng.domain.auth.jwt.JwtUtil;
 import com.example.dahaeng.domain.auth.oauth2.CustomSuccessHandler;
 import com.example.dahaeng.domain.auth.service.CustomOAuth2UserService;
 import com.example.dahaeng.domain.member.repository.MemberRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -19,9 +21,14 @@ import org.springframework.security.oauth2.client.web.DefaultOAuth2Authorization
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
+import org.springframework.security.web.util.matcher.OrRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 @Configuration
@@ -30,16 +37,29 @@ import java.util.Collections;
 @EnableConfigurationProperties(JwtProperties.class)
 public class SecurityConfig {
 
+    private static final String[] PUBLIC_URLS = {
+            "/",
+            "/login/**",
+            "/oauth2/**",
+            "/api/auth/google/login-url",
+            "/api/auth/exchange",
+            "/api/cost/**",
+            "/api/exchange-rate/**",
+            "/api/city/list",
+            "/api/tag",
+            "/api/country/**"
+    };
+
     private final CustomOAuth2UserService customOAuth2UserService;
     private final CustomSuccessHandler customSuccessHandler;
     private final JwtUtil jwtUtil;
     private final MemberRepository memberRepository;
     private final ClientRegistrationRepository clientRegistrationRepository;
+    private final ObjectMapper objectMapper;
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, RequestMatcher jwtProtectedPathMatcher) throws Exception {
 
-        // 1. CORS 설정 (filterChain 안에 통합)
         http
                 .cors(corsCustomizer -> corsCustomizer.configurationSource(new CorsConfigurationSource() {
                     @Override
@@ -51,26 +71,22 @@ public class SecurityConfig {
                         configuration.setAllowCredentials(true);
                         configuration.setAllowedHeaders(Collections.singletonList("*"));
                         configuration.setMaxAge(3600L);
-
-                        // 브라우저가 응답에서 읽을 수 있도록 헤더 노출
-                        configuration.setExposedHeaders(Collections.singletonList("Set-Cookie"));
                         configuration.setExposedHeaders(Collections.singletonList("Authorization"));
 
                         return configuration;
                     }
                 }));
 
-        // 2. CSRF, FormLogin, HttpBasic disable
         http
                 .csrf((auth) -> auth.disable())
                 .formLogin((auth) -> auth.disable())
                 .httpBasic((auth) -> auth.disable());
 
-        // 3. JwtFilter 추가 (UsernamePasswordAuthenticationFilter 이전에 실행)
         http
-                .addFilterBefore(new JwtFilter(jwtUtil, memberRepository), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(new JwtFilter(jwtUtil, memberRepository, jwtProtectedPathMatcher),
+                        UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtExceptionFilter(objectMapper, jwtProtectedPathMatcher), JwtFilter.class);
 
-        // 4. OAuth2 로그인 설정
         http
                 .oauth2Login((oauth2) -> oauth2
                         .authorizationEndpoint(authorization -> authorization
@@ -80,7 +96,6 @@ public class SecurityConfig {
                         .successHandler(customSuccessHandler)
                 );
 
-        // 5. 경로별 권한 설정
         http
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers(
@@ -95,21 +110,29 @@ public class SecurityConfig {
                                 "/api/city/*",
                                 "/api/recommend"
                         ).permitAll()
+                        .requestMatchers(PUBLIC_URLS).permitAll()
                         .anyRequest().authenticated());
 
-        // 6. 로그아웃 설정
         http
                 .logout((logout) -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/")
                         .deleteCookies("Authorization"));
 
-        // 7. 세션 설정 : STATELESS (JWT 사용 시 필수 설정)
         http
                 .sessionManagement((session) -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         return http.build();
+    }
+
+    @Bean
+    public RequestMatcher publicPathMatcher() {
+        return new OrRequestMatcher(
+                Arrays.stream(PUBLIC_URLS)
+                        .map(pattern -> PathPatternRequestMatcher.withDefaults().matcher(pattern))
+                        .toArray(RequestMatcher[]::new)
+        );
     }
 
     private OAuth2AuthorizationRequestResolver authorizationRequestResolver(

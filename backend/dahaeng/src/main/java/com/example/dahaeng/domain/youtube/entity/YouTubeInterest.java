@@ -1,3 +1,4 @@
+// [FILE_DELETE_CANDIDATE] - 사용하지 않는 엔티티
 package com.example.dahaeng.domain.youtube.entity;
 
 import com.example.dahaeng.global.entity.BaseEntity;

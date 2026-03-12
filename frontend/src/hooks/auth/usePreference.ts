@@ -1,11 +1,11 @@
-import { useMutation } from '@tanstack/react-query';
-import { useNavigate } from '@tanstack/react-router';
-import { authApi } from '@/api/auth.api';
-import { useAuthStore } from '@/stores/authStore';
-import { usePreferenceStore } from '@/stores/preferenceStore';
+import { useMutation } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
+import { authApi } from "@/api/auth.api";
+import { useAuthStore } from "@/stores/authStore";
+import { usePreferenceStore } from "@/stores/preferenceStore";
 
 /**
- * 선호도 입력 (최초 등록)
+ * 선호도 입력 (최초 등록) — 성공 시 /main으로 이동
  * POST /api/members/tag
  */
 export const useSubmitPreference = () => {
@@ -18,16 +18,24 @@ export const useSubmitPreference = () => {
     onSuccess: () => {
       setHasCompletedPreference(true);
       reset();
-      navigate({ to: '/main' });
+    },
+    onSettled: () => {
+      navigate({ to: '/main', search: { tab: 'recommend' } });
     },
   });
 };
 
 /**
- * 선호도 수정
+ * 선호도 수정 — 성공 시 /mypage로 이동
  * PATCH /api/members/tag
  */
-export const useUpdatePreference = () =>
-  useMutation({
+export const useUpdatePreference = () => {
+  const navigate = useNavigate();
+
+  return useMutation({
     mutationFn: (tags: string[]) => authApi.updatePreference({ tags }),
+    onSettled: () => {
+      navigate({ to: '/mypage' });
+    },
   });
+};
