@@ -12,7 +12,6 @@ import com.example.dahaeng.domain.livingcost.entity.LivingCostOfCity;
 public interface LivingCostOfCityRepository extends JpaRepository<LivingCostOfCity, Long> {
 	@Query("select lcc from LivingCostOfCity lcc join fetch lcc.city c join fetch c.country where c.id = :id and lcc.isDeleted = false")
 	Optional<LivingCostOfCity> findOneByCityId(Long id);
-
 	@Query(
 		"""
 		select lcc

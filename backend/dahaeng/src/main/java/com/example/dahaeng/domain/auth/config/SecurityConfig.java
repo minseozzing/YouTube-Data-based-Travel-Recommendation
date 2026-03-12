@@ -98,6 +98,18 @@ public class SecurityConfig {
 
         http
                 .authorizeHttpRequests((auth) -> auth
+                        .requestMatchers(
+                                "/",
+                                "/login/**",
+                                "/oauth2/**",
+                                "/api/auth/google/login-url",
+                                "/api/auth/exchange",
+                                  "/api/cost/**",
+                            "/api/exchange-rate/**",
+                                "/api/city",
+                                "/api/city/*",
+                                "/api/recommend"
+                        ).permitAll()
                         .requestMatchers(PUBLIC_URLS).permitAll()
                         .anyRequest().authenticated());
 
