@@ -44,4 +44,14 @@ public interface LivingCostOfCityRepository extends JpaRepository<LivingCostOfCi
 		"""
 	)
 	List<LivingCostOfCity> findAllByCountryKeywordOrderByDailyBudgetDesc(String keyword);
+
+	@Query(
+		"""
+		select lcc
+		from LivingCostOfCity lcc join fetch lcc.city
+		where lcc.isDeleted = false
+			and lower(lcc.city.cityName) like concat('%', :keyword, '%') 
+		"""
+	)
+	List<LivingCostOfCity> findAllByNameKeyword(String keyword);
 }
