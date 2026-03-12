@@ -18,11 +18,13 @@ import com.example.dahaeng.domain.exchange.repository.ExchangeRepository;
 import com.example.dahaeng.domain.livingcost.dto.request.LivingCostCardRequest;
 import com.example.dahaeng.domain.livingcost.dto.request.LivingCostComparisonRequest;
 import com.example.dahaeng.domain.livingcost.dto.request.LivingCostDetailRequest;
+import com.example.dahaeng.domain.livingcost.dto.request.LivingCostSearchRequest;
 import com.example.dahaeng.domain.livingcost.dto.response.card.LivingCostCardResponse;
 import com.example.dahaeng.domain.livingcost.dto.response.card.LivingCostRankCard;
 import com.example.dahaeng.domain.livingcost.dto.response.card.LivingCostSearchedCard;
 import com.example.dahaeng.domain.livingcost.dto.response.compare.LivingCostComparisonResponse;
 import com.example.dahaeng.domain.livingcost.dto.response.detail.LivingCostDetailResponse;
+import com.example.dahaeng.domain.livingcost.dto.response.search.LivingCostSearchedResponse;
 import com.example.dahaeng.domain.livingcost.entity.LivingCostOfCity;
 import com.example.dahaeng.domain.livingcost.entity.LivingCostOfCountry;
 import com.example.dahaeng.domain.livingcost.enums.Mode;
@@ -186,6 +188,37 @@ public class LivingCostService {
 		return new LivingCostCardResponse(Mode.SEARCH, searchedCardList);
 	}
 
+	public LivingCostSearchedResponse search(LivingCostSearchRequest request) {
+		Exchange usd = exchangeRepository.findFirstByCurrencyOrderByEventDateDesc(Currency.USD)
+			.orElseThrow(() -> new CustomException(ErrorCode.INTERNAL_ERROR, "환율 정보를 찾지 못했습니다."));
 
+		if (request.type() == null) {
+			throw new CustomException(ErrorCode.INVALID_REQUEST, "타입을 선택해주세요.");
+		}
+
+		String keyword = request.keyword().toLowerCase();
+
+		Object items =  switch (request.type()) {
+			case COUNTRY -> searchCountryByKeyword(keyword, usd);
+			case CITY -> searchCityByKeyword(keyword, usd);
+			default -> throw new CustomException(ErrorCode.INVALID_REQUEST, "지원하지 않는 범위입니다.");
+		};
+
+		return new LivingCostSearchedResponse(request.type(), items);
+	}
+
+	private List<LivingCostSearchedCard> searchCountryByKeyword(String keyword, Exchange usd) {
+		return countryRepository.findAllByNameKeyword(keyword)
+			.stream()
+			.map((cost) -> LivingCostSearchedCard.from(cost, usd))
+			.toList();
+	}
+
+	private List<LivingCostSearchedCard> searchCityByKeyword(String keyword, Exchange usd) {
+		return cityRepository.findAllByNameKeyword(keyword)
+			.stream()
+			.map((cost) -> LivingCostSearchedCard.from(cost, usd))
+			.toList();
+	}
 }
 

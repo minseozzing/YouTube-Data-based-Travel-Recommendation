@@ -45,4 +45,14 @@ public interface LivingCostOfCountryRepository extends JpaRepository<LivingCostO
 		"""
 	)
 	List<LivingCostOfCountry> findAllByContinentOrderByDailyBudgetDesc(Continent continent);
+
+	@Query(
+		"""
+		select lcc
+		from LivingCostOfCountry lcc join fetch lcc.country
+		where lcc.isDeleted = false
+				and lower(lcc.country.countryName) like concat('%', :keyword, '%') 
+		"""
+	)
+	List<LivingCostOfCountry> findAllByNameKeyword(String keyword);
 }
