@@ -6,3 +6,5 @@ application.ymlbackend/dahaeng/.gradle-user-home/
 
 ai/google_flight/*
 .idea/*
+ai/silver/*
+ai/spark_pipeline/*

@@ -10,7 +10,9 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(name = "flight_summary")
+@Table(name = "flight_summary", uniqueConstraints = {
+        @UniqueConstraint(name = "uk_city_year_month", columnNames = { "city_id", "target_year_month" })
+})
 public class FlightSummary extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
