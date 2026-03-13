@@ -1,62 +1,48 @@
 package com.example.dahaeng.domain.interest.service;
 
-import com.example.dahaeng.global.exception.CustomException;
-import com.example.dahaeng.global.exception.ErrorCode;
 import com.example.dahaeng.domain.interest.dto.InterestKeywordCandidate;
-import com.example.dahaeng.domain.interest.enums.InterestCategory;
+import com.example.dahaeng.domain.interest.dto.TravelTagScore;
 import com.example.dahaeng.domain.interest.enums.InterestSourceType;
 import com.example.dahaeng.domain.interest.repository.YoutubeInterestKeywordRepository;
-import com.example.dahaeng.domain.interest.repository.YoutubeInterestRepository;
 import com.example.dahaeng.domain.youtube.entity.YouTubeAccount;
-import com.example.dahaeng.domain.youtube.entity.YouTubeInterest;
 import com.example.dahaeng.domain.youtube.entity.YouTubeInterestKeyword;
-import com.example.dahaeng.domain.youtube.enums.SourceType;
-import com.example.dahaeng.domain.interest.dto.TravelTagScore;
 import com.example.dahaeng.domain.youtube.entity.YouTubeTravelTag;
+import com.example.dahaeng.domain.youtube.enums.SourceType;
 import com.example.dahaeng.domain.youtube.repository.YouTubeAccountRepository;
 import com.example.dahaeng.domain.youtube.repository.YouTubeTravelTagRepository;
+import com.example.dahaeng.global.exception.CustomException;
+import com.example.dahaeng.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class InterestResultSaver {
 
     private final YouTubeAccountRepository accountRepository;
-    // [DELETE_START] (아래 1줄 삭제)
-    private final YoutubeInterestRepository interestRepository;
-    // [DELETE_END]
     private final YoutubeInterestKeywordRepository keywordRepository;
     private final YouTubeTravelTagRepository travelTagRepository;
 
     @Transactional
     public void save(Long accountId,
                      List<InterestKeywordCandidate> keywords,
-                     // [DELETE_START] (아래 1줄 삭제)
-                     Map<InterestCategory, Double> categories,
-                     // [DELETE_END]
                      List<TravelTagScore> travelTags) {
 
         // 1. 연동 계정 조회
         YouTubeAccount account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "연동 계정을 찾을 수 없습니다."));
 
-        // 2. 기존 분석 결과 초기화 (삭제 후 재삽입)
+        // 2. 기존 분석 결과 초기화
         keywordRepository.deleteByAccount_Id(accountId);
-        // [DELETE_START] (아래 1줄 삭제)
-        // interestRepository.deleteByAccount_Id(accountId); // 단계적 폐쇄를 위해 주석 처리
-        // [DELETE_END]
         travelTagRepository.deleteByAccount_Id(accountId);
 
         LocalDateTime now = LocalDateTime.now();
 
-        // 3. 관심 키워드(Keyword) 저장
+        // 3. 관심 키워드 저장
         if (keywords != null) {
             List<YouTubeInterestKeyword> keywordEntities = keywords.stream()
                     .map(k -> YouTubeInterestKeyword.builder()
@@ -71,31 +57,7 @@ public class InterestResultSaver {
             keywordRepository.saveAll(keywordEntities);
         }
 
-        // 4. 관심 카테고리(Category) 점수 기반 정렬 및 저장
-        // [DELETE_START] (아래 블록 전체 삭제)
-        /* 단계적 폐쇄를 위해 주석 처리
-        if (categories != null) {
-            List<Map.Entry<InterestCategory, Double>> sorted = categories.entrySet().stream()
-                    .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-                    .toList();
-
-            int rank = 1;
-            for (Map.Entry<InterestCategory, Double> e : sorted) {
-                YouTubeInterest interest = YouTubeInterest.builder()
-                        .account(account)
-                        .categoryName(e.getKey().name())
-                        .score(e.getValue())
-                        .rankNo(rank++)
-                        .analysisVersion("rule-v1")
-                        .analyzedAt(now)
-                        .build();
-                interestRepository.save(interest);
-            }
-        }
-        */
-        // [DELETE_END]
-
-        // 5. [신규] 여행 취향 태그(Travel Tags) 저장
+        // 4. 여행 취향 태그 저장
         if (travelTags != null && !travelTags.isEmpty()) {
             List<YouTubeTravelTag> tagEntities = travelTags.stream()
                     .map(t -> YouTubeTravelTag.builder()
@@ -116,7 +78,7 @@ public class InterestResultSaver {
     }
 
     /**
-     * 관심분야 모듈의 SourceType을 유튜브 모듈의 SourceType으로 매핑
+     * 관심분석 모듈의 SourceType을 유튜브 모듈의 SourceType으로 매핑
      */
     private SourceType mapSourceType(InterestSourceType type) {
         if (type == null) {
