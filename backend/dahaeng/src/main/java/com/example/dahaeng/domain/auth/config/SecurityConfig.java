@@ -36,119 +36,110 @@ import java.util.Collections;
 @EnableConfigurationProperties(JwtProperties.class)
 public class SecurityConfig {
 
-        private static final String[] PUBLIC_URLS = {
-                        "/",
-                        "/login/**",
-                        "/oauth2/**",
-                        "/api/auth/google/login-url",
-                        "/api/auth/exchange",
-                        "/api/cost/**",
-                        "/api/exchange-rate/**",
-                        "/api/city/list",
-                        "/api/tag",
-                        "/api/country/**",
-                        "/api/recommend",
-                        "/api/city",
-                        "/api/city/*",
-                        "/api/flights/**",
-                        "/api/cities/**"
-        };
+    private static final String[] PUBLIC_URLS = {
+            "/",
+            "/login/**",
+            "/oauth2/**",
+            "/api/auth/google/login-url",
+            "/api/auth/exchange",
+            "/api/cost/**",
+            "/api/exchange-rate/**",
+            "/api/city/list",
+            "/api/tag",
+            "/api/country/**",
+            "/api/recommend",
+            "/api/city",
+            "/api/city/*",
+            "/api/flights/**",
+            "/api/cities/**"
+    };
 
-        private final CustomOAuth2UserService customOAuth2UserService;
-        private final CustomSuccessHandler customSuccessHandler;
-        private final JwtUtil jwtUtil;
-        private final MemberRepository memberRepository;
-        private final ClientRegistrationRepository clientRegistrationRepository;
-        private final ObjectMapper objectMapper;
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final CustomSuccessHandler customSuccessHandler;
+    private final JwtUtil jwtUtil;
+    private final MemberRepository memberRepository;
+    private final ClientRegistrationRepository clientRegistrationRepository;
+    private final ObjectMapper objectMapper;
 
-        @Bean
-        public SecurityFilterChain filterChain(HttpSecurity http, RequestMatcher jwtProtectedPathMatcher)
-                        throws Exception {
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http, RequestMatcher jwtProtectedPathMatcher) throws Exception {
 
-                http
-                                .cors(corsCustomizer -> corsCustomizer
-                                                .configurationSource(new CorsConfigurationSource() {
-                                                        @Override
-                                                        public CorsConfiguration getCorsConfiguration(
-                                                                        HttpServletRequest request) {
-                                                                CorsConfiguration configuration = new CorsConfiguration();
+        http
+                .cors(corsCustomizer -> corsCustomizer
+                        .configurationSource(new CorsConfigurationSource() {
+                            @Override
+                            public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
+                                CorsConfiguration configuration = new CorsConfiguration();
+                                configuration.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
+                                configuration.setAllowedMethods(Collections.singletonList("*"));
+                                configuration.setAllowCredentials(true);
+                                configuration.setAllowedHeaders(Collections.singletonList("*"));
+                                configuration.setMaxAge(3600L);
+                                configuration.setExposedHeaders(Collections.singletonList("Authorization"));
 
-                                                                configuration.setAllowedOrigins(Collections
-                                                                                .singletonList("http://localhost:3000"));
-                                                                configuration.setAllowedMethods(
-                                                                                Collections.singletonList("*"));
-                                                                configuration.setAllowCredentials(true);
-                                                                configuration.setAllowedHeaders(
-                                                                                Collections.singletonList("*"));
-                                                                configuration.setMaxAge(3600L);
-                                                                configuration.setExposedHeaders(Collections
-                                                                                .singletonList("Authorization"));
+                                return configuration;
+                            }
+                        }));
 
-                                                                return configuration;
-                                                        }
-                                                }));
+        http
+                .csrf((auth) -> auth.disable())
+                .formLogin((auth) -> auth.disable())
+                .httpBasic((auth) -> auth.disable());
 
-                http
-                                .csrf((auth) -> auth.disable())
-                                .formLogin((auth) -> auth.disable())
-                                .httpBasic((auth) -> auth.disable());
+        http
+                .addFilterBefore(new JwtFilter(jwtUtil, memberRepository, jwtProtectedPathMatcher),
+                        UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtExceptionFilter(objectMapper, jwtProtectedPathMatcher),
+                        JwtFilter.class);
 
-                http
-                                .addFilterBefore(new JwtFilter(jwtUtil, memberRepository, jwtProtectedPathMatcher),
-                                                UsernamePasswordAuthenticationFilter.class)
-                                .addFilterBefore(new JwtExceptionFilter(objectMapper, jwtProtectedPathMatcher),
-                                                JwtFilter.class);
+        http
+                .oauth2Login((oauth2) -> oauth2
+                        .authorizationEndpoint(authorization -> authorization
+                                .authorizationRequestResolver(
+                                        authorizationRequestResolver(clientRegistrationRepository)))
+                        .userInfoEndpoint((userInfoEndpointConfig) -> userInfoEndpointConfig
+                                .userService(customOAuth2UserService))
+                        .successHandler(customSuccessHandler));
 
-                http
-                                .oauth2Login((oauth2) -> oauth2
-                                                .authorizationEndpoint(authorization -> authorization
-                                                                .authorizationRequestResolver(
-                                                                                authorizationRequestResolver(
-                                                                                                clientRegistrationRepository)))
-                                                .userInfoEndpoint((userInfoEndpointConfig) -> userInfoEndpointConfig
-                                                                .userService(customOAuth2UserService))
-                                                .successHandler(customSuccessHandler));
+        http
+                .authorizeHttpRequests((auth) -> auth
+                        .requestMatchers(PUBLIC_URLS).permitAll()
+                        .anyRequest().authenticated());
 
-                http
-                                .authorizeHttpRequests((auth) -> auth
-                                                .requestMatchers(PUBLIC_URLS).permitAll()
-                                                .anyRequest().authenticated());
+        http
+                .logout((logout) -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/")
+                        .deleteCookies("Authorization"));
 
-                http
-                                .logout((logout) -> logout
-                                                .logoutUrl("/logout")
-                                                .logoutSuccessUrl("/")
-                                                .deleteCookies("Authorization"));
+        http
+                .sessionManagement((session) -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-                http
-                                .sessionManagement((session) -> session
-                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        return http.build();
+    }
 
-                return http.build();
-        }
+    @Bean
+    public RequestMatcher publicPathMatcher() {
+        return new OrRequestMatcher(
+                Arrays.stream(PUBLIC_URLS)
+                        .map(pattern -> PathPatternRequestMatcher.withDefaults().matcher(pattern))
+                        .toArray(RequestMatcher[]::new));
+    }
 
-        @Bean
-        public RequestMatcher publicPathMatcher() {
-                return new OrRequestMatcher(
-                                Arrays.stream(PUBLIC_URLS)
-                                                .map(pattern -> PathPatternRequestMatcher.withDefaults()
-                                                                .matcher(pattern))
-                                                .toArray(RequestMatcher[]::new));
-        }
+    private OAuth2AuthorizationRequestResolver authorizationRequestResolver(
+            ClientRegistrationRepository clientRegistrationRepository) {
 
-        private OAuth2AuthorizationRequestResolver authorizationRequestResolver(
-                        ClientRegistrationRepository clientRegistrationRepository) {
+        DefaultOAuth2AuthorizationRequestResolver authorizationRequestResolver =
+                new DefaultOAuth2AuthorizationRequestResolver(clientRegistrationRepository, "/oauth2/authorization");
 
-                DefaultOAuth2AuthorizationRequestResolver authorizationRequestResolver = new DefaultOAuth2AuthorizationRequestResolver(
-                                clientRegistrationRepository, "/oauth2/authorization");
+        authorizationRequestResolver.setAuthorizationRequestCustomizer(
+                customizer -> customizer
+                        .additionalParameters(params -> {
+                            params.put("access_type", "offline");
+                            params.put("prompt", "consent");
+                        }));
 
-                authorizationRequestResolver.setAuthorizationRequestCustomizer(
-                                customizer -> customizer
-                                                .additionalParameters(params -> {
-                                                        params.put("access_type", "offline");
-                                                        params.put("prompt", "consent");
-                                                }));
-
-                return authorizationRequestResolver;
-        }
+        return authorizationRequestResolver;
+    }
 }
