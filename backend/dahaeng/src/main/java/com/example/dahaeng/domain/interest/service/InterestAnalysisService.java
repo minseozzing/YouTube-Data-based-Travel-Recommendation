@@ -2,7 +2,9 @@ package com.example.dahaeng.domain.interest.service;
 
 import com.example.dahaeng.domain.interest.dto.ExtractedInterestFeatures;
 import com.example.dahaeng.domain.interest.dto.InterestAnalysisResult;
+import com.example.dahaeng.domain.interest.dto.InterestTagResponse;
 import com.example.dahaeng.domain.interest.dto.TravelTagScore;
+import com.example.dahaeng.domain.youtube.repository.YouTubeTravelTagRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,7 @@ public class InterestAnalysisService {
     private final TravelTagInferenceClient aiClient;
     private final TravelTagValidator validator;
     private final InterestResultSaver saver;
+    private final YouTubeTravelTagRepository youTubeTravelTagRepository;
 
     public InterestAnalysisResult analyze(Long accountId) {
         log.info(">>> [COORDINATOR] Starting orchestrated analysis for account: {}", accountId);
@@ -50,5 +53,14 @@ public class InterestAnalysisService {
         saver.save(features.getAccountId(), features.getAllKeywords(), validatedTags);
 
         log.info(">>> [Phase 3] All results successfully persisted to DB.");
+    }
+
+    public List<InterestTagResponse> getAnalyzedTags(Long accountId) {
+        return youTubeTravelTagRepository.findByAccount_Id(accountId).stream()
+                .map(tag -> InterestTagResponse.builder()
+                        .categoryName(tag.getCategoryName())
+                        .tagName(tag.getTagName())
+                        .build())
+                .toList();
     }
 }
