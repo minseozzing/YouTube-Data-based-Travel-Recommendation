@@ -13,8 +13,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RecommendController {
     private final RecommendFacade recommendFacade;
+
     @PostMapping
-    public RecommendCitiesResponse getRecommendCities(@RequestBody RecommendCitiesRequest request){
-    return recommendFacade.recommend(request);
+    public RecommendCitiesResponse getRecommendCities(@RequestBody RecommendCitiesRequest request) {
+        return recommendFacade.recommend(request);
     }
 }

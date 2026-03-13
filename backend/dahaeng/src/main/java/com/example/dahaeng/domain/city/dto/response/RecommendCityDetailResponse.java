@@ -3,6 +3,8 @@ package com.example.dahaeng.domain.city.dto.response;
 
 import java.util.List;
 
+import com.example.dahaeng.domain.country.dto.response.CountryDangerResponse;
+
 public record RecommendCityDetailResponse(
     String name,
     Score score,
@@ -10,7 +12,7 @@ public record RecommendCityDetailResponse(
     LivingCostFor1Day livingCostFor1Day,
     AirTicketAndHotel airTicketAndHotel,
     News news,
-    String danger,
+    CountryDangerResponse danger,
     List<TagResponse> tags,
     List<TouristSpotResponse> touristSpot
 ) {
