@@ -20,28 +20,36 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class CityService {
+    private static final String DEFAULT_DANGER_LABEL = "안전";
+
     private final CityRepository cityRepository;
     private final FlightSummaryRepository flightSummaryRepository;
     private final LivingCostOfCityRepository livingCostOfCityRepository;
     private final DangerRepository dangerRepository;
     private final CityTagRepository cityTagRepository;
-    public List<AllCitiesResponse> getAllCities(){
+
+    public List<AllCitiesResponse> getAllCities() {
         YearMonth now = YearMonth.now();
         String targetYearMonth = YearMonth.of(now.getYear(), now.getMonth()).toString();
-        System.out.println(targetYearMonth);
         List<City> cities = cityRepository.findAll();
+        Map<Long, Danger> dangerByCountryId = getDangerByCountryId(cities);
         List<AllCitiesResponse> result = new ArrayList<>();
 
-        for(City city : cities) {
+        for (City city : cities) {
             double flightAndHotel = 0.0;
 
-            FlightSummary summary = flightSummaryRepository.findByCityIdAndYearMonthWithCity(city.getId(), targetYearMonth).orElse(null);
-            if(summary != null){
+            FlightSummary summary = flightSummaryRepository
+                    .findByCityIdAndYearMonthWithCity(city.getId(), targetYearMonth)
+                    .orElse(null);
+            if (summary != null) {
                 double avgFlightPrice = summary.getAvgFlightPrice() != null ? summary.getAvgFlightPrice() : 0.0;
                 double avgHotelPrice = summary.getAvgHotelPrice() != null ? summary.getAvgHotelPrice() : 0.0;
                 flightAndHotel = avgFlightPrice + avgHotelPrice;
@@ -49,59 +57,101 @@ public class CityService {
 
             double localLivingCost = 0.0;
             LivingCostOfCity cost = livingCostOfCityRepository.findOneByCityId(city.getId()).orElse(null);
-            if(cost != null){
+            if (cost != null) {
                 double transport = cost.getTransport() != null ? cost.getTransport() : 0.0;
-                double food = cost.getFood() != null ? cost.getFood() : 0;
+                double food = cost.getFood() != null ? cost.getFood() : 0.0;
                 localLivingCost = transport + food;
             }
 
-            String dangerLabel = "안전";
-            Danger danger = dangerRepository.findByCountryId(city.getCountry().getId()).orElse(null);
-            if(danger != null){
-                dangerLabel = getDangerLabel(danger);
-            }
+            Danger danger = dangerByCountryId.get(city.getCountry().getId());
+            String dangerLabel = danger != null ? getDangerLabel(danger) : DEFAULT_DANGER_LABEL;
+            String dangerDescription = danger != null ? getDangerDescription(danger) : null;
 
-            AllCitiesResponse response = new AllCitiesResponse(
+            result.add(new AllCitiesResponse(
                     city.getCityName(),
                     city.getImgUrl(),
                     flightAndHotel + localLivingCost,
                     dangerLabel,
+                    dangerDescription,
                     city.getLat(),
                     city.getLon()
-            );
-            result.add(response);
+            ));
         }
         return result;
     }
 
-    private String getDangerLabel(Danger danger){
-        if(danger.getControl() != null && !danger.getControl().isBlank()){
-            return "여행자제";
-        }
-        if(danger.getAttention() != null && ! danger.getAttention().isBlank()){
-            return "여행유의";
-        }
-        if(danger.getLimita() != null && !danger.getLimita().isBlank()){
-            return "출국권고";
-        }
-        return "안전";
+    private Map<Long, Danger> getDangerByCountryId(List<City> cities) {
+        List<Long> countryIds = cities.stream()
+                .map(city -> city.getCountry().getId())
+                .distinct()
+                .toList();
+
+        return dangerRepository.findAllByCountryIdIn(countryIds).stream()
+                .collect(Collectors.toMap(danger -> danger.getCountry().getId(), Function.identity()));
     }
 
-    public RecommendCityDetailResponse getRecommendCityDetail(Long id){
+    private String getDangerLabel(Danger danger) {
+        if (hasText(danger.getControl())) {
+            return danger.getControl().trim();
+        }
+        if (hasText(danger.getAttention())) {
+            return danger.getAttention().trim();
+        }
+        if (hasText(danger.getLimita())) {
+            return danger.getLimita().trim();
+        }
+        return DEFAULT_DANGER_LABEL;
+    }
 
-
+    private String getDangerDescription(Danger danger) {
+        if (hasText(danger.getControl())) {
+            return joinDangerDescription(
+                    danger.getControlNote(),
+                    danger.getControlPartial(),
+                    danger.getEvacuateRegionTy()
+            );
+        }
+        if (hasText(danger.getAttention())) {
+            return joinDangerDescription(
+                    danger.getAttentionNote(),
+                    danger.getAttentionPartial()
+            );
+        }
+        if (hasText(danger.getLimita())) {
+            return joinDangerDescription(
+                    danger.getLimitaNote(),
+                    danger.getLimitaPartial(),
+                    danger.getEvacuateRcmndRemark()
+            );
+        }
         return null;
     }
 
-    public NotRecommendCityDetailResponse getNotRecommendCityDetail(Long id){
+    private String joinDangerDescription(String... parts) {
+        String description = java.util.Arrays.stream(parts)
+                .filter(this::hasText)
+                .map(String::trim)
+                .collect(Collectors.joining(" / "));
+        return description.isBlank() ? null : description;
+    }
+
+    private boolean hasText(String value) {
+        return value != null && !value.isBlank();
+    }
+
+    public RecommendCityDetailResponse getRecommendCityDetail(Long id) {
+        return null;
+    }
+
+    public NotRecommendCityDetailResponse getNotRecommendCityDetail(Long id) {
         City city = cityRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("도시가 존재하지 않습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("해당 도시는 존재하지 않습니다."));
         YearMonth now = YearMonth.now();
         String targetYearMonth = YearMonth.of(now.getYear(), now.getMonth()).toString();
         FlightSummary summary = flightSummaryRepository.findByCityIdAndYearMonthWithCity(id, targetYearMonth).orElse(null);
         double avgFlightPrice = 0.0;
         double avgHotelPrice = 0.0;
-        if(summary != null){
+        if (summary != null) {
             avgFlightPrice = summary.getAvgFlightPrice() != null ? summary.getAvgFlightPrice() : 0.0;
             avgHotelPrice = summary.getAvgHotelPrice() != null ? summary.getAvgHotelPrice() : 0.0;
         }
@@ -109,15 +159,17 @@ public class CityService {
         double food = 0.0;
         double transport = 0.0;
         LivingCostOfCity cost = livingCostOfCityRepository.findOneByCityId(id).orElse(null);
-        if(cost != null){
+        if (cost != null) {
             transport = cost.getTransport() != null ? cost.getTransport() : 0.0;
-            food = cost.getFood() != null ? cost.getFood() : 0;
-
+            food = cost.getFood() != null ? cost.getFood() : 0.0;
         }
-        String dangerLabel = "안전";
+
+        String dangerLabel = DEFAULT_DANGER_LABEL;
+        String dangerDescription = null;
         Danger danger = dangerRepository.findByCountryId(city.getCountry().getId()).orElse(null);
-        if(danger != null){
+        if (danger != null) {
             dangerLabel = getDangerLabel(danger);
+            dangerDescription = getDangerDescription(danger);
         }
 
         List<NotRecommendCityDetailResponse.TagResponse> list =
@@ -126,33 +178,31 @@ public class CityService {
                                 cityTag.getTag().getName(),
                                 cityTag.getTagScore()
                         ))
-                        .toList();;
+                        .toList();
 
         return new NotRecommendCityDetailResponse(
                 city.getCityName(),
                 new NotRecommendCityDetailResponse.LivingCostFor1Day(food, transport),
                 new NotRecommendCityDetailResponse.AirTicketAndHotel(avgFlightPrice, avgHotelPrice),
                 dangerLabel,
+                dangerDescription,
                 list
         );
     }
 
     public List<CityResponse> list(Long countryId) {
-		if (countryId == null) {
-			List<City> cities = cityRepository.findAllByIsDeletedFalse();
-			return parseToCityListResponseList(cities);
-		} else {
-			List<City> cities = cityRepository.findAllByCountryIdAndIsDeletedFalse(countryId);
-			return parseToCityListResponseList(cities);
-		}
-	}
+        if (countryId == null) {
+            List<City> cities = cityRepository.findAllByIsDeletedFalse();
+            return parseToCityListResponseList(cities);
+        } else {
+            List<City> cities = cityRepository.findAllByCountryIdAndIsDeletedFalse(countryId);
+            return parseToCityListResponseList(cities);
+        }
+    }
 
-	private List<CityResponse> parseToCityListResponseList(List<City> cities) {
-		return cities
-			.stream()
-			.map(CityResponse::from)
-			.toList();
-	}
+    private List<CityResponse> parseToCityListResponseList(List<City> cities) {
+        return cities.stream()
+                .map(CityResponse::from)
+                .toList();
+    }
 }
-
-

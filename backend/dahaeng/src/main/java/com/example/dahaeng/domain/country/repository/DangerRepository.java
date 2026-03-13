@@ -8,5 +8,6 @@ import java.util.Optional;
 
 public interface DangerRepository extends JpaRepository<Danger, Long> {
     Optional<Danger> findByCountryId(Long countryId);
+    List<Danger> findAllByCountryIdIn(List<Long> countryIds);
 
 }

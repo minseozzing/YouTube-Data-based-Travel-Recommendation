@@ -6,6 +6,7 @@ public record AllCitiesResponse(
         String imgUrl,
         Double expectedBudgetFor1day,
         String danger,
+        String dangerDescription,
 
         Double lat,
         Double lon
