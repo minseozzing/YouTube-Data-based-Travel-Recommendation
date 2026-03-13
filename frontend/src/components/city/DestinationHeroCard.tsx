@@ -53,13 +53,13 @@ function BookmarkButton({ city }: BookmarkButtonProps) {
   const { mutate: deleteBookmark, isPending: isDeleting } = useDeleteBookmark();
   const { data: bookmarkList } = useBookmarkList();
 
-  const bookmarkedItem = bookmarkList?.find((b) => b.cityId === city.cityId);
+  const bookmarkedItem = bookmarkList?.content.find((b) => b.cityId === city.cityId);
   const isBookmarked = !!bookmarkedItem;
   const isPending = isCreating || isDeleting;
 
   const handleToggle = () => {
-    if (isBookmarked && bookmarkedItem?.bookmarkId !== undefined) {
-      deleteBookmark(bookmarkedItem.bookmarkId);
+    if (isBookmarked && bookmarkedItem?.id !== undefined) {
+      deleteBookmark(bookmarkedItem.id);
     } else {
       createBookmark({
         country: city.countryName,

@@ -64,6 +64,7 @@ export function CityDetailModal() {
     selectedCityId,
     isCityModalOpen,
     activeCityTab,
+    isRecommendActive,
     closeCityModal,
     setActiveCityTab,
   } = useUiStore();
@@ -73,7 +74,7 @@ export function CityDetailModal() {
     data: cityFromApi,
     isLoading,
     isError,
-  } = useCityDetail(selectedCityId);
+  } = useCityDetail(selectedCityId, isRecommendActive);
 
   // API 실패 시 더미 데이터로 대체하고, 더미도 없으면 null
   const city =

@@ -4,7 +4,7 @@ export const CityListItemSchema = z.object({
   cityId: z.number(),
   cityName: z.string(),
   countryName: z.string(),
-  imgUrl: z.string().url(),
+  imgUrl: z.string(),
   estimatedBudget: z.number(),
   riskLevel: z.number().min(0).max(5),
   latitude: z.number(),
@@ -29,7 +29,7 @@ export const AirTicketSchema = z.object({
 // 뉴스 항목
 export const NewsItemSchema = z.object({
   title: z.string(),
-  url: z.string().url(),
+  url: z.string(),
   createdAt: z.string(), // ISO timestamp
 });
 
@@ -49,7 +49,7 @@ export const CityDetailSchema = z.object({
   cityName: z.string(),
   countryId: z.number(),
   countryName: z.string(),
-  imgUrl: z.string().url(),
+  imgUrl: z.string(),
   matchingScore: z.number().optional(),
   recommendReason: z.string().optional(),
   

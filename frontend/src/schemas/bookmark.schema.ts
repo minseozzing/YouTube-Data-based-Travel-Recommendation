@@ -6,8 +6,8 @@ export const BookmarkListItemSchema = z.object({
   cityId: z.number(),
   cityName: z.string(),
   countryName: z.string(),
-  imgUrl: z.string().url().nullable(),
-  createdAt: z.string().datetime({ offset: false }),
+  imgUrl: z.string().nullable(),
+  createdAt: z.string(),
 });
 export type BookmarkListItem = z.infer<typeof BookmarkListItemSchema>;
 
