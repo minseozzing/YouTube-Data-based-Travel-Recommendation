@@ -21,7 +21,6 @@ import org.springframework.security.oauth2.client.web.DefaultOAuth2Authorization
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
@@ -47,7 +46,10 @@ public class SecurityConfig {
             "/api/exchange-rate/**",
             "/api/city/list",
             "/api/tag",
-            "/api/country/**"
+            "/api/country/**",
+            "/api/recommend",
+            "/api/city",
+            "/api/city/*",
     };
 
     private final CustomOAuth2UserService customOAuth2UserService;
@@ -98,18 +100,6 @@ public class SecurityConfig {
 
         http
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers(
-                                "/",
-                                "/login/**",
-                                "/oauth2/**",
-                                "/api/auth/google/login-url",
-                                "/api/auth/exchange",
-                                  "/api/cost/**",
-                            "/api/exchange-rate/**",
-                                "/api/city",
-                                "/api/city/*",
-                                "/api/recommend"
-                        ).permitAll()
                         .requestMatchers(PUBLIC_URLS).permitAll()
                         .anyRequest().authenticated());
 
