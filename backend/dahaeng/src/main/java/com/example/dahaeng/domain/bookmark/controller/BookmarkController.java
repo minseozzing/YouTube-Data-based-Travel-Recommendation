@@ -41,7 +41,7 @@ public class BookmarkController {
 
 	@GetMapping("/{bookmarkId}")
 	public ResponseEntity<BookmarkDetailResponse> detail(
-		@PathVariable Long bookmarkId,
+		@PathVariable("bookmarkId") Long bookmarkId,
 		@AuthenticationPrincipal CustomOAuth2User user
 	) throws JsonProcessingException {
 		return ResponseEntity.ok(bookmarkService.detail(bookmarkId, user.getId()));

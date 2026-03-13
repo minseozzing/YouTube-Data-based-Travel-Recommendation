@@ -28,8 +28,8 @@ public class CityController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getCityDetail(
-            @PathVariable Long id,
-            @RequestParam Boolean recommend
+            @PathVariable("id") Long id,
+            @RequestParam("recommend") Boolean recommend
     ){
         if(recommend){
             RecommendCityDetailResponse recommendCityDetailResponse = cityService.getRecommendCityDetail(id);
