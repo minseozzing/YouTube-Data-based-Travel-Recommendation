@@ -50,6 +50,8 @@ public class SecurityConfig {
             "/api/recommend",
             "/api/city",
             "/api/city/*",
+            "/api/flights/**",
+            "/api/cities/**"
     };
 
     private final CustomOAuth2UserService customOAuth2UserService;
@@ -63,21 +65,21 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http, RequestMatcher jwtProtectedPathMatcher) throws Exception {
 
         http
-                .cors(corsCustomizer -> corsCustomizer.configurationSource(new CorsConfigurationSource() {
-                    @Override
-                    public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
-                        CorsConfiguration configuration = new CorsConfiguration();
+                .cors(corsCustomizer -> corsCustomizer
+                        .configurationSource(new CorsConfigurationSource() {
+                            @Override
+                            public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
+                                CorsConfiguration configuration = new CorsConfiguration();
+                                configuration.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
+                                configuration.setAllowedMethods(Collections.singletonList("*"));
+                                configuration.setAllowCredentials(true);
+                                configuration.setAllowedHeaders(Collections.singletonList("*"));
+                                configuration.setMaxAge(3600L);
+                                configuration.setExposedHeaders(Collections.singletonList("Authorization"));
 
-                        configuration.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
-                        configuration.setAllowedMethods(Collections.singletonList("*"));
-                        configuration.setAllowCredentials(true);
-                        configuration.setAllowedHeaders(Collections.singletonList("*"));
-                        configuration.setMaxAge(3600L);
-                        configuration.setExposedHeaders(Collections.singletonList("Authorization"));
-
-                        return configuration;
-                    }
-                }));
+                                return configuration;
+                            }
+                        }));
 
         http
                 .csrf((auth) -> auth.disable())
@@ -87,16 +89,17 @@ public class SecurityConfig {
         http
                 .addFilterBefore(new JwtFilter(jwtUtil, memberRepository, jwtProtectedPathMatcher),
                         UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(new JwtExceptionFilter(objectMapper, jwtProtectedPathMatcher), JwtFilter.class);
+                .addFilterBefore(new JwtExceptionFilter(objectMapper, jwtProtectedPathMatcher),
+                        JwtFilter.class);
 
         http
                 .oauth2Login((oauth2) -> oauth2
                         .authorizationEndpoint(authorization -> authorization
-                                .authorizationRequestResolver(authorizationRequestResolver(clientRegistrationRepository)))
+                                .authorizationRequestResolver(
+                                        authorizationRequestResolver(clientRegistrationRepository)))
                         .userInfoEndpoint((userInfoEndpointConfig) -> userInfoEndpointConfig
                                 .userService(customOAuth2UserService))
-                        .successHandler(customSuccessHandler)
-                );
+                        .successHandler(customSuccessHandler));
 
         http
                 .authorizeHttpRequests((auth) -> auth
@@ -121,24 +124,21 @@ public class SecurityConfig {
         return new OrRequestMatcher(
                 Arrays.stream(PUBLIC_URLS)
                         .map(pattern -> PathPatternRequestMatcher.withDefaults().matcher(pattern))
-                        .toArray(RequestMatcher[]::new)
-        );
+                        .toArray(RequestMatcher[]::new));
     }
 
     private OAuth2AuthorizationRequestResolver authorizationRequestResolver(
             ClientRegistrationRepository clientRegistrationRepository) {
 
         DefaultOAuth2AuthorizationRequestResolver authorizationRequestResolver =
-                new DefaultOAuth2AuthorizationRequestResolver(
-                        clientRegistrationRepository, "/oauth2/authorization");
+                new DefaultOAuth2AuthorizationRequestResolver(clientRegistrationRepository, "/oauth2/authorization");
 
         authorizationRequestResolver.setAuthorizationRequestCustomizer(
                 customizer -> customizer
                         .additionalParameters(params -> {
                             params.put("access_type", "offline");
                             params.put("prompt", "consent");
-                        })
-        );
+                        }));
 
         return authorizationRequestResolver;
     }
