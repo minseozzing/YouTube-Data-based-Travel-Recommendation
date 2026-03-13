@@ -19,7 +19,7 @@ import java.util.List;
 public class CityController {
     private final CityService cityService;
 
-    @GetMapping
+    @GetMapping("")
     public ResponseEntity<List<AllCitiesResponse>> getAllCities() {
         List<AllCitiesResponse> list = new ArrayList<>();
         list = cityService.getAllCities();

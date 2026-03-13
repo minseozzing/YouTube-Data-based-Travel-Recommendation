@@ -7,6 +7,7 @@ public record NotRecommendCityDetailResponse(
         LivingCostFor1Day livingCostFor1Day,
         AirTicketAndHotel airTicketAndHotel,
         String danger,
+        String dangerDescription,
         List<TagResponse> tags
 ) {
     public record LivingCostFor1Day(
