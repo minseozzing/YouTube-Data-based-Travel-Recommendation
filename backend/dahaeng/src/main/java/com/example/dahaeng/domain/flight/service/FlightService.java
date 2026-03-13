@@ -13,9 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.YearMonth;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -66,7 +64,6 @@ public class FlightService {
                         return Collections.emptyList();
 
                 List<CalendarResponseDto.DailyPriceDto> result = new ArrayList<>();
-                LocalDate latestDateParsed = LocalDate.parse(latest.getCollectedDate());
 
                 for (int i = 0; i < basePrices.size(); i++) {
                         FlightPriceCalendar.DailyPrice daily = basePrices.get(i);
@@ -80,13 +77,9 @@ public class FlightService {
                                                 : cal.getInboundDailyPrices();
                                 if (targetPrices != null && i < targetPrices.size()
                                                 && targetPrices.get(i).getDate().equals(date)) {
-                                        LocalDate targetParsed = LocalDate.parse(cal.getCollectedDate());
-                                        long daysDiff = ChronoUnit.DAYS.between(targetParsed, latestDateParsed);
-
                                         history.add(CalendarResponseDto.PriceHistoryDto.builder()
                                                         .collectedDate(cal.getCollectedDate())
                                                         .price(targetPrices.get(i).getPrice())
-                                                        .label(determineLabel(daysDiff))
                                                         .build());
                                 }
                         }
@@ -98,18 +91,6 @@ public class FlightService {
                                         .build());
                 }
                 return result;
-        }
-
-        private String determineLabel(long daysDiff) {
-                if (daysDiff == 0)
-                        return "오늘";
-                if (daysDiff == 1)
-                        return "어제";
-                if (daysDiff >= 7 && daysDiff < 14)
-                        return "1주 전";
-                if (daysDiff >= 14)
-                        return "2주 전";
-                return daysDiff + "일 전";
         }
 
         public TrendResponseDto getSixMonthTrend(Long cityId) {
