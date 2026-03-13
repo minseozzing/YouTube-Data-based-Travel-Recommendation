@@ -21,9 +21,7 @@ public class CityController {
 
     @GetMapping
     public ResponseEntity<List<AllCitiesResponse>> getAllCities() {
-        List<AllCitiesResponse> list = new ArrayList<>();
-        list = cityService.getAllCities();
-        return ResponseEntity.ok(list);
+        return ResponseEntity.ok(cityService.getAllCities());
     }
 
     @GetMapping("/{id}")
