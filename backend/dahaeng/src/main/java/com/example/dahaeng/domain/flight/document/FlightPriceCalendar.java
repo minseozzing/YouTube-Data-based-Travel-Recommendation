@@ -14,21 +14,21 @@ import java.util.List;
 public class FlightPriceCalendar {
 
     @Id
-    private String id; // e.g., "12-2026-05-20260309"
+    private String id; // e.g., "6920208-2026-05-20260309"
 
-    @Field("city_id")
+    @Field("cityId")
     private Long cityId;
 
-    @Field("year_month")
+    @Field("yearMonth")
     private String yearMonth;
 
-    @Field("collected_date")
+    @Field("collectedDate")
     private String collectedDate; // YYYY-MM-DD
 
-    @Field("outbound_daily_prices")
+    @Field("outboundDailyPrices")
     private List<DailyPrice> outboundDailyPrices;
 
-    @Field("inbound_daily_prices")
+    @Field("inboundDailyPrices")
     private List<DailyPrice> inboundDailyPrices;
 
     @Getter
