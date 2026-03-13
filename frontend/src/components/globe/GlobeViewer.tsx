@@ -331,14 +331,12 @@ const BaseLayer = React.memo(
     onLeave: () => void;
     zoom: number;
   }) => {
-    // 3D 효과 계산: 줌이 커질수록 시각적 높이는 줄어들지만, 
-    // SVG 단위에서의 높이는 zoom에 반비례하게 더 빠르게 줄여서 
-    // 줌인했을 때 육안으로 보이는 돌출 정도가 작아지게 함.
-    const visualHeight = 8 / Math.pow(zoom, 0.4); 
+    // 3D 효과 계산: 줌에 따라 돌출 정도를 조절
+    const visualHeight = 7 / Math.pow(zoom, 0.45); 
     const totalH = visualHeight / zoom;
-    const xOffset = totalH * 0.4; // 육면체 느낌을 위해 대각선 오프셋
+    const xOffset = totalH * 0.45; 
     const yOffset = -totalH;
-    const sideLayersCount = 8;
+    const sideLayersCount = 12; // 더 매끄러운 옆면을 위해 레이어 수 증가
 
     return (
     <Geographies geography={geography}>
@@ -390,24 +388,29 @@ const BaseLayer = React.memo(
                     fill={MAP_COLORS.countrySelectedShadow}
                     stroke="none"
                     style={{ default: { pointerEvents: "none" } }}
-                    transform={`translate(${xOffset * 0.5}, ${-yOffset * 0.5})`}
+                    transform={`translate(${xOffset * 0.4}, ${-yOffset * 0.4})`}
                   />
-                  {/* 옆면 레이어 (스무스한 육면체 효과: 아래에서 위로 쌓기) */}
+                  {/* 옆면 레이어 (부드러운 그라데이션 효과) */}
                   {[...Array(sideLayersCount)].map((_, i) => {
                     const ratio = (i + 1) / (sideLayersCount + 1);
                     const curX = xOffset * ratio;
                     const curY = yOffset * ratio;
-                    // 아래쪽은 어둡게, 위쪽은 살짝 밝게
-                    const color = i < sideLayersCount / 2 
-                      ? MAP_COLORS.countrySelectedSide2 
-                      : MAP_COLORS.countrySelectedSide1;
+                    
+                    // 색상 보간: 어두운 회색(#909090) -> 상면 색상(#D4D4D4)
+                    const startRGB = [144, 144, 144]; 
+                    const endRGB = [212, 212, 212];
+                    const r = Math.round(startRGB[0] + (endRGB[0] - startRGB[0]) * ratio);
+                    const g = Math.round(startRGB[1] + (endRGB[1] - startRGB[1]) * ratio);
+                    const b = Math.round(startRGB[2] + (endRGB[2] - startRGB[2]) * ratio);
+                    const color = `rgb(${r},${g},${b})`;
                     
                     return (
                       <Geography
                         key={`side-${i}`}
                         geography={geo}
                         fill={color}
-                        stroke="none"
+                        stroke={color} // 레이어 사이의 미세한 틈새 방지
+                        strokeWidth={0.2 / zoom}
                         style={{ default: { pointerEvents: "none" } }}
                         transform={`translate(${curX}, ${curY})`}
                       />
@@ -418,8 +421,8 @@ const BaseLayer = React.memo(
                     geography={geo}
                     tabIndex={-1}
                     fill={MAP_COLORS.countrySelected}
-                    stroke="none"
-                    strokeWidth={0}
+                    stroke={MAP_COLORS.countrySelected} // 상면 테두리 정돈
+                    strokeWidth={0.2 / zoom}
                     style={{
                       default: {
                         outline: "none",
