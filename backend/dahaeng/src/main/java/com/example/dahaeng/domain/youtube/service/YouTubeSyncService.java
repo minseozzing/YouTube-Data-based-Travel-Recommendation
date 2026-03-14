@@ -69,7 +69,7 @@ public class YouTubeSyncService {
             Map<String, YouTubeVideo> videoMap = syncVideoDetails(accessToken, videoIds, now);
 
             finalizeRelations(account, playlistMap, playlistItemsMap, videoMap, likedVideoIds, now);
-            extractAndSaveKeywords(account.getId());
+            extractAndSaveKeywordsSafely(account.getId());
 
             saveService.replaceSnapshot(account, SnapshotType.FULL_SYNC, "{\"status\":\"ok\"}", now);
             saveService.updateSyncStatus(account, SyncStatus.SYNCED, now);
@@ -244,9 +244,14 @@ public class YouTubeSyncService {
         saveService.replaceLikedVideos(account, likedVideoEntities, now);
     }
 
-    private void extractAndSaveKeywords(Long accountId) {
-        var features = keywordExtractionEngine.extractFeatures(accountId);
-        interestResultSaver.saveKeywords(accountId, features.getAllKeywords());
+    private void extractAndSaveKeywordsSafely(Long accountId) {
+        try {
+            var features = keywordExtractionEngine.extractFeatures(accountId);
+            interestResultSaver.saveKeywords(accountId, features.getAllKeywords());
+        } catch (Exception e) {
+            System.out.println(">>> [KEYWORD EXTRACTION SKIP] Failed to extract keywords for account " + accountId
+                    + ": " + e.getMessage());
+        }
     }
 
     private LocalDateTime parseDateTime(String value) {
