@@ -1,7 +1,6 @@
 package com.example.dahaeng.domain.interest.controller;
 
 import com.example.dahaeng.domain.auth.dto.CustomOAuth2User;
-import com.example.dahaeng.domain.interest.dto.InterestAnalysisResult;
 import com.example.dahaeng.domain.interest.dto.InterestTagResponse;
 import com.example.dahaeng.domain.interest.service.InterestAnalysisService;
 import com.example.dahaeng.domain.member.entity.Member;
@@ -19,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,10 +30,10 @@ public class InterestController {
     private final YouTubeAccountRepository accountRepository;
 
     @PostMapping("/analyze")
-    public ResponseEntity<InterestAnalysisResult> analyze(@AuthenticationPrincipal CustomOAuth2User principal) {
+    public ResponseEntity<Map<String, String>> analyze(@AuthenticationPrincipal CustomOAuth2User principal) {
         YouTubeAccount account = getLoginUserYouTubeAccount(principal);
-        InterestAnalysisResult result = analysisService.analyze(account.getId());
-        return ResponseEntity.ok(result);
+        analysisService.analyze(account.getId());
+        return ResponseEntity.ok(Map.of("message", "interest analysis completed"));
     }
 
     @GetMapping("/analyze")
