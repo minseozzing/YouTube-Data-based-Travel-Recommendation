@@ -56,11 +56,26 @@ public class InterestAnalysisService {
     }
 
     public List<InterestTagResponse> getAnalyzedTags(Long accountId) {
-        return youTubeTravelTagRepository.findByAccount_Id(accountId).stream()
+        return youTubeTravelTagRepository.findAllByAccountIdWithTag(accountId).stream()
                 .map(tag -> InterestTagResponse.builder()
-                        .categoryName(tag.getCategoryName())
-                        .tagName(tag.getTagName())
+                        .tagId(tag.getTag() != null ? tag.getTag().getId() : null)
+                        .categoryName(resolveCategoryName(tag))
+                        .tagName(resolveTagName(tag))
                         .build())
                 .toList();
+    }
+
+    private String resolveCategoryName(com.example.dahaeng.domain.youtube.entity.YouTubeTravelTag tag) {
+        if (tag.getTag() != null && tag.getTag().getCategory() != null) {
+            return tag.getTag().getCategory().getName();
+        }
+        return tag.getCategoryName();
+    }
+
+    private String resolveTagName(com.example.dahaeng.domain.youtube.entity.YouTubeTravelTag tag) {
+        if (tag.getTag() != null) {
+            return tag.getTag().getName();
+        }
+        return tag.getTagName();
     }
 }
