@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Repository
@@ -18,4 +19,14 @@ public interface TagRepository extends JpaRepository<Tag, Long> {
 
 	@Query("select t from Tag t where t.id in (:tagIds) and t.isDeleted = false")
 	List<Tag> findAllByTagIds(Set<Long> tagIds);
+
+	@Query("""
+		select t
+		from Tag t
+		join fetch t.category c
+		where lower(c.name) = lower(:categoryName)
+			and lower(t.name) = lower(:tagName)
+			and t.isDeleted = false
+		""")
+	Optional<Tag> findByCategoryNameAndTagName(String categoryName, String tagName);
 }

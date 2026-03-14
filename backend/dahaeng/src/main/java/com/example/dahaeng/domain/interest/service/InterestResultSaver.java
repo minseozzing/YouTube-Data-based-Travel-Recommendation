@@ -3,6 +3,8 @@ package com.example.dahaeng.domain.interest.service;
 import com.example.dahaeng.domain.interest.dto.InterestKeywordCandidate;
 import com.example.dahaeng.domain.interest.dto.TravelTagScore;
 import com.example.dahaeng.domain.interest.enums.InterestSourceType;
+import com.example.dahaeng.domain.tag.entity.Tag;
+import com.example.dahaeng.domain.tag.repository.TagRepository;
 import com.example.dahaeng.domain.interest.repository.YoutubeInterestKeywordRepository;
 import com.example.dahaeng.domain.youtube.entity.YouTubeAccount;
 import com.example.dahaeng.domain.youtube.entity.YouTubeInterestKeyword;
@@ -13,12 +15,14 @@ import com.example.dahaeng.domain.youtube.repository.YouTubeTravelTagRepository;
 import com.example.dahaeng.global.exception.CustomException;
 import com.example.dahaeng.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class InterestResultSaver {
@@ -28,6 +32,7 @@ public class InterestResultSaver {
     private final YouTubeAccountRepository accountRepository;
     private final YoutubeInterestKeywordRepository keywordRepository;
     private final YouTubeTravelTagRepository travelTagRepository;
+    private final TagRepository tagRepository;
 
     @Transactional
     public void save(Long accountId,
@@ -69,15 +74,8 @@ public class InterestResultSaver {
 
         if (travelTags != null && !travelTags.isEmpty()) {
             List<YouTubeTravelTag> tagEntities = travelTags.stream()
-                    .map(t -> YouTubeTravelTag.builder()
-                            .account(account)
-                            .tagName(t.getTag())
-                            .categoryName(t.getCategory())
-                            .score(t.getScore())
-                            .confidence(t.getConfidence())
-                            .reason(t.getReason())
-                            .analyzedAt(now)
-                            .build())
+                    .map(t -> toYouTubeTravelTag(account, t, now))
+                    .filter(java.util.Objects::nonNull)
                     .toList();
             travelTagRepository.saveAllAndFlush(tagEntities);
             System.out.println(">>> [DB SAVE SUCCESS] Saved " + tagEntities.size() + " travel tags for account " + accountId);
@@ -89,6 +87,38 @@ public class InterestResultSaver {
     private YouTubeAccount getAccount(Long accountId) {
         return accountRepository.findById(accountId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "Linked account not found."));
+    }
+
+    private YouTubeTravelTag toYouTubeTravelTag(YouTubeAccount account, TravelTagScore tagScore, LocalDateTime now) {
+        Tag tag = findTag(tagScore);
+        if (tag == null) {
+            return null;
+        }
+
+        return YouTubeTravelTag.builder()
+                .account(account)
+                .tag(tag)
+                .tagName(tag.getName())
+                .categoryName(tag.getCategory().getName())
+                .score(tagScore.getScore())
+                .confidence(tagScore.getConfidence())
+                .reason(tagScore.getReason())
+                .analyzedAt(now)
+                .build();
+    }
+
+    private Tag findTag(TravelTagScore tagScore) {
+        if (tagScore.getCategory() == null || tagScore.getTag() == null) {
+            log.warn(">>> [TAG MAP SKIP] Missing category/tag in AI result: {}", tagScore);
+            return null;
+        }
+
+        return tagRepository.findByCategoryNameAndTagName(tagScore.getCategory().trim(), tagScore.getTag().trim())
+                .orElseGet(() -> {
+                    log.warn(">>> [TAG MAP SKIP] No tag entity found for category='{}', tag='{}'.",
+                            tagScore.getCategory(), tagScore.getTag());
+                    return null;
+                });
     }
 
     private SourceType mapSourceType(InterestSourceType type) {
