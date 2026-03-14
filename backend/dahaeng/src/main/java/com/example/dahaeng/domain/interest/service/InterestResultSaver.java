@@ -31,18 +31,17 @@ public class InterestResultSaver {
     public void save(Long accountId,
                      List<InterestKeywordCandidate> keywords,
                      List<TravelTagScore> travelTags) {
+        saveKeywords(accountId, keywords);
+        saveTravelTags(accountId, travelTags);
+    }
 
-        // 1. 연동 계정 조회
-        YouTubeAccount account = accountRepository.findById(accountId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "연동 계정을 찾을 수 없습니다."));
-
-        // 2. 기존 분석 결과 초기화
+    @Transactional
+    public void saveKeywords(Long accountId, List<InterestKeywordCandidate> keywords) {
+        YouTubeAccount account = getAccount(accountId);
         keywordRepository.deleteByAccount_Id(accountId);
-        travelTagRepository.deleteByAccount_Id(accountId);
 
         LocalDateTime now = LocalDateTime.now();
 
-        // 3. 관심 키워드 저장
         if (keywords != null) {
             List<YouTubeInterestKeyword> keywordEntities = keywords.stream()
                     .map(k -> YouTubeInterestKeyword.builder()
@@ -56,8 +55,15 @@ public class InterestResultSaver {
                     .toList();
             keywordRepository.saveAll(keywordEntities);
         }
+    }
 
-        // 4. 여행 취향 태그 저장
+    @Transactional
+    public void saveTravelTags(Long accountId, List<TravelTagScore> travelTags) {
+        YouTubeAccount account = getAccount(accountId);
+        travelTagRepository.deleteByAccount_Id(accountId);
+
+        LocalDateTime now = LocalDateTime.now();
+
         if (travelTags != null && !travelTags.isEmpty()) {
             List<YouTubeTravelTag> tagEntities = travelTags.stream()
                     .map(t -> YouTubeTravelTag.builder()
@@ -77,9 +83,11 @@ public class InterestResultSaver {
         }
     }
 
-    /**
-     * 관심분석 모듈의 SourceType을 유튜브 모듈의 SourceType으로 매핑
-     */
+    private YouTubeAccount getAccount(Long accountId) {
+        return accountRepository.findById(accountId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "Linked account not found."));
+    }
+
     private SourceType mapSourceType(InterestSourceType type) {
         if (type == null) {
             return SourceType.PLAYLIST_TITLE;
