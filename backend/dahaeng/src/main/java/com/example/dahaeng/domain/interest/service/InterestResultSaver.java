@@ -23,6 +23,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class InterestResultSaver {
 
+    private static final int MAX_KEYWORDS_TO_SAVE = 200;
+
     private final YouTubeAccountRepository accountRepository;
     private final YoutubeInterestKeywordRepository keywordRepository;
     private final YouTubeTravelTagRepository travelTagRepository;
@@ -44,6 +46,7 @@ public class InterestResultSaver {
 
         if (keywords != null) {
             List<YouTubeInterestKeyword> keywordEntities = keywords.stream()
+                    .limit(MAX_KEYWORDS_TO_SAVE)
                     .map(k -> YouTubeInterestKeyword.builder()
                             .account(account)
                             .keyword(k.getRawKeyword())
