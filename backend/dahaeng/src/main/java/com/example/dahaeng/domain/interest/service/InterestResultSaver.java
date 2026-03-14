@@ -3,6 +3,9 @@ package com.example.dahaeng.domain.interest.service;
 import com.example.dahaeng.domain.interest.dto.InterestKeywordCandidate;
 import com.example.dahaeng.domain.interest.dto.TravelTagScore;
 import com.example.dahaeng.domain.interest.enums.InterestSourceType;
+import com.example.dahaeng.domain.member.entity.Member;
+import com.example.dahaeng.domain.member.entity.MemberTag;
+import com.example.dahaeng.domain.member.repository.MemberTagRepository;
 import com.example.dahaeng.domain.tag.entity.Tag;
 import com.example.dahaeng.domain.tag.repository.TagRepository;
 import com.example.dahaeng.domain.interest.repository.YoutubeInterestKeywordRepository;
@@ -21,6 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -33,6 +38,7 @@ public class InterestResultSaver {
     private final YoutubeInterestKeywordRepository keywordRepository;
     private final YouTubeTravelTagRepository travelTagRepository;
     private final TagRepository tagRepository;
+    private final MemberTagRepository memberTagRepository;
 
     @Transactional
     public void save(Long accountId,
@@ -78,8 +84,10 @@ public class InterestResultSaver {
                     .filter(java.util.Objects::nonNull)
                     .toList();
             travelTagRepository.saveAllAndFlush(tagEntities);
+            syncMemberTagsFromYoutube(account.getMember(), tagEntities);
             System.out.println(">>> [DB SAVE SUCCESS] Saved " + tagEntities.size() + " travel tags for account " + accountId);
         } else {
+            syncMemberTagsFromYoutube(account.getMember(), List.of());
             System.out.println(">>> [DB SAVE SKIP] No travel tags to save for account " + accountId);
         }
     }
@@ -91,15 +99,11 @@ public class InterestResultSaver {
 
     private YouTubeTravelTag toYouTubeTravelTag(YouTubeAccount account, TravelTagScore tagScore, LocalDateTime now) {
         Tag tag = findTag(tagScore);
-        if (tag == null) {
-            return null;
-        }
-
         return YouTubeTravelTag.builder()
                 .account(account)
                 .tag(tag)
-                .tagName(tag.getName())
-                .categoryName(tag.getCategory().getName())
+                .tagName(resolveTagName(tagScore, tag))
+                .categoryName(resolveCategoryName(tagScore, tag))
                 .score(tagScore.getScore())
                 .confidence(tagScore.getConfidence())
                 .reason(tagScore.getReason())
@@ -115,10 +119,49 @@ public class InterestResultSaver {
 
         return tagRepository.findByCategoryNameAndTagName(tagScore.getCategory().trim(), tagScore.getTag().trim())
                 .orElseGet(() -> {
-                    log.warn(">>> [TAG MAP SKIP] No tag entity found for category='{}', tag='{}'.",
+                    log.warn(">>> [TAG MAP MISS] No tag entity found for category='{}', tag='{}'.",
                             tagScore.getCategory(), tagScore.getTag());
                     return null;
                 });
+    }
+
+    private String resolveCategoryName(TravelTagScore tagScore, Tag tag) {
+        if (tag != null && tag.getCategory() != null) {
+            return tag.getCategory().getName();
+        }
+        return tagScore.getCategory();
+    }
+
+    private String resolveTagName(TravelTagScore tagScore, Tag tag) {
+        if (tag != null) {
+            return tag.getName();
+        }
+        return tagScore.getTag();
+    }
+
+    private void syncMemberTagsFromYoutube(Member member, List<YouTubeTravelTag> youtubeTravelTags) {
+        memberTagRepository.deleteByMemberAndIsFromYoutubeTrue(member);
+
+        Set<Long> desiredTagIds = youtubeTravelTags.stream()
+                .map(YouTubeTravelTag::getTag)
+                .filter(java.util.Objects::nonNull)
+                .map(Tag::getId)
+                .collect(Collectors.toSet());
+
+        if (desiredTagIds.isEmpty()) {
+            return;
+        }
+
+        List<Tag> desiredTags = tagRepository.findAllByTagIds(desiredTagIds);
+        List<MemberTag> memberTags = desiredTags.stream()
+                .map(tag -> MemberTag.builder()
+                        .member(member)
+                        .tag(tag)
+                        .isFromYoutube(true)
+                        .build())
+                .toList();
+
+        memberTagRepository.saveAll(memberTags);
     }
 
     private SourceType mapSourceType(InterestSourceType type) {
