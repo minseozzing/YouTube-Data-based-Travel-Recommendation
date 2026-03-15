@@ -5,8 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useUiStore } from "@/stores/uiStore";
 import { useCityDetail } from "@/hooks/city/useCityDetail";
-import { DUMMY_CITY_DETAILS } from "@/data/dummyCityData";
-
 function getMatchColor(score: number | undefined) {
   if (score === undefined) return "bg-slate-100 text-slate-600";
   if (score >= 80) return "bg-emerald-500 text-white";
@@ -24,17 +22,12 @@ export function RightPanel() {
     openCityModal,
   } = useUiStore();
 
-  const {
-    data: cityFromApi,
-    isLoading,
-    isError,
-  } = useCityDetail(selectedCityId, isRecommendActive);
+  const { data: cityFromApi, isLoading } = useCityDetail(
+    selectedCityId,
+    isRecommendActive,
+  );
 
-  const city =
-    cityFromApi ??
-    (isError && selectedCityId
-      ? (DUMMY_CITY_DETAILS[selectedCityId] ?? null)
-      : null);
+  const city = cityFromApi ?? null;
 
   const handleOpenDetail = () => {
     openCityModal("recommend");
@@ -86,7 +79,7 @@ export function RightPanel() {
                   <div className="flex items-center gap-1 mt-0.5">
                     <MapPin className="size-3 text-white/70" />
                     <span className="text-xs text-white/80">
-                      {city?.countryName ?? "나라 정보"}
+                      {city?.danger?.countryName ?? "나라 정보"}
                     </span>
                   </div>
                 </>
@@ -94,13 +87,15 @@ export function RightPanel() {
             </div>
 
             {/* 매칭 점수 배지 */}
-            {!isLoading && city?.matchingScore !== undefined && (
-              <Badge
-                className={`absolute top-2.5 left-3 text-xs font-bold border-none ${getMatchColor(city.matchingScore)}`}
-              >
-                {city.matchingScore}% 매칭
-              </Badge>
-            )}
+            {!isLoading &&
+              city?.score?.finalScore !== undefined &&
+              city.score.finalScore !== null && (
+                <Badge
+                  className={`absolute top-2.5 left-3 text-xs font-bold border-none ${getMatchColor(city.score.finalScore)}`}
+                >
+                  {city.score.finalScore}% 매칭
+                </Badge>
+              )}
           </div>
 
           {/* ── 스크롤 콘텐츠 영역 ── */}
@@ -112,14 +107,14 @@ export function RightPanel() {
                   <Skeleton key={i} className="h-5 w-14 rounded-full" />
                 ))}
               </div>
-            ) : city?.keywords && city.keywords.length > 0 ? (
+            ) : city?.tags && city.tags.length > 0 ? (
               <div className="flex flex-wrap gap-1.5">
-                {city.keywords.map((kw) => (
+                {city.tags.map((tag) => (
                   <span
-                    key={kw}
+                    key={tag.name}
                     className="text-[11px] bg-slate-100 text-slate-600 rounded-full px-2.5 py-0.5 font-medium"
                   >
-                    #{kw}
+                    #{tag.name}
                   </span>
                 ))}
               </div>
@@ -138,11 +133,11 @@ export function RightPanel() {
                 ) : (
                   <span className="text-xs font-bold text-slate-800 text-center">
                     {(() => {
-                      const cost = city?.livingCostFor1Day
-                        ? city.livingCostFor1Day.accommodation +
-                          city.livingCostFor1Day.food +
-                          city.livingCostFor1Day.transportation
-                        : city?.dailyCost;
+                      const lc = city?.livingCostFor1Day;
+                      const hotel = city?.airTicketAndHotel?.hotel ?? 0;
+                      const cost = lc
+                        ? lc.food + lc.transportation + hotel
+                        : undefined;
                       return cost ? `₩${(cost / 10000).toFixed(0)}만` : "-";
                     })()}
                   </span>
@@ -160,10 +155,7 @@ export function RightPanel() {
                 ) : (
                   <span className="text-xs font-bold text-slate-800 text-center">
                     {(() => {
-                      const price = city?.airTicket
-                        ? city.airTicket.departAirTicket +
-                          city.airTicket.arriveAirTicket
-                        : city?.flightPrice;
+                      const price = city?.airTicketAndHotel?.airTicket;
                       return price ? `₩${(price / 10000).toFixed(0)}만~` : "-";
                     })()}
                   </span>
@@ -198,7 +190,7 @@ export function RightPanel() {
                 </div>
               ) : (
                 <p className="text-xs text-slate-500 leading-relaxed line-clamp-3">
-                  {city?.recommendReason ??
+                  {city?.recommendationReason ??
                     "AI가 분석한 추천 이유를 불러오는 중입니다."}
                 </p>
               )}

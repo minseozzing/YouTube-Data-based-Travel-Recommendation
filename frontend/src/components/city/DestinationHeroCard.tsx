@@ -16,8 +16,6 @@ import {
 } from "lucide-react";
 import { useUiStore } from "@/stores/uiStore";
 import { useCreateBookmark } from "@/hooks/bookmark/useCreateBookmark";
-import { useDeleteBookmark } from "@/hooks/bookmark/useDeleteBookmark";
-import { useBookmarkList } from "@/hooks/bookmark/useBookmarkList";
 import { cn } from "@/lib/utils";
 import type { CityDetail } from "@/schemas/city.schema";
 
@@ -49,51 +47,26 @@ interface BookmarkButtonProps {
 }
 
 function BookmarkButton({ city }: BookmarkButtonProps) {
-  const { mutate: createBookmark, isPending: isCreating } = useCreateBookmark();
-  const { mutate: deleteBookmark, isPending: isDeleting } = useDeleteBookmark();
-  const { data: bookmarkList } = useBookmarkList();
-
-  const bookmarkedItem = bookmarkList?.content.find((b) => b.cityId === city.cityId);
-  const isBookmarked = !!bookmarkedItem;
-  const isPending = isCreating || isDeleting;
-
-  const handleToggle = () => {
-    if (isBookmarked && bookmarkedItem?.id !== undefined) {
-      deleteBookmark(bookmarkedItem.id);
-    } else {
-      createBookmark({
-        country: city.countryName,
-        city: city.cityName,
-        json: JSON.stringify(city),
-      });
-    }
-  };
+  const { mutate: createBookmark, isPending } = useCreateBookmark();
 
   return (
     <button
-      onClick={handleToggle}
+      onClick={() => createBookmark({ cityId: city.cityId, json: city })}
       disabled={isPending}
-      aria-label={isBookmarked ? "저장 취소" : "저장하기"}
+      aria-label="저장하기"
       className={cn(
         "w-14 h-14 rounded-full border-[3px] bg-blue-500/20",
         "flex items-center justify-center shrink-0",
         "active:scale-95 transition-all duration-150",
         "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300/60",
-        isBookmarked
-          ? "border-pink-400/80 hover:bg-pink-500/30"
-          : "border-blue-400/80 hover:bg-blue-500/40",
+        "border-blue-400/80 hover:bg-blue-500/40",
         isPending && "opacity-70 cursor-not-allowed",
       )}
     >
       {isPending ? (
         <Loader2 className="size-5 text-white animate-spin" />
       ) : (
-        <Heart
-          className={cn(
-            "size-5 text-white transition-all",
-            isBookmarked && "fill-white",
-          )}
-        />
+        <Heart className="size-5 text-white" />
       )}
     </button>
   );
@@ -151,9 +124,7 @@ export function DestinationHeroCard({
   const { closeCityModal } = useUiStore();
 
   // API의 tags(객체 배열)를 우선 사용하고, 없으면 keywords(문자열 배열) 사용
-  const displayKeywords = city.tags 
-    ? city.tags.map(t => t.name) 
-    : (city.keywords ?? []);
+  const displayKeywords = city.tags ? city.tags.map((t) => t.name) : [];
 
   return (
     <div
@@ -197,14 +168,16 @@ export function DestinationHeroCard({
         </div>
 
         {/* Danger Alert Section */}
-        {city.danger && (
-          <motion.div 
+        {city.danger && city.danger.items.length > 0 && (
+          <motion.div
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             className="flex items-center gap-2 px-3 py-2 bg-amber-500/20 backdrop-blur-md border border-amber-500/40 rounded-xl text-amber-200"
           >
             <AlertTriangle className="size-4 shrink-0 text-amber-400" />
-            <span className="text-xs font-bold leading-tight">{city.danger}</span>
+            <span className="text-xs font-bold leading-tight">
+              {city.danger.items.map((item) => item.description).join(' / ')}
+            </span>
           </motion.div>
         )}
       </div>
@@ -223,8 +196,8 @@ export function DestinationHeroCard({
         </div>
 
         {/* 매칭 스코어 + 하트 버튼 */}
-        {city.matchingScore !== undefined ? (
-          <MatchCard score={city.matchingScore} city={city} />
+        {city.score?.finalScore !== undefined && city.score.finalScore !== null ? (
+          <MatchCard score={city.score.finalScore} city={city} />
         ) : (
           <div className="flex justify-end">
             <BookmarkButton city={city} />

@@ -24,9 +24,12 @@ export const bookmarkApi = {
     size = 10,
     sort = "id,desc",
   }: BookmarkListParams = {}) => {
-    const { data } = await axiosInstance.get("/api/bookmarks", {
+    const res = await axiosInstance.get("/api/bookmarks", {
       params: { ...(keyword ? { keyword } : {}), page, size, sort },
     });
+    const data = res.data;
+
+    console.log(res);
     console.log(data);
 
     return BookmarkPageSchema.parse(data);

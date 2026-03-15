@@ -60,8 +60,7 @@ export type BookmarkDetail = z.infer<typeof BookmarkDetailSchema>;
 
 // 북마크 생성 요청
 export const CreateBookmarkRequestSchema = z.object({
-  country: z.string(),
-  city: z.string(),
-  json: z.string(), // 상세 정보 JSON 문자열
+  cityId: z.number(),
+  json: z.unknown(), // 상세 정보 객체
 });
 export type CreateBookmarkRequest = z.infer<typeof CreateBookmarkRequestSchema>;

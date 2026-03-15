@@ -12,9 +12,8 @@ export function SaveButton({ city }: SaveButtonProps) {
 
   const handleSave = () => {
     createBookmark({
-      country: city.countryName,
-      city: city.cityName,
-      json: JSON.stringify(city),
+      cityId: city.cityId,
+      json: city,
     });
   };
 

@@ -12,7 +12,6 @@ import { useAuthStore } from "@/stores/authStore";
 import { useState, useRef, useEffect, useMemo } from "react";
 import { useCityList } from "@/hooks/city/useCityList";
 import { useUiStore } from "@/stores/uiStore";
-import { DUMMY_CITY_DETAILS } from "@/data/dummyCityData";
 import { cn } from "@/lib/utils";
 
 export function UnifiedNavBar() {
@@ -31,8 +30,7 @@ export function UnifiedNavBar() {
   const { openRightPanel, isCityModalOpen } = useUiStore();
   const { data: cities } = useCityList();
 
-  const fallbackCities = useMemo(() => Object.values(DUMMY_CITY_DETAILS), []);
-  const citySource = cities ?? fallbackCities;
+  const citySource = cities ?? [];
 
   const suggestions = useMemo(() => {
     if (!query.trim()) return [];

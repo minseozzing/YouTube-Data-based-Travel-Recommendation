@@ -9,7 +9,7 @@ import { queryKeys } from "@/utils/queryKeys";
  */
 export const useBookmarkList = (params: BookmarkListParams = {}) =>
   useQuery({
-    queryKey: queryKeys.bookmark.list(params.keyword),
+    queryKey: queryKeys.bookmark.list(params.keyword, params.page, params.size),
     queryFn: () => bookmarkApi.getList(params),
     staleTime: 0,
   });

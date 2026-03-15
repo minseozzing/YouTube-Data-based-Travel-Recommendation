@@ -30,7 +30,7 @@ export const queryKeys = {
   },
   bookmark: {
     all: ['bookmark'] as const,
-    list: (keyword?: string) => ['bookmark', 'list', keyword] as const,
+    list: (keyword?: string, page?: number, size?: number) => ['bookmark', 'list', keyword, page, size] as const,
     detail: (id: number) => ['bookmark', 'detail', id] as const,
   },
 } as const;

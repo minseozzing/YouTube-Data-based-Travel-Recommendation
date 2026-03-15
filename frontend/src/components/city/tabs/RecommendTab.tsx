@@ -78,25 +78,22 @@ function InfoCard({ icon: Icon, label, value, subValue, onClick }: InfoCardProps
 // ── RecommendTab ─────────────────────────────────────────────
 export function RecommendTab({ city, onTabChange }: RecommendTabProps) {
   const recommendText =
-    city.recommendReason ?? "AI가 분석한 추천 이유를 불러오는 중입니다.";
+    city.recommendationReason ?? "AI가 분석한 추천 이유를 불러오는 중입니다.";
 
-  // API 데이터 (livingCostFor1Day) 사용
+  // API 데이터 (livingCostFor1Day) 사용 — 백엔드: { food, transportation }
   const lc = city.livingCostFor1Day;
-  const totalDaily = lc ? (lc.accommodation + lc.food + lc.transportation) : city.dailyCost;
-  
-  const accomPct = lc && totalDaily ? (lc.accommodation / totalDaily) * 100 : 45;
+  const at = city.airTicketAndHotel;
+  const hotel = at?.hotel ?? 0;
+  const totalDaily = lc ? (lc.food + lc.transportation + hotel) : undefined;
+
+  const accomPct = lc && totalDaily ? (hotel / totalDaily) * 100 : 45;
   const foodPct = lc && totalDaily ? (lc.food / totalDaily) * 100 : 35;
   const transPct = lc && totalDaily ? (lc.transportation / totalDaily) * 100 : 20;
 
-  // 항공권 상세 정보
-  const at = city.airTicket;
-  const flightValue = at 
-    ? `₩${(at.departAirTicket + at.arriveAirTicket).toLocaleString()}`
-    : city.flightPrice ? `₩${city.flightPrice.toLocaleString()}~` : "조회하기";
-  
-  const flightSub = at 
-    ? `가는편 ₩${at.departAirTicket.toLocaleString()} / 오는편 ₩${at.arriveAirTicket.toLocaleString()}`
-    : undefined;
+  // 항공권 정보 — 백엔드: { airTicket, hotel }
+  const flightValue = at?.airTicket
+    ? `₩${at.airTicket.toLocaleString()}~`
+    : "조회하기";
 
   const costValue = totalDaily ? `일평균 ₩${totalDaily.toLocaleString()}` : "비교 보기";
 
@@ -113,9 +110,9 @@ export function RecommendTab({ city, onTabChange }: RecommendTabProps) {
             "{recommendText}"
           </p>
           {/* 키워드 뱃지 */}
-          {(city.tags || city.keywords) && (
+          {city.tags && city.tags.length > 0 && (
             <div className="flex flex-wrap gap-2 mt-4">
-              {(city.tags ? city.tags.map(t => t.name) : (city.keywords ?? [])).map((kw) => (
+              {city.tags.map((t) => t.name).map((kw) => (
                 <Badge
                   key={kw}
                   variant="outline"
@@ -155,7 +152,7 @@ export function RecommendTab({ city, onTabChange }: RecommendTabProps) {
                 <div className="space-y-4">
                   <CostBar
                     label="숙박 (평균)"
-                    amount={`₩${(lc?.accommodation ?? Math.round(totalDaily * 0.45)).toLocaleString()}`}
+                    amount={`₩${(hotel || Math.round((totalDaily ?? 0) * 0.45)).toLocaleString()}`}
                     pct={accomPct}
                     color="bg-blue-500"
                   />
@@ -185,7 +182,6 @@ export function RecommendTab({ city, onTabChange }: RecommendTabProps) {
                 icon={Plane}
                 label="최저 항공권 (왕복)"
                 value={flightValue}
-                subValue={flightSub}
                 onClick={() => onTabChange("flight")}
               />
               <InfoCard
@@ -238,7 +234,7 @@ export function RecommendTab({ city, onTabChange }: RecommendTabProps) {
                       {news.title}
                     </p>
                     <p className="text-[9px] text-slate-400 mt-0.5">
-                      {dayjs(news.createdAt).format('YYYY.MM.DD')}
+                      {dayjs(news.publishedAt).format('YYYY.MM.DD')}
                     </p>
                   </div>
                   <ExternalLink className="size-3 text-slate-300 group-hover:text-blue-400 transition-colors shrink-0" />

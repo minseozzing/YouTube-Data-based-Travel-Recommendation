@@ -9,7 +9,6 @@ import {
 } from "react-simple-maps";
 import { useUiStore } from "@/stores/uiStore";
 import { useCityList } from "@/hooks/city/useCityList";
-import { DUMMY_CITIES } from "@/data/dummyCityData";
 import { COUNTRY_NAME_KO } from "@/data/countryNameKo";
 import { COUNTRY_NAME_ISO3 } from "@/data/countryNameIso3";
 import React from "react";
@@ -794,7 +793,7 @@ export function GlobeViewer({ width, height }: GlobeViewerProps) {
   }, [selectedCityCoords]);
 
   const { data: citiesFromApi } = useCityList();
-  const cities = citiesFromApi?.length ? citiesFromApi : DUMMY_CITIES;
+  const cities = citiesFromApi ?? [];
 
   const matchedCityIds = useMemo<Set<number>>(() => {
     if (!isRecommendActive) return new Set();
