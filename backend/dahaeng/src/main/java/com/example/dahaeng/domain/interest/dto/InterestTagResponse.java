@@ -6,15 +6,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
-
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class InterestAnalysisResult {
-    private Long accountId;
-    private List<InterestKeywordCandidate> keywords;
-    private List<TravelTagScore> travelTags;
+public class InterestTagResponse {
+    private Long tagId;
+    private String categoryName;
+    private String tagName;
 }

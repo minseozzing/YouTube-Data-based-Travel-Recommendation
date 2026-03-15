@@ -2,18 +2,18 @@ package com.example.dahaeng.domain.interest.service;
 
 import com.example.dahaeng.domain.interest.dto.ExtractedInterestFeatures;
 import com.example.dahaeng.domain.interest.dto.InterestAnalysisResult;
+import com.example.dahaeng.domain.interest.dto.InterestTagResponse;
 import com.example.dahaeng.domain.interest.dto.TravelTagScore;
-import com.example.dahaeng.domain.interest.enums.InterestCategory;
+import com.example.dahaeng.domain.youtube.repository.YouTubeTravelTagRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Interest Analysis Orchestrator
- * 트랜잭션 경계를 관리하고 각 엔진/클라이언트를 조율합니다.
+ * 트랜잭션 경계를 관리하고 각 엔진/클라이언트를 조합합니다.
  */
 @Slf4j
 @Service
@@ -23,10 +23,8 @@ public class InterestAnalysisService {
     private final KeywordExtractionEngine extractionEngine;
     private final TravelTagInferenceClient aiClient;
     private final TravelTagValidator validator;
-    // [DELETE_START] (아래 1줄 삭제)
-    private final InterestCategoryMapper categoryMapper;
-    // [DELETE_END]
     private final InterestResultSaver saver;
+    private final YouTubeTravelTagRepository youTubeTravelTagRepository;
 
     public InterestAnalysisResult analyze(Long accountId) {
         log.info(">>> [COORDINATOR] Starting orchestrated analysis for account: {}", accountId);
@@ -47,21 +45,37 @@ public class InterestAnalysisService {
         return InterestAnalysisResult.builder()
                 .accountId(accountId)
                 .keywords(features.getAllKeywords())
-                // [DELETE_START] (아래 1줄 삭제)
-                .categories(categoryMapper.map(features.getAllKeywords()))
-                // [DELETE_END]
                 .travelTags(validatedTags)
                 .build();
     }
 
     private void saveFinalResults(ExtractedInterestFeatures features, List<TravelTagScore> validatedTags) {
-        // [DELETE_START] (아래 2줄 삭제)
-        Map<InterestCategory, Double> categoryScores = categoryMapper.map(features.getAllKeywords());
-        saver.save(features.getAccountId(), features.getAllKeywords(), categoryScores, validatedTags);
-        // [DELETE_END]
-        // [REPLACE_WITH] (위 삭제 후 아래 코드로 대체)
-        // saver.save(features.getAccountId(), features.getAllKeywords(), null, validatedTags);
-        
+        saver.save(features.getAccountId(), features.getAllKeywords(), validatedTags);
+
         log.info(">>> [Phase 3] All results successfully persisted to DB.");
+    }
+
+    public List<InterestTagResponse> getAnalyzedTags(Long accountId) {
+        return youTubeTravelTagRepository.findAllByAccountIdWithTag(accountId).stream()
+                .map(tag -> InterestTagResponse.builder()
+                        .tagId(tag.getTag() != null ? tag.getTag().getId() : null)
+                        .categoryName(resolveCategoryName(tag))
+                        .tagName(resolveTagName(tag))
+                        .build())
+                .toList();
+    }
+
+    private String resolveCategoryName(com.example.dahaeng.domain.youtube.entity.YouTubeTravelTag tag) {
+        if (tag.getTag() != null && tag.getTag().getCategory() != null) {
+            return tag.getTag().getCategory().getName();
+        }
+        return tag.getCategoryName();
+    }
+
+    private String resolveTagName(com.example.dahaeng.domain.youtube.entity.YouTubeTravelTag tag) {
+        if (tag.getTag() != null) {
+            return tag.getTag().getName();
+        }
+        return tag.getTagName();
     }
 }

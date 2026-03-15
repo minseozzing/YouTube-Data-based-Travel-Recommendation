@@ -1,5 +1,6 @@
 package com.example.dahaeng.domain.youtube.entity;
 
+import com.example.dahaeng.domain.tag.entity.Tag;
 import com.example.dahaeng.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -21,6 +22,10 @@ public class YouTubeTravelTag extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id", nullable = false)
     private YouTubeAccount account;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tag_id")
+    private Tag tag;
 
     @Column(name = "tag_name", length = 50, nullable = false)
     private String tagName;
