@@ -2,8 +2,10 @@ package com.example.dahaeng.domain.recommend.Service;
 
 public record CityRankResult(
         Long cityId,
+        Long countryId,
         String countryName,
         String cityName,
+        String cityImageUrl,
         Double totalScore,
         Double budgetScore,
         Double safetyScore,

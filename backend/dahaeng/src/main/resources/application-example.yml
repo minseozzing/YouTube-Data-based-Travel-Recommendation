@@ -49,6 +49,8 @@ jwt:
 
 app:
   front-callback-url: ${FRONT_CALLBACK_URL:http://localhost:8080/}
+  demo-data:
+    enabled: ${DEMO_DATA_ENABLED:false}
 
 external:
   newsapi:

@@ -1,6 +1,7 @@
 package com.example.dahaeng.domain.city.dto.response;
 
 
+import java.util.Map;
 import java.util.List;
 
 import com.example.dahaeng.domain.country.dto.response.CountryDangerResponse;
@@ -11,6 +12,7 @@ public record RecommendCityDetailResponse(
     String recommendationReason,
     LivingCostFor1Day livingCostFor1Day,
     AirTicketAndHotel airTicketAndHotel,
+    ExchangeRate exchangeRate,
     News news,
     CountryDangerResponse danger,
     List<TagResponse> tags,
@@ -33,6 +35,11 @@ public record RecommendCityDetailResponse(
     public record AirTicketAndHotel(
             double airTicket,
             double hotel
+    ){}
+    public record ExchangeRate(
+            String currency,
+            Double krwPerDisplayUnit,
+            String eventDate
     ){}
     public record News(
             String summation,
@@ -58,6 +65,9 @@ public record RecommendCityDetailResponse(
             String description,
             Double lat,
             Double lon,
-            String imageUrl
+            String imageUrl,
+            List<String> tags,
+            Double spotScore,
+            Map<String, Double> tagScores
     ) { }
 }

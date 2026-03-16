@@ -9,7 +9,6 @@ import {
 } from "react-simple-maps";
 import { useUiStore } from "@/stores/uiStore";
 import { useCityList } from "@/hooks/city/useCityList";
-import { DUMMY_CITIES } from "@/data/dummyCityData";
 import { COUNTRY_NAME_KO } from "@/data/countryNameKo";
 import { COUNTRY_NAME_ISO3 } from "@/data/countryNameIso3";
 import React from "react";
@@ -94,10 +93,24 @@ function getGeoBounds(geo: GeoFeature) {
 // Russia만 사용 — France/USA는 폴리곤 분리 방식으로 처리
 const COUNTRY_MAIN_BBOX: Record<
   string,
-  { minLng: number; maxLng: number; minLat: number; maxLat: number; width: number; height: number }
+  {
+    minLng: number;
+    maxLng: number;
+    minLat: number;
+    maxLat: number;
+    width: number;
+    height: number;
+  }
 > = {
   // 러시아: 유럽~시베리아~극동 본토 (쿠릴·사할린 등 동쪽 섬 제외)
-  Russia: { minLng: 19, maxLng: 170, minLat: 41, maxLat: 82, width: 151, height: 41 },
+  Russia: {
+    minLng: 19,
+    maxLng: 170,
+    minLat: 41,
+    maxLat: 82,
+    width: 151,
+    height: 41,
+  },
 };
 
 // MultiPolygon 나라에서 클릭 지점에 가장 가까운 서브 폴리곤의 bbox 반환
@@ -112,7 +125,14 @@ const POLYGON_LEVEL_CLICK = new Set([
 type SubregionEntry = {
   detectLng: [number, number];
   detectLat: [number, number];
-  viewBbox: { minLng: number; maxLng: number; minLat: number; maxLat: number; width: number; height: number };
+  viewBbox: {
+    minLng: number;
+    maxLng: number;
+    minLat: number;
+    maxLat: number;
+    width: number;
+    height: number;
+  };
 };
 
 // POLYGON_LEVEL_CLICK 나라에서 screenToGeo 결과를 이 테이블에 먼저 대조
@@ -124,13 +144,27 @@ const SUBREGION_BBOX: Record<string, SubregionEntry[]> = {
     {
       detectLng: [172, 179],
       detectLat: [-42, -34],
-      viewBbox: { minLng: 172.5, maxLng: 178.6, minLat: -41.7, maxLat: -34.3, width: 6.1, height: 7.4 },
+      viewBbox: {
+        minLng: 172.5,
+        maxLng: 178.6,
+        minLat: -41.7,
+        maxLat: -34.3,
+        width: 6.1,
+        height: 7.4,
+      },
     },
     // 2. 남섬 + 스튜어트 섬 (South Island + Stewart) — lat -48 ~ -40, lng 165 ~ 174
     {
       detectLng: [165, 174],
       detectLat: [-48, -40],
-      viewBbox: { minLng: 165.8, maxLng: 173.9, minLat: -47.4, maxLat: -40.4, width: 8.1, height: 7.0 },
+      viewBbox: {
+        minLng: 165.8,
+        maxLng: 173.9,
+        minLat: -47.4,
+        maxLat: -40.4,
+        width: 8.1,
+        height: 7.0,
+      },
     },
   ],
   "United States of America": [
@@ -138,26 +172,54 @@ const SUBREGION_BBOX: Record<string, SubregionEntry[]> = {
     {
       detectLng: [-162, -154],
       detectLat: [18, 24],
-      viewBbox: { minLng: -162, maxLng: -154, minLat: 18, maxLat: 23, width: 8, height: 5 },
+      viewBbox: {
+        minLng: -162,
+        maxLng: -154,
+        minLat: 18,
+        maxLat: 23,
+        width: 8,
+        height: 5,
+      },
     },
     // 2. 알류산 열도 — 실제 열도는 서경 165° 이서, 위도 51–56°
     //    (알래스카 반도 lat 54–58 과 겹치지 않도록 lng < -165 으로 좁힘)
     {
       detectLng: [-181, -165],
       detectLat: [51, 56],
-      viewBbox: { minLng: -180, maxLng: -163, minLat: 51, maxLat: 56, width: 17, height: 5 },
+      viewBbox: {
+        minLng: -180,
+        maxLng: -163,
+        minLat: 51,
+        maxLat: 56,
+        width: 17,
+        height: 5,
+      },
     },
     // 3. 알래스카 본토 (반도 포함, lat 54–72)
     {
       detectLng: [-170, -129],
       detectLat: [54, 72],
-      viewBbox: { minLng: -170, maxLng: -129, minLat: 54, maxLat: 72, width: 41, height: 18 },
+      viewBbox: {
+        minLng: -170,
+        maxLng: -129,
+        minLat: 54,
+        maxLat: 72,
+        width: 41,
+        height: 18,
+      },
     },
     // 4. 미국 본토 (lower 48)
     {
       detectLng: [-126, -65],
       detectLat: [24, 50],
-      viewBbox: { minLng: -126, maxLng: -65, minLat: 24, maxLat: 50, width: 61, height: 26 },
+      viewBbox: {
+        minLng: -126,
+        maxLng: -65,
+        minLat: 24,
+        maxLat: 50,
+        width: 61,
+        height: 26,
+      },
     },
   ],
 };
@@ -297,9 +359,9 @@ function getMarkerColor(score: number | undefined): string {
 const MAP_COLORS = {
   countryDefault: "#F1F5F9",
   countryHover: "#d4d4d4",
-  countrySelected: "#d4d4d4",       // 나라 상면
-  countrySelectedSide1: "#b0b0b0",  // 옆면 상단 레이어 (밝은 회색)
-  countrySelectedSide2: "#808080",  // 옆면 하단 레이어 (어두운 회색)
+  countrySelected: "#d4d4d4", // 나라 상면
+  countrySelectedSide1: "#b0b0b0", // 옆면 상단 레이어 (밝은 회색)
+  countrySelectedSide2: "#808080", // 옆면 하단 레이어 (어두운 회색)
   countrySelectedShadow: "rgba(0,0,0,0.28)", // 바닥 그림자
 } as const;
 
@@ -332,123 +394,129 @@ const BaseLayer = React.memo(
     zoom: number;
   }) => {
     // 3D 효과 계산: 줌에 따라 돌출 정도를 조절
-    const visualHeight = 7 / Math.pow(zoom, 0.45); 
+    const visualHeight = 7 / Math.pow(zoom, 0.45);
     const totalH = visualHeight / zoom;
-    const xOffset = totalH * 0.45; 
+    const xOffset = totalH * 0.45;
     const yOffset = -totalH;
     const sideLayersCount = 12; // 더 매끄러운 옆면을 위해 레이어 수 증가
 
     return (
-    <Geographies geography={geography}>
-      {({ geographies }: { geographies: GeoFeature[] }) => {
-        const nonSelected = geographies.filter(
-          (geo) => (geo.properties.name ?? "") !== clickedName,
-        );
-        const selected = geographies.filter(
-          (geo) => (geo.properties.name ?? "") === clickedName,
-        );
-        return (
-          <>
-            {/* 선택되지 않은 나라 먼저 렌더 */}
-            {nonSelected.map((geo) => {
-              const rawName = geo.properties.name ?? "";
-              return (
-                <Geography
-                  key={geo.rsmKey}
-                  geography={geo}
-                  tabIndex={-1}
-                  fill={MAP_COLORS.countryDefault}
-                  stroke={showBorders ? "#cfcfcf" : "none"}
-                  strokeWidth={showBorders ? 0.5 : 0}
-                  style={{
-                    default: COUNTRY_STYLE_DEFAULT,
-                    hover: {
-                      fill: MAP_COLORS.countryHover,
-                      outline: "none",
-                      cursor: "pointer",
-                      vectorEffect: "non-scaling-stroke" as const,
-                    },
-                    pressed: COUNTRY_STYLE_PRESSED,
-                  }}
-                  onClick={(e) => onCountryClick(geo, e)}
-                  onMouseEnter={(e) => onEnter(rawName, e)}
-                  onMouseMove={(e) => handleMove(rawName, e)}
-                  onMouseLeave={onLeave}
-                />
-              );
-            })}
-            {/* 선택된 나라 — 3D 레이어링 */}
-            {selected.map((geo) => {
-              const rawName = geo.properties.name ?? "";
-              return (
-                <g key={`3d-${geo.rsmKey}`}>
-                  {/* 바닥 그림자 */}
+      <Geographies geography={geography}>
+        {({ geographies }: { geographies: GeoFeature[] }) => {
+          const nonSelected = geographies.filter(
+            (geo) => (geo.properties.name ?? "") !== clickedName,
+          );
+          const selected = geographies.filter(
+            (geo) => (geo.properties.name ?? "") === clickedName,
+          );
+          return (
+            <>
+              {/* 선택되지 않은 나라 먼저 렌더 */}
+              {nonSelected.map((geo) => {
+                const rawName = geo.properties.name ?? "";
+                return (
                   <Geography
-                    geography={geo}
-                    fill={MAP_COLORS.countrySelectedShadow}
-                    stroke="none"
-                    style={{ default: { pointerEvents: "none" } }}
-                    transform={`translate(${xOffset * 0.4}, ${-yOffset * 0.4})`}
-                  />
-                  {/* 옆면 레이어 (부드러운 그라데이션 효과) */}
-                  {[...Array(sideLayersCount)].map((_, i) => {
-                    const ratio = (i + 1) / (sideLayersCount + 1);
-                    const curX = xOffset * ratio;
-                    const curY = yOffset * ratio;
-                    
-                    // 색상 보간: 어두운 회색(#909090) -> 상면 색상(#D4D4D4)
-                    const startRGB = [144, 144, 144]; 
-                    const endRGB = [212, 212, 212];
-                    const r = Math.round(startRGB[0] + (endRGB[0] - startRGB[0]) * ratio);
-                    const g = Math.round(startRGB[1] + (endRGB[1] - startRGB[1]) * ratio);
-                    const b = Math.round(startRGB[2] + (endRGB[2] - startRGB[2]) * ratio);
-                    const color = `rgb(${r},${g},${b})`;
-                    
-                    return (
-                      <Geography
-                        key={`side-${i}`}
-                        geography={geo}
-                        fill={color}
-                        stroke={color} // 레이어 사이의 미세한 틈새 방지
-                        strokeWidth={0.2 / zoom}
-                        style={{ default: { pointerEvents: "none" } }}
-                        transform={`translate(${curX}, ${curY})`}
-                      />
-                    );
-                  })}
-                  {/* 상면 (실제 클릭 가능한 표면) */}
-                  <Geography
+                    key={geo.rsmKey}
                     geography={geo}
                     tabIndex={-1}
-                    fill={MAP_COLORS.countrySelected}
-                    stroke={MAP_COLORS.countrySelected} // 상면 테두리 정돈
-                    strokeWidth={0.2 / zoom}
+                    fill={MAP_COLORS.countryDefault}
+                    stroke={showBorders ? "#cfcfcf" : "none"}
+                    strokeWidth={showBorders ? 0.5 : 0}
                     style={{
-                      default: {
-                        outline: "none",
-                        vectorEffect: "non-scaling-stroke" as const,
-                      },
+                      default: COUNTRY_STYLE_DEFAULT,
                       hover: {
-                        fill: MAP_COLORS.countrySelected,
+                        fill: MAP_COLORS.countryHover,
                         outline: "none",
                         cursor: "pointer",
                         vectorEffect: "non-scaling-stroke" as const,
                       },
                       pressed: COUNTRY_STYLE_PRESSED,
                     }}
-                    transform={`translate(${xOffset}, ${yOffset})`}
                     onClick={(e) => onCountryClick(geo, e)}
                     onMouseEnter={(e) => onEnter(rawName, e)}
                     onMouseMove={(e) => onMove(rawName, e)}
                     onMouseLeave={onLeave}
                   />
-                </g>
-              );
-            })}
-          </>
-        );
-      }}
-    </Geographies>
+                );
+              })}
+              {/* 선택된 나라 — 3D 레이어링 */}
+              {selected.map((geo) => {
+                const rawName = geo.properties.name ?? "";
+                return (
+                  <g key={`3d-${geo.rsmKey}`}>
+                    {/* 바닥 그림자 */}
+                    <Geography
+                      geography={geo}
+                      fill={MAP_COLORS.countrySelectedShadow}
+                      stroke="none"
+                      style={{ default: { pointerEvents: "none" } }}
+                      transform={`translate(${xOffset * 0.4}, ${-yOffset * 0.4})`}
+                    />
+                    {/* 옆면 레이어 (부드러운 그라데이션 효과) */}
+                    {[...Array(sideLayersCount)].map((_, i) => {
+                      const ratio = (i + 1) / (sideLayersCount + 1);
+                      const curX = xOffset * ratio;
+                      const curY = yOffset * ratio;
+
+                      // 색상 보간: 어두운 회색(#909090) -> 상면 색상(#D4D4D4)
+                      const startRGB = [144, 144, 144];
+                      const endRGB = [212, 212, 212];
+                      const r = Math.round(
+                        startRGB[0] + (endRGB[0] - startRGB[0]) * ratio,
+                      );
+                      const g = Math.round(
+                        startRGB[1] + (endRGB[1] - startRGB[1]) * ratio,
+                      );
+                      const b = Math.round(
+                        startRGB[2] + (endRGB[2] - startRGB[2]) * ratio,
+                      );
+                      const color = `rgb(${r},${g},${b})`;
+
+                      return (
+                        <Geography
+                          key={`side-${i}`}
+                          geography={geo}
+                          fill={color}
+                          stroke={color} // 레이어 사이의 미세한 틈새 방지
+                          strokeWidth={0.2 / zoom}
+                          style={{ default: { pointerEvents: "none" } }}
+                          transform={`translate(${curX}, ${curY})`}
+                        />
+                      );
+                    })}
+                    {/* 상면 (실제 클릭 가능한 표면) */}
+                    <Geography
+                      geography={geo}
+                      tabIndex={-1}
+                      fill={MAP_COLORS.countrySelected}
+                      stroke={MAP_COLORS.countrySelected} // 상면 테두리 정돈
+                      strokeWidth={0.2 / zoom}
+                      style={{
+                        default: {
+                          outline: "none",
+                          vectorEffect: "non-scaling-stroke" as const,
+                        },
+                        hover: {
+                          fill: MAP_COLORS.countrySelected,
+                          outline: "none",
+                          cursor: "pointer",
+                          vectorEffect: "non-scaling-stroke" as const,
+                        },
+                        pressed: COUNTRY_STYLE_PRESSED,
+                      }}
+                      transform={`translate(${xOffset}, ${yOffset})`}
+                      onClick={(e) => onCountryClick(geo, e)}
+                      onMouseEnter={(e) => onEnter(rawName, e)}
+                      onMouseMove={(e) => onMove(rawName, e)}
+                      onMouseLeave={onLeave}
+                    />
+                  </g>
+                );
+              })}
+            </>
+          );
+        }}
+      </Geographies>
     );
   },
 );
@@ -565,12 +633,17 @@ export function GlobeViewer({ width, height }: GlobeViewerProps) {
     globeDuration,
     selectedCityCoords,
     isRecommendActive,
+    recommendResults,
   } = useUiStore();
 
   // ── 지도 데이터 캐시 state ─────────────────────────────
   // 모듈 캐시에 이미 있으면 즉시 사용 (재마운트 시 fetch 없이 바로 렌더)
-  const [geoData, setGeoData] = useState<object | null>(() => geoCache.get(GEO_URL) ?? null);
-  const [landData, setLandData] = useState<object | null>(() => geoCache.get(LAND_URL) ?? null);
+  const [geoData, setGeoData] = useState<object | null>(
+    () => geoCache.get(GEO_URL) ?? null,
+  );
+  const [landData, setLandData] = useState<object | null>(
+    () => geoCache.get(LAND_URL) ?? null,
+  );
 
   useEffect(() => {
     if (!geoData) fetchGeoWithCache(GEO_URL).then(setGeoData);
@@ -682,7 +755,7 @@ export function GlobeViewer({ width, height }: GlobeViewerProps) {
       }
 
       // POLYGON_LEVEL_CLICK 나라는 마우스 좌표를 역투영해 어느 폴리곤인지 판별
-      let bounds: ReturnType<typeof getGeoBounds>;
+      let bounds: { minLng: number; maxLng: number; minLat: number; maxLat: number } | null;
       if (POLYGON_LEVEL_CLICK.has(rawName)) {
         const svgEl = containerRef.current?.querySelector("svg");
         if (svgEl) {
@@ -707,7 +780,9 @@ export function GlobeViewer({ width, height }: GlobeViewerProps) {
               lat >= r.detectLat[0] &&
               lat <= r.detectLat[1],
           );
-          bounds = matched ? matched.viewBbox : findSubPolygonBbox(geo, lng, lat);
+          bounds = matched
+            ? matched.viewBbox
+            : findSubPolygonBbox(geo, lng, lat);
         } else {
           bounds = getGeoBounds(geo);
         }
@@ -794,61 +869,59 @@ export function GlobeViewer({ width, height }: GlobeViewerProps) {
   }, [selectedCityCoords]);
 
   const { data: citiesFromApi } = useCityList();
-  const cities = citiesFromApi?.length ? citiesFromApi : DUMMY_CITIES;
+  const cities = citiesFromApi ?? [];
 
   const matchedCityIds = useMemo<Set<number>>(() => {
-    if (!isRecommendActive) return new Set();
-    const matched = cities.filter((city) => {
-      const adjustedBudget = (city.estimatedBudget / 7) * globeDuration;
-      const withinBudget =
-        adjustedBudget >= globeBudgetFilter[0] &&
-        adjustedBudget <= globeBudgetFilter[1];
-      return withinBudget;
-    });
-    return new Set(matched.map((c) => c.cityId));
-  }, [cities, globeBudgetFilter, globeDuration, isRecommendActive]);
+    if (!isRecommendActive || recommendResults.length === 0) return new Set();
+    const recommendCityNames = new Set(recommendResults.map((r) => r.city));
+    return new Set(
+      cities
+        .filter((c) => recommendCityNames.has(c.cityName))
+        .map((c) => c.cityId),
+    );
+  }, [cities, recommendResults, isRecommendActive]);
 
   // 추천 활성 시 상위 3개 도시 → cityId: rank(1|2|3) 매핑
   const medalRankMap = useMemo<Map<number, 1 | 2 | 3>>(() => {
-    if (!isRecommendActive) return new Map();
-    const sorted = [...cities]
-      .filter((c) => matchedCityIds.has(c.cityId))
-      .sort((a, b) => (b.matchingScore ?? 0) - (a.matchingScore ?? 0))
-      .slice(0, 3);
+    if (!isRecommendActive || recommendResults.length === 0) return new Map();
+    const cityNameToId = new Map(cities.map((c) => [c.cityName, c.cityId]));
     const map = new Map<number, 1 | 2 | 3>();
-    sorted.forEach((c, i) => map.set(c.cityId, (i + 1) as 1 | 2 | 3));
+    recommendResults.slice(0, 3).forEach((r) => {
+      const id = cityNameToId.get(r.city);
+      if (id !== undefined) map.set(id, r.rank as 1 | 2 | 3);
+    });
     return map;
-  }, [cities, matchedCityIds, isRecommendActive]);
+  }, [cities, recommendResults, isRecommendActive]);
 
   // ── 줌 버튼 핸들러 ────────────────────────────────────────
-  const handleZoomButton = useCallback(
-    (factor: number) => {
-      const fromZoom = zoomRef.current;
-      const toZoom = Math.min(Math.max(fromZoom * factor, 0.8), 80);
-      if (animControlsRef.current) animControlsRef.current.stop();
-      const controls = animate(0, 1, {
-        duration: 0.4,
-        ease: "easeInOut",
-        onUpdate: (t) => {
-          const z = fromZoom + (toZoom - fromZoom) * t;
-          zoomRef.current = z;
-          setZoom(z);
-        },
-        onComplete: () => {
-          zoomRef.current = toZoom;
-          setZoom(toZoom);
-        },
-      });
-      animControlsRef.current = controls;
-    },
-    [],
-  );
+  const handleZoomButton = useCallback((factor: number) => {
+    const fromZoom = zoomRef.current;
+    const toZoom = Math.min(Math.max(fromZoom * factor, 0.8), 80);
+    if (animControlsRef.current) animControlsRef.current.stop();
+    const controls = animate(0, 1, {
+      duration: 0.4,
+      ease: "easeInOut",
+      onUpdate: (t) => {
+        const z = fromZoom + (toZoom - fromZoom) * t;
+        zoomRef.current = z;
+        setZoom(z);
+      },
+      onComplete: () => {
+        zoomRef.current = toZoom;
+        setZoom(toZoom);
+      },
+    });
+    animControlsRef.current = controls;
+  }, []);
 
   const worldWidth = (2 * Math.PI * width) / 7;
   const OFFSETS = [-1, 0, 1] as const;
 
   return (
-    <div ref={containerRef} style={{ width: "100%", height: "100%", position: "relative" }}>
+    <div
+      ref={containerRef}
+      style={{ width: "100%", height: "100%", position: "relative" }}
+    >
       <ComposableMap
         width={width}
         height={height}
@@ -927,7 +1000,7 @@ export function GlobeViewer({ width, height }: GlobeViewerProps) {
                   const totalH = visualHeight / zoom;
                   const xOffset = totalH * 0.4;
                   const yOffset = -totalH;
-                  
+
                   return (
                     <g transform={`translate(${xOffset}, ${yOffset})`}>
                       <AdminLayer
@@ -953,13 +1026,14 @@ export function GlobeViewer({ width, height }: GlobeViewerProps) {
                 const medalSize = 30 / zoom;
 
                 // 클릭된 국가에 속한 도시라면 3D 상면으로 이동
-                const isCityInClickedCountry = 
-                  clickedName && (
-                    COUNTRY_NAME_KO[clickedName] === city.countryName || 
-                    (clickedName === "South Korea" && city.countryName === "한국") ||
-                    (clickedName === "United Kingdom" && city.countryName === "영국")
-                  );
-                
+                const isCityInClickedCountry =
+                  clickedName &&
+                  (COUNTRY_NAME_KO[clickedName] === city.countryName ||
+                    (clickedName === "South Korea" &&
+                      city.countryName === "한국") ||
+                    (clickedName === "United Kingdom" &&
+                      city.countryName === "영국"));
+
                 let markerTransform = "";
                 if (isCityInClickedCountry) {
                   const visualHeight = 8 / Math.pow(zoom, 0.4);

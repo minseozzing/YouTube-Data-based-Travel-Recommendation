@@ -1,5 +1,39 @@
 import json
+import os
 import re
+from pathlib import Path
+
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+WORLD_PATH = REPO_ROOT / "backend" / "world.md"
+OUTPUT_PATH = REPO_ROOT / "ai" / "trip_com" / "city_airport_mapping.json"
+DESTINATIONS_PATH = REPO_ROOT / "ai" / "google_flight" / "destinations.txt"
+WORLD_DATA = json.loads(WORLD_PATH.read_text(encoding="utf-8"))
+
+# Shared-airport cities need explicit canonical names instead of first-airport fallback.
+CITY_NAME_OVERRIDES = {
+    "KYOTO": ("Japan", "Kyoto"),
+    "HAGUE": ("Netherlands", "The Hague"),
+    "INTERLAKEN": ("Switzerland", "Interlaken"),
+    "LUCERNE": ("Switzerland", "Lucerne"),
+    "GENEVA": ("Switzerland", "Geneva"),
+    "PLAYA": ("Mexico", "Playa Del Carmen"),
+    "DENPASAR": ("Indonesia", "Denpasar"),
+    "MALACCA": ("Malaysia", "Malacca"),
+}
+
+
+def apply_world_override(city_code, country_en, city_name_en):
+    return CITY_NAME_OVERRIDES.get(city_code, (country_en, city_name_en))
+
+
+def validate_world_mapping(country_en, city_name_en, city_code):
+    if country_en not in WORLD_DATA:
+        raise ValueError(f"{city_code}: unknown country '{country_en}' outside world.md")
+    if city_name_en not in WORLD_DATA[country_en]:
+        raise ValueError(
+            f"{city_code}: city '{city_name_en}' is not listed under '{country_en}' in world.md"
+        )
 
 raw_data = """
 ## 🇺🇸 미국
@@ -370,6 +404,23 @@ lines = raw_data.strip().splitlines()
 
 all_airports = set()
 
+# Load English Mapping to attach country_en and city_name_en
+eng_mapping_path = os.path.join(os.path.dirname(__file__), "en_city_airport_mapping.json")
+try:
+    with open(eng_mapping_path, "r", encoding="utf-8") as eng_f:
+        en_mapping = json.load(eng_f)
+except Exception as e:
+    print(f"Warning: Could not load {eng_mapping_path}. Error: {e}")
+    en_mapping = {}
+
+# Build reverse mapping: apt -> (country_en, city_en)
+airport_to_en = {}
+for country, cities in en_mapping.items():
+    for city, airports in cities.items():
+        for apt in airports:
+            if apt not in airport_to_en:
+                airport_to_en[apt] = (country, city)
+
 for line in lines:
     line = line.strip()
     if not line: continue
@@ -383,26 +434,43 @@ for line in lines:
             city_code = city_code_map.get(city_kr, "UNKNOWN_CITY")
             
             routes = []
+            country_en = "UNKNOWN_COUNTRY"
+            city_name_en = city_code
+
             for apt in airports:
                 apt = apt.strip().upper()
                 all_airports.add(apt)
+                
+                # Try setting EN names from first known airport in this city block
+                if country_en == "UNKNOWN_COUNTRY" and apt in airport_to_en:
+                    country_en, city_name_en = airport_to_en[apt]
+                
                 routes.append({
                     "trip_city": clean_city_name(apt.lower()),
                     "airport": apt,
                     "trip_airport": apt.lower()
                 })
+
+            country_en, city_name_en = apply_world_override(
+                city_code,
+                country_en,
+                city_name_en,
+            )
+            validate_world_mapping(country_en, city_name_en, city_code)
                 
             results.append({
                 "city_code": city_code,
                 "city_name_kr": city_kr,
+                "city_name_en": city_name_en,
                 "country_kr": current_country,
+                "country_en": country_en,
                 "routes": routes
             })
 
-with open("c:/Users/SSAFY/Desktop/soob/S14P21D206/ai/trip_com/city_airport_mapping.json", "w", encoding="utf-8") as f:
+with open(OUTPUT_PATH, "w", encoding="utf-8") as f:
     json.dump(results, f, ensure_ascii=False, indent=4)
 
 print("Generated mapping json.")
-with open("c:/Users/SSAFY/Desktop/soob/S14P21D206/ai/google_flight/destinations.txt", "w", encoding="utf-8") as f:
+with open(DESTINATIONS_PATH, "w", encoding="utf-8") as f:
     f.write(",".join(sorted(list(all_airports))))
 print("Also exported airport destinations for google_flight.")

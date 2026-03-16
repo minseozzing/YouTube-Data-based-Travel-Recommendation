@@ -13,11 +13,11 @@ public class DummyNewsSerachService implements NewsSearchService {
         return new RecommendCitiesResponse.NewsInsight(
                 summary,
                 List.of(
-                        new RecommendCitiesResponse.Article(city + " travel news 1", "https://example.com/1", null),
-                        new RecommendCitiesResponse.Article(city + " travel news 2", "https://example.com/2", null),
-                        new RecommendCitiesResponse.Article(city + " travel news 3", "https://example.com/3", null),
-                        new RecommendCitiesResponse.Article(city + " travel news 4", "https://example.com/4", null),
-                        new RecommendCitiesResponse.Article(city + " travel news 5", "https://example.com/5", null)
+                        new RecommendCitiesResponse.Article(city + " travel news 1", "https://example.com/1", null, city + " news description 1", city + " news content 1", null),
+                        new RecommendCitiesResponse.Article(city + " travel news 2", "https://example.com/2", null, city + " news description 2", city + " news content 2", null),
+                        new RecommendCitiesResponse.Article(city + " travel news 3", "https://example.com/3", null, city + " news description 3", city + " news content 3", null),
+                        new RecommendCitiesResponse.Article(city + " travel news 4", "https://example.com/4", null, city + " news description 4", city + " news content 4", null),
+                        new RecommendCitiesResponse.Article(city + " travel news 5", "https://example.com/5", null, city + " news description 5", city + " news content 5", null)
                 )
         );
     }

@@ -146,7 +146,12 @@ export function TripSettingsPanel() {
       setGlobeDuration(duration);
       setGlobeTravelMonth(selectedYear, selectedMonth);
       setRecommendActive(true);
-      recommend({ budget, duration });
+      recommend({
+        selectedTags: [],
+        userDailyBudget: budget / duration,
+        travelDays: duration,
+        month: selectedMonth,
+      });
     }
   }, [
     budgetInput,

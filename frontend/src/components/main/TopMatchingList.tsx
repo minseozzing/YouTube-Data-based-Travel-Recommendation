@@ -1,40 +1,47 @@
-import { useMemo } from 'react';
-import { MapPin } from 'lucide-react';
-import { Skeleton } from '@/components/ui/skeleton';
-import { useCityList } from '@/hooks/city/useCityList';
-import { useUiStore } from '@/stores/uiStore';
-import { TopMatchingCard } from './TopMatchingCard';
-import { cn } from '@/lib/utils';
-import { DUMMY_CITIES } from '@/data/dummyCityData';
+import { useMemo } from "react";
+import { MapPin } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useCityList } from "@/hooks/city/useCityList";
+import { useUiStore } from "@/stores/uiStore";
+import { TopMatchingCard } from "./TopMatchingCard";
+import { cn } from "@/lib/utils";
+import type { CityListItem } from "@/schemas/city.schema";
 
 const TOP_N = 5;
 
 export function TopMatchingList() {
   const { data: citiesFromApi, isLoading } = useCityList();
-  const { globeBudgetFilter, globeDuration, isRecommendActive } = useUiStore();
+  const { isRecommendActive, recommendResults } = useUiStore();
 
-  const cities = citiesFromApi?.length ? citiesFromApi : DUMMY_CITIES;
+  const cities = citiesFromApi ?? [];
 
-  const topCities = useMemo(() => {
-    const base = isRecommendActive
-      ? cities.filter((city) => {
-          const adjustedBudget = (city.estimatedBudget / 7) * globeDuration;
-          const withinBudget =
-            adjustedBudget >= globeBudgetFilter[0] &&
-            adjustedBudget <= globeBudgetFilter[1];
-          return withinBudget;
-        })
-      : cities;
-    return [...base]
-      .sort((a, b) => (b.matchingScore ?? 0) - (a.matchingScore ?? 0))
-      .slice(0, TOP_N);
-  }, [cities, globeBudgetFilter, globeDuration, isRecommendActive]);
+  const topCities = useMemo((): CityListItem[] => {
+    if (isRecommendActive && recommendResults.length > 0) {
+      return recommendResults.slice(0, TOP_N).map((r) => {
+        const matched = cities.find((c) => c.cityName === r.city);
+        return matched
+          ? { ...matched, matchingScore: r.totalScore }
+          : {
+              cityId: r.rank,
+              cityName: r.city,
+              countryName: r.country,
+              imgUrl: "",
+              estimatedBudget: 0,
+              riskLevel: 1,
+              latitude: 0,
+              longitude: 0,
+              matchingScore: r.totalScore,
+            };
+      });
+    }
+    return [...cities].slice(0, TOP_N);
+  }, [cities, recommendResults, isRecommendActive]);
 
   return (
     <section
       className={cn(
-        'bg-white/85 backdrop-blur-md rounded-2xl shadow-lg p-4',
-        'flex flex-col gap-2 flex-1 min-h-0',
+        "bg-white/85 backdrop-blur-md rounded-2xl shadow-lg p-4",
+        "flex flex-col gap-2 flex-1 min-h-0",
       )}
       aria-label="최고의 매칭 여행지"
     >
@@ -46,12 +53,18 @@ export function TopMatchingList() {
             최고의 매칭 여행지
           </h2>
         </div>
-        <span className="text-[10px] text-slate-400 font-medium">TOP {TOP_N}</span>
+        <span className="text-[10px] text-slate-400 font-medium">
+          TOP {TOP_N}
+        </span>
       </div>
 
       {/* 로딩 스켈레톤 */}
       {isLoading && (
-        <div className="flex flex-col gap-2" role="status" aria-label="목록 불러오는 중">
+        <div
+          className="flex flex-col gap-2"
+          role="status"
+          aria-label="목록 불러오는 중"
+        >
           {Array.from({ length: TOP_N }).map((_, i) => (
             <div key={i} className="flex items-center gap-3 p-2.5">
               <Skeleton className="size-4 rounded" />

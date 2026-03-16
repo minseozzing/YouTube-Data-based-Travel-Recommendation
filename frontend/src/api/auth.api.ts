@@ -43,6 +43,12 @@ export const authApi = {
     await axiosInstance.delete('/api/auth/withdraw');
   },
 
+  // POST /api/auth/dev-login (개발 전용)
+  devLogin: async () => {
+    const { data } = await axiosInstance.post('/api/auth/dev-login');
+    return AuthCallbackResponseSchema.parse(data);
+  },
+
   // POST /api/members/tag
   submitPreference: async (body: PreferenceTagRequest) => {
     PreferenceTagRequestSchema.parse(body);

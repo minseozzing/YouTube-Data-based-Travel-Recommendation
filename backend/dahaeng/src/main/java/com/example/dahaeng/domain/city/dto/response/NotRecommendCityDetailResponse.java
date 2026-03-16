@@ -9,6 +9,7 @@ public record NotRecommendCityDetailResponse(
         String name,
         LivingCostFor1Day livingCostFor1Day,
         AirTicketAndHotel airTicketAndHotel,
+        ExchangeRate exchangeRate,
         CountryDangerResponse danger,
         List<TagResponse> tags
 ) {
@@ -20,6 +21,12 @@ public record NotRecommendCityDetailResponse(
     public record AirTicketAndHotel(
             double airTicket,
             double hotel
+    ){}
+
+    public record ExchangeRate(
+            String currency,
+            Double krwPerDisplayUnit,
+            String eventDate
     ){}
 
     public record TagResponse(
