@@ -12,6 +12,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class InterestTagResponse {
+    private Long tagId;
     private String categoryName;
     private String tagName;
 }

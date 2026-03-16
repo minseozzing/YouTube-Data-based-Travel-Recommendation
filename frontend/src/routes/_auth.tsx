@@ -24,6 +24,7 @@ import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { useGoogleLogin } from "@/hooks/auth/useGoogleLogin";
 import { useAuthStore } from "@/stores/authStore";
+import { authApi } from "@/api/auth.api";
 import introBg from "@/assets/treesky2.jpg";
 import nukiImg from "@/assets/AIDrawing_260308_d2d848f3-0f64-44a7-acfa-d2cf92266ef6_0_MiriCanvas.png";
 import maldiveImg from "@/assets/Maldive_beach_1.jpg";
@@ -348,15 +349,10 @@ const LoginCardContent = () => {
   const { setAccessToken, setUser, setHasCompletedPreference } = useAuthStore();
   const navigate = useNavigate();
 
-  const handleDevLogin = () => {
-    setAccessToken("dev-mock-token");
-    setUser({
-      id: 1,
-      email: "dev@dahaeng.com",
-      nickname: "개발자",
-      profileImageUrl: null,
-      role: "ROLE_USER",
-    });
+  const handleDevLogin = async () => {
+    const { accessToken, member } = await authApi.devLogin();
+    setAccessToken(accessToken);
+    setUser(member);
     setHasCompletedPreference(true);
     navigate({ to: "/main" });
   };
