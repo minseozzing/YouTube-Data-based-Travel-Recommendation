@@ -12,6 +12,7 @@ public record RecommendCityDetailResponse(
     String recommendationReason,
     LivingCostFor1Day livingCostFor1Day,
     AirTicketAndHotel airTicketAndHotel,
+    ExchangeRate exchangeRate,
     News news,
     CountryDangerResponse danger,
     List<TagResponse> tags,
@@ -34,6 +35,11 @@ public record RecommendCityDetailResponse(
     public record AirTicketAndHotel(
             double airTicket,
             double hotel
+    ){}
+    public record ExchangeRate(
+            String currency,
+            Double krwPerDisplayUnit,
+            String eventDate
     ){}
     public record News(
             String summation,
