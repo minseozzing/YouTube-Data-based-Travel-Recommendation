@@ -39,5 +39,7 @@ public class TouristSpot extends BaseEntity {
     @Column(name = "sns", length = 255)
     private String sns;
 
+    @Column(name = "imageUrl", columnDefinition = "TEXT")
+    private String imageUrl;
 
 }
