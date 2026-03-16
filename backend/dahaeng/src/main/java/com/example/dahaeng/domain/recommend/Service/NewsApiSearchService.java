@@ -3,6 +3,7 @@ package com.example.dahaeng.domain.recommend.Service;
 import com.example.dahaeng.domain.recommend.dto.response.RecommendCitiesResponse;
 import com.example.dahaeng.global.config.ExternalApiProperties;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import java.util.List;
 @Service
 @Primary
 @RequiredArgsConstructor
+@Slf4j
 public class NewsApiSearchService implements NewsSearchService {
 
     private final ExternalApiProperties externalApiProperties;
@@ -26,7 +28,7 @@ public class NewsApiSearchService implements NewsSearchService {
     public RecommendCitiesResponse.NewsInsight searchAndSummarize(String city, String country, double newsPenaltyScore) {
         if (externalApiProperties.newsapi() == null || !StringUtils.hasText(externalApiProperties.newsapi().key())) {
             return new RecommendCitiesResponse.NewsInsight(
-                    city + " 관련 뉴스 API 키가 설정되지 않아 요약을 생성하지 못했습니다.",
+                    city + " 관련 뉴스 API 키가 없어 뉴스를 불러오지 못했습니다.",
                     List.of()
             );
         }
@@ -38,7 +40,7 @@ public class NewsApiSearchService implements NewsSearchService {
                 .queryParam("language", "en")
                 .queryParam("sortBy", "publishedAt")
                 .queryParam("pageSize", 5)
-                .queryParam("from", LocalDate.now().minusDays(30))
+                .queryParam("from", LocalDate.now().minusDays(7))
                 .build()
                 .toUriString();
 
@@ -50,6 +52,7 @@ public class NewsApiSearchService implements NewsSearchService {
                     .retrieve()
                     .body(NewsApiResponse.class);
         } catch (Exception e) {
+            log.warn("News API request failed for city={}, country={}: {}", city, country, e.getMessage(), e);
             return new RecommendCitiesResponse.NewsInsight(
                     city + " 관련 뉴스를 불러오지 못했습니다.",
                     List.of()
@@ -64,7 +67,10 @@ public class NewsApiSearchService implements NewsSearchService {
                 .map(article -> new RecommendCitiesResponse.Article(
                         safe(article.title()),
                         safe(article.url()),
-                        article.urlToImage()
+                        article.urlToImage(),
+                        safe(article.description()),
+                        safe(article.content()),
+                        safe(article.publishedAt())
                 ))
                 .toList();
 
@@ -81,7 +87,7 @@ public class NewsApiSearchService implements NewsSearchService {
 
     private String summarizeArticles(String city, String country, double newsPenaltyScore, List<ArticleItem> articles) {
         if (articles.isEmpty()) {
-            return city + " 관련 최근 기사를 찾지 못했습니다.";
+            return city + " 관련 뉴스를 찾지 못했습니다.";
         }
 
         String articleBlock = articles.stream()
@@ -90,20 +96,20 @@ public class NewsApiSearchService implements NewsSearchService {
                 .orElse("");
 
         String mode = newsPenaltyScore <= -8
-                ? "부정적인 이슈와 여행 주의사항을 우선해서"
-                : "여행, 관광, 분위기, 먹거리 관점에서";
+                ? "안전 이슈 중심으로 뉴스 흐름을 요약해 주세요."
+                : "관광과 여행 분위기 중심으로 뉴스 흐름을 요약해 주세요.";
 
         try {
             String content = chatClientBuilder.build()
                     .prompt()
-                    .system("너는 여행 추천 서비스의 뉴스 요약기다. 한국어로만 답하고, 기사에 없는 내용은 지어내지 마라.")
+                    .system("당신은 여행 추천 서비스를 위한 뉴스 요약 보조자입니다. 사용자에게 보여줄 짧고 명확한 요약문을 작성하세요.")
                     .user("""
                             도시: %s
                             국가: %s
-                            요약 관점: %s
+                            요청: %s
 
-                            아래 기사 목록만 바탕으로 2문장 이내로 요약해라.
-                            긍정 요소와 주의 요소가 같이 있으면 함께 반영해라.
+                            아래 기사들을 참고해서 2문장 이내로 한국어 요약을 작성하세요.
+                            과장 없이 실제 여행 판단에 도움이 되도록 작성하세요.
 
                             %s
                             """.formatted(city, country, mode, articleBlock))
@@ -112,7 +118,8 @@ public class NewsApiSearchService implements NewsSearchService {
 
             return StringUtils.hasText(content) ? content.trim() : city + " 관련 뉴스 요약을 생성하지 못했습니다.";
         } catch (Exception e) {
-            return city + " 관련 최근 기사 " + articles.size() + "건을 수집했습니다.";
+            log.warn("News summary generation failed for city={}, country={}: {}", city, country, e.getMessage(), e);
+            return city + " 관련 뉴스 " + articles.size() + "건을 찾았지만 요약 생성에는 실패했습니다.";
         }
     }
 
@@ -127,6 +134,7 @@ public class NewsApiSearchService implements NewsSearchService {
             String url,
             String urlToImage,
             String description,
-            String content
+            String content,
+            String publishedAt
     ) {}
 }

@@ -1,6 +1,7 @@
 package com.example.dahaeng.domain.city.dto.response;
 
 
+import java.util.Map;
 import java.util.List;
 
 import com.example.dahaeng.domain.country.dto.response.CountryDangerResponse;
@@ -58,6 +59,9 @@ public record RecommendCityDetailResponse(
             String description,
             Double lat,
             Double lon,
-            String imageUrl
+            String imageUrl,
+            List<String> tags,
+            Double spotScore,
+            Map<String, Double> tagScores
     ) { }
 }
