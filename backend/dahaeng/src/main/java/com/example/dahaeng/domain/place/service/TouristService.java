@@ -29,10 +29,12 @@ import com.example.dahaeng.global.exception.ErrorCode;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class TouristService {
 
 	private final MemberRepository memberRepository;
@@ -41,6 +43,7 @@ public class TouristService {
 	private final SpotTagRepository spotTagRepository;
 	private final TagRepository tagRepository;
 
+	@Transactional
 	public List<PlaceResponse> places(Long cityId, Long memberId) {
 		// 1. memberId 확인
 		// 2. 분기 ( 추천, 비추천 )
@@ -57,8 +60,8 @@ public class TouristService {
 		TouristSpot touristSpot = touristSpotRepository.findById(spotId)
 			.orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "유효하지 않은 관광지 아이디입니다."));
 
-		Collections.sort(tags,
-			(o1, o2) -> Double.compare(o2.getScore(), o1.getScore()));
+		tags.sort((o1, o2)
+			-> Double.compare(o2.getScore(), o1.getScore()));
 
 		List<SpotTagResponse> tagResList = tags.stream()
 			.map((tag) -> new SpotTagResponse(tag.getTagName(), tag.getScore()))
@@ -96,6 +99,7 @@ public class TouristService {
 	}
 
 	private List<PlaceResponse> unrecommend(Long cityId) {
+		log.info("unrecommended={}", cityId);
 		List<TouristSpot> places = touristSpotRepository.findByCityId(cityId);
 
 		List<Long> placeIds = places.stream()

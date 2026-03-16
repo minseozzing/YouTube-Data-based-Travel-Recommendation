@@ -46,7 +46,7 @@ public interface SpotTagRepository extends JpaRepository<SpotTag, Long> {
     );
 
     @Query(
-        """
+        value = """
         select
         st.tourist_spot_id as spotId,
         t.name as tagName,
@@ -58,7 +58,7 @@ public interface SpotTagRepository extends JpaRepository<SpotTag, Long> {
         where st.tourist_spot_id = :spotId
         and st.is_deleted = b'0'
         """
-    )
+    , nativeQuery = true)
     List<SpotTagScoreProjection> findTageScoresBySpotId(
         @Param("spotId") Long spotId
     );

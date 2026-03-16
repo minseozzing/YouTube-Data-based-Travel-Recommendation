@@ -18,6 +18,7 @@ public record PlaceDetailResponse(
 		return new PlaceDetailResponse(
 			spot.getId(),
 			spot.getTouristName(),
+			spot.getImageUrl(),
 			spot.getDescription(),
 			spot.getAddress(),
 			spot.getSns(),

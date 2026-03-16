@@ -14,7 +14,7 @@ public record PlaceResponse(
 		return new PlaceResponse(
 			spot.getId(),
 			spot.getTouristName(),
-			spot.getImgUrl(),
+			spot.getImageUrl(),
 			tags
 		);
 	}

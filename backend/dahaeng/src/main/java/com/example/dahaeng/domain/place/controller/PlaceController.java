@@ -27,7 +27,7 @@ public class PlaceController {
 		return ResponseEntity.ok(placeService.places(cityId, user != null ? user.getId() : null));
 	}
 
-	@GetMapping("/place/{id}")
+	@GetMapping("/places/{id}")
 	public ResponseEntity<?> detail(
 		@PathVariable("id") Long id,
 		@AuthenticationPrincipal CustomOAuth2User user
