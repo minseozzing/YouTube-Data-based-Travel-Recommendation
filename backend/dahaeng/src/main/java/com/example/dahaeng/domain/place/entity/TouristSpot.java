@@ -38,6 +38,5 @@ public class TouristSpot extends BaseEntity {
 
     @Column(name = "sns", length = 255)
     private String sns;
-
-
+    
 }
