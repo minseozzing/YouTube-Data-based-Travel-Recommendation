@@ -50,7 +50,10 @@ public record RecommendCitiesResponse(
     public record Article(
             String title,
             String url,
-            String imageUrl
+            String imageUrl,
+            String description,
+            String content,
+            String publishedAt
     ){}
 
     public record RecommendedPlace(

@@ -4,6 +4,7 @@ import com.example.dahaeng.domain.recommend.dto.response.RecommendCitiesResponse
 import com.example.dahaeng.domain.recommend.repository.SpotRecommendationProjection;
 import com.example.dahaeng.global.config.ExternalApiProperties;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -15,6 +16,7 @@ import java.util.Map;
 @Service
 @Primary
 @RequiredArgsConstructor
+@Slf4j
 public class GooglePlacesEnrichmentService implements PlaceEnrichmentService {
 
     private final ExternalApiProperties externalApiProperties;
@@ -34,6 +36,9 @@ public class GooglePlacesEnrichmentService implements PlaceEnrichmentService {
         if (externalApiProperties.googlePlaces() != null
                 && StringUtils.hasText(externalApiProperties.googlePlaces().key())) {
             try {
+                String maskedKey = maskKey(externalApiProperties.googlePlaces().key());
+                log.info("Google Places request configured with key={} baseUrl={}",
+                        maskedKey, externalApiProperties.googlePlaces().baseUrl());
                 RestClient restClient = restClientBuilder.baseUrl(externalApiProperties.googlePlaces().baseUrl()).build();
                 TextSearchResponse searchResponse = restClient.post()
                         .uri("/v1/places:searchText")
@@ -72,7 +77,13 @@ public class GooglePlacesEnrichmentService implements PlaceEnrichmentService {
                         }
                     }
                 }
-            } catch (Exception ignored) {
+            } catch (Exception e) {
+                log.warn("Google Places enrichment failed for spot={} key={} baseUrl={}: {}",
+                        spot.getPlaceName(),
+                        maskKey(externalApiProperties.googlePlaces().key()),
+                        externalApiProperties.googlePlaces().baseUrl(),
+                        e.getMessage(),
+                        e);
             }
         }
 
@@ -107,4 +118,14 @@ public class GooglePlacesEnrichmentService implements PlaceEnrichmentService {
     public record Photo(String name) {}
 
     public record PhotoMediaResponse(String name, String photoUri) {}
+
+    private String maskKey(String key) {
+        if (!StringUtils.hasText(key)) {
+            return "<empty>";
+        }
+        if (key.length() <= 8) {
+            return key.substring(0, Math.min(4, key.length())) + "...";
+        }
+        return key.substring(0, 6) + "..." + key.substring(key.length() - 4);
+    }
 }

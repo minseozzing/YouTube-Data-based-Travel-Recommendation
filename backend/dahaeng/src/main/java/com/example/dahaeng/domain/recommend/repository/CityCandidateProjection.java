@@ -2,6 +2,7 @@ package com.example.dahaeng.domain.recommend.repository;
 
 public interface CityCandidateProjection {
     Long getCityId();
+    Long getCountryId();
     String getCityName();
     String getCountryName();
     String getCityImageUrl();
