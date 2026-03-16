@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 // ── CityListItem: GET /api/city (AllCitiesResponse) 매핑 결과 ──────────────
 // 백엔드: { id, name, countryName, imgUrl, expectedBudgetFor1day, danger(object), lat, lon }
@@ -104,7 +104,18 @@ export const CityDetailSchema = z.object({
 export type CityDetail = z.infer<typeof CityDetailSchema>;
 
 export const RecommendRequestSchema = z.object({
-  budget: z.number().positive(),
-  duration: z.number().int().positive(),
+  selectedTags: z.array(z.string()),
+  userDailyBudget: z.number().positive(),
+  travelDays: z.number().int().positive(),
+  month: z.number().int().min(1).max(12),
 });
 export type RecommendRequest = z.infer<typeof RecommendRequestSchema>;
+
+export const RecommendResultItemSchema = z.object({
+  rank: z.number(),
+  country: z.string(),
+  city: z.string(),
+  totalScore: z.number(),
+  reason: z.string().nullable().optional(),
+});
+export type RecommendResultItem = z.infer<typeof RecommendResultItemSchema>;

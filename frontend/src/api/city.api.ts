@@ -1,5 +1,4 @@
 import { axiosInstance } from "./axiosInstance";
-import { RecommendRequestSchema } from "@/schemas/city.schema";
 import type { CityDetail } from "@/schemas/city.schema";
 import { z } from "zod";
 
@@ -124,6 +123,7 @@ export const cityApi = {
       .map((city) => ({
         cityId: city.id,
         cityName: city.name,
+        countryName: city.danger?.countryName ?? "",
         imgUrl: city.imgUrl ?? "",
         estimatedBudget: (city.expectedBudgetFor1day ?? 0) * 7,
         riskLevel: dangerToRiskLevel(city.danger),
@@ -180,21 +180,41 @@ export const cityApi = {
   },
 
   // POST /api/recommend
-  recommend: async (body: { budget: number; duration: number }) => {
-    RecommendRequestSchema.parse(body);
+  // POST /api/recommend → RecommendCitiesResponse
+  recommend: async (body: {
+    selectedTags: string[];
+    userDailyBudget: number;
+    travelDays: number;
+    month: number;
+  }) => {
+    const BackendRecommendResponseSchema = z.object({
+      status: z.string(),
+      data: z.object({
+        recommendations: z.array(
+          z.object({
+            rank: z.number(),
+            country: z.string(),
+            city: z.string(),
+            scores: z.object({
+              totalScore: z.number().nullable().optional(),
+              budgetScore: z.number().nullable().optional(),
+              safetyScore: z.number().nullable().optional(),
+              tagMatchScore: z.number().nullable().optional(),
+              newPenaltyScore: z.number().nullable().optional(),
+            }),
+            recommendationReason: z.string().nullable().optional(),
+          }),
+        ),
+      }),
+    });
     const { data } = await axiosInstance.post("/api/recommend", body);
-    return z
-      .array(BackendCitySchema)
-      .parse(data)
-      .map((city) => ({
-        cityId: city.id,
-        cityName: city.name,
-        imgUrl: city.imgUrl ?? "",
-        estimatedBudget: (city.expectedBudgetFor1day ?? 0) * 7,
-        riskLevel: dangerToRiskLevel(city.danger),
-        latitude: city.lat ?? 0,
-        longitude: city.lon ?? 0,
-        matchingScore: undefined,
-      }));
+    const parsed = BackendRecommendResponseSchema.parse(data);
+    return parsed.data.recommendations.map((item) => ({
+      rank: item.rank,
+      country: item.country,
+      city: item.city,
+      totalScore: item.scores.totalScore ?? 0,
+      reason: item.recommendationReason ?? null,
+    }));
   },
 };
