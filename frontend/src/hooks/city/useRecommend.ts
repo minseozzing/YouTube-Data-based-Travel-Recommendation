@@ -1,19 +1,19 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { cityApi } from '@/api/city.api';
-import { queryKeys } from '@/utils/queryKeys';
+import { useMutation } from "@tanstack/react-query";
+import { cityApi } from "@/api/city.api";
+import { useUiStore } from "@/stores/uiStore";
 
-/**
- * 도시 추천받기
- * POST /api/recommend
- */
 export const useRecommend = () => {
-  const queryClient = useQueryClient();
+  const setRecommendResults = useUiStore((s) => s.setRecommendResults);
 
   return useMutation({
-    mutationFn: (body: { budget: number; duration: number }) => cityApi.recommend(body),
-    onSuccess: (data, variables) => {
-      // 추천 결과를 캐시에 저장
-      queryClient.setQueryData(queryKeys.city.recommend(variables), data);
+    mutationFn: (body: {
+      selectedTags: string[];
+      userDailyBudget: number;
+      travelDays: number;
+      month: number;
+    }) => cityApi.recommend(body),
+    onSuccess: (data) => {
+      setRecommendResults(data);
     },
   });
 };

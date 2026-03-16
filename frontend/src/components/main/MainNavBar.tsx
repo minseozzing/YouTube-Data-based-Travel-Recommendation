@@ -162,7 +162,7 @@ export function MainNavBar() {
           {user?.profileImageUrl ? (
             <img
               src={user.profileImageUrl}
-              alt={user.name ?? "사용자"}
+              alt={user.nickname ?? "사용자"}
               className="size-full object-cover"
             />
           ) : (

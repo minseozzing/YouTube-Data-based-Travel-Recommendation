@@ -9,8 +9,6 @@ import { RecommendTab } from "@/components/city/tabs/RecommendTab";
 import { CostCompareTab } from "@/components/city/tabs/CostCompareTab";
 import { FlightTab } from "@/components/city/tabs/FlightTab";
 import { NewsTab } from "@/components/city/tabs/NewsTab";
-import { DUMMY_CITY_DETAILS } from "@/data/dummyCityData";
-
 // 배경 오버레이 페이드 인/아웃 애니메이션 정의
 const backdropVariants: Variants = {
   hidden: { opacity: 0 },
@@ -64,6 +62,7 @@ export function CityDetailModal() {
     selectedCityId,
     isCityModalOpen,
     activeCityTab,
+    isRecommendActive,
     closeCityModal,
     setActiveCityTab,
   } = useUiStore();
@@ -73,15 +72,9 @@ export function CityDetailModal() {
     data: cityFromApi,
     isLoading,
     isError,
-  } = useCityDetail(selectedCityId);
+  } = useCityDetail(selectedCityId, isRecommendActive);
 
-  // API 실패 시 더미 데이터로 대체하고, 더미도 없으면 null
-  const city =
-    cityFromApi ??
-    (isError && selectedCityId
-      ? (DUMMY_CITY_DETAILS[selectedCityId] ?? null)
-      : null);
-  // 더미 데이터로도 복구 불가한 경우에만 에러 UI 표시
+  const city = cityFromApi ?? null;
   const showError = isError && !city;
 
   return (
