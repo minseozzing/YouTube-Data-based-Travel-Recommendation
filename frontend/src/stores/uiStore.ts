@@ -1,5 +1,13 @@
 import { create } from "zustand";
 
+export type RecommendResultItem = {
+  rank: number;
+  country: string;
+  city: string;
+  totalScore: number;
+  reason: string | null | undefined;
+};
+
 type CityDetailTab = "recommend" | "cost" | "flight" | "news";
 
 interface UiState {
@@ -13,6 +21,8 @@ interface UiState {
 
   // 추천 상태
   isRecommendActive: boolean;
+
+  recommendResults: RecommendResultItem[];
 
   // 도시 상세 모달 (전체 화면)
   isCityModalOpen: boolean;
@@ -38,6 +48,7 @@ interface UiState {
   setGlobeDuration: (days: number) => void;
   setGlobeTravelMonth: (year: number, month: number) => void;
   setRecommendActive: (v: boolean) => void;
+  setRecommendResults: (results: RecommendResultItem[]) => void;
 }
 
 export const useUiStore = create<UiState>((set) => ({
@@ -68,7 +79,10 @@ export const useUiStore = create<UiState>((set) => ({
   globeTravelMonth: new Date().getMonth() + 1,
   setGlobeBudgetFilter: (range) => set({ globeBudgetFilter: range }),
   setGlobeDuration: (days) => set({ globeDuration: days }),
-  setGlobeTravelMonth: (year, month) => set({ globeTravelYear: year, globeTravelMonth: month }),
+  setGlobeTravelMonth: (year, month) =>
+    set({ globeTravelYear: year, globeTravelMonth: month }),
   isRecommendActive: false,
+  recommendResults: [],
   setRecommendActive: (v) => set({ isRecommendActive: v }),
+  setRecommendResults: (results) => set({ recommendResults: results }),
 }));

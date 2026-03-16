@@ -9,10 +9,10 @@ import org.springframework.util.StringUtils;
 
 import com.example.dahaeng.domain.country.dto.response.CountryDanger;
 import com.example.dahaeng.domain.country.dto.response.CountryDangerResponse;
+import com.example.dahaeng.domain.country.entity.Country;
 import com.example.dahaeng.domain.country.entity.Danger;
+import com.example.dahaeng.domain.country.repository.CountryRepository;
 import com.example.dahaeng.domain.country.repository.DangerRepository;
-import com.example.dahaeng.global.exception.CustomException;
-import com.example.dahaeng.global.exception.ErrorCode;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,10 +22,17 @@ import lombok.RequiredArgsConstructor;
 public class DangerService {
 
 	private final DangerRepository dangerRepository;
+	private final CountryRepository countryRepository;
 
 	public CountryDangerResponse dangers(Long countryId) {
-		Danger danger = dangerRepository.findByCountryId(countryId)
-			.orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "유효하지 않은 국가 아이디입니다."));
+		Country country = countryRepository.findById(countryId).orElse(null);
+		Danger danger = dangerRepository.findByCountryId(countryId).orElse(null);
+		if (danger == null) {
+			return new CountryDangerResponse(
+				country != null ? country.getCountryName() : null,
+				List.of()
+			);
+		}
 
 		List<CountryDanger> res = new ArrayList<>();
 

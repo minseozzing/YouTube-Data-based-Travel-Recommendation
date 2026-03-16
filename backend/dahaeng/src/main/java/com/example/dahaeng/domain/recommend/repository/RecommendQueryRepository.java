@@ -12,6 +12,7 @@ public interface RecommendQueryRepository extends Repository<City, Long> {
     @Query(value = """
         select
             c.id as cityId,
+            co.id as countryId,
             c.city_name as cityName,
             co.country_name as countryName,
             c.img_url as cityImageUrl,
