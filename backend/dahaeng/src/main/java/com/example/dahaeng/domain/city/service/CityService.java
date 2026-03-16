@@ -12,6 +12,8 @@ import com.example.dahaeng.domain.city.repository.CityTagRepository;
 import com.example.dahaeng.domain.country.entity.Danger;
 import com.example.dahaeng.domain.country.repository.DangerRepository;
 import com.example.dahaeng.domain.country.service.DangerService;
+import com.example.dahaeng.domain.exchange.entity.Exchange;
+import com.example.dahaeng.domain.exchange.repository.ExchangeRepository;
 import com.example.dahaeng.domain.flight.entity.FlightSummary;
 import com.example.dahaeng.domain.flight.repository.FlightSummaryRepository;
 import com.example.dahaeng.domain.livingcost.entity.LivingCostOfCity;
@@ -53,6 +55,7 @@ public class CityService {
     private final DangerRepository dangerRepository;
     private final CityTagRepository cityTagRepository;
     private final DangerService dangerService;
+    private final ExchangeRepository exchangeRepository;
     private final TouristSpotRepository touristSpotRepository;
     private final TouristSpotRecommendRepository touristSpotRecommendRepository;
     private final SpotTagRepository spotTagRepository;
@@ -126,6 +129,7 @@ public class CityService {
         double finalScore = clamp(tagScore + safetyScore + budgetScore + newsPenaltyScore, 0.0, 100.0);
 
         List<RecommendCitiesResponse.RecommendedPlace> places = buildRecommendedPlaces(id, selectedTags);
+        Exchange exchange = exchangeRepository.findFirstByCurrencyOrderByEventDateDesc(city.getCountry().getCurrency()).orElse(null);
         RecommendCitiesResponse.NewsInsight newsInsight =
                 newsSearchService.searchAndSummarize(city.getCityName(), city.getCountry().getCountryName(), newsPenaltyScore);
 
@@ -173,7 +177,7 @@ public class CityService {
                                 .filter(entry -> entry.getValue() != null && entry.getValue() > 0)
                                 .map(Map.Entry::getKey)
                                 .toList(),
-                        round(place.tagScores().values().stream()
+                        round4(place.tagScores().values().stream()
                                 .filter(java.util.Objects::nonNull)
                                 .mapToDouble(Double::doubleValue)
                                 .sum()),
@@ -205,6 +209,11 @@ public class CityService {
                 recommendationReason,
                 new RecommendCityDetailResponse.LivingCostFor1Day(food, transport),
                 new RecommendCityDetailResponse.AirTicketAndHotel(avgFlightPrice, avgHotelPrice),
+                new RecommendCityDetailResponse.ExchangeRate(
+                        city.getCountry().getCurrency().name(),
+                        exchange != null ? exchange.getKrwPerDisplayUnit() : null,
+                        exchange != null && exchange.getEventDate() != null ? exchange.getEventDate().toString() : null
+                ),
                 new RecommendCityDetailResponse.News(newsInsight.summary(), newsItems),
                 dangerService.dangers(city.getCountry().getId()),
                 tags,
@@ -224,6 +233,7 @@ public class CityService {
         LivingCostOfCity cost = livingCostOfCityRepository.findOneByCityId(id).orElse(null);
         double food = cost != null && cost.getFood() != null ? cost.getFood() : 0.0;
         double transport = cost != null && cost.getTransport() != null ? cost.getTransport() : 0.0;
+        Exchange exchange = exchangeRepository.findFirstByCurrencyOrderByEventDateDesc(city.getCountry().getCurrency()).orElse(null);
 
         List<NotRecommendCityDetailResponse.TagResponse> tags = cityTagRepository.findCityTagsByCityId(id).stream()
                 .map(cityTag -> new NotRecommendCityDetailResponse.TagResponse(
@@ -237,6 +247,11 @@ public class CityService {
                 city.getCityName(),
                 new NotRecommendCityDetailResponse.LivingCostFor1Day(food, transport),
                 new NotRecommendCityDetailResponse.AirTicketAndHotel(avgFlightPrice, avgHotelPrice),
+                new NotRecommendCityDetailResponse.ExchangeRate(
+                        city.getCountry().getCurrency().name(),
+                        exchange != null ? exchange.getKrwPerDisplayUnit() : null,
+                        exchange != null && exchange.getEventDate() != null ? exchange.getEventDate().toString() : null
+                ),
                 dangerService.dangers(city.getCountry().getId()),
                 tags
         );
@@ -418,5 +433,9 @@ public class CityService {
 
     private double round(double value) {
         return Math.round(value * 10.0) / 10.0;
+    }
+
+    private double round4(double value) {
+        return Math.round(value * 10000.0) / 10000.0;
     }
 }
