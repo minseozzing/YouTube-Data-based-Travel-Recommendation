@@ -9,3 +9,4 @@ ai/google_flight/*
 .idea/*
 ai/silver/*
 ai/spark_pipeline/*
+ai/normalized/*

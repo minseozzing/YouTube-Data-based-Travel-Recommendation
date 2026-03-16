@@ -67,6 +67,20 @@ TO_WRAPPER_SELECTORS = [
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 
+def matches_route_filter(route: Dict, route_filter: str) -> bool:
+    needles = [token.strip().lower() for token in route_filter.split(",") if token.strip()]
+    if not needles:
+        return True
+
+    haystacks = [
+        route.get("route_key", "").lower(),
+        route.get("label", "").lower(),
+        route.get("city_code", "").lower(),
+        route.get("city_name_kr", "").lower(),
+    ]
+    return any(any(needle in haystack for haystack in haystacks) for needle in needles)
+
+
 def parse_price_krw(price_text: str) -> int:
     text = (price_text or "").strip()
     if not text:
@@ -134,7 +148,9 @@ def build_routes(mapping: List[Dict]) -> List[Dict]:
     for city in mapping:
         city_code = city["city_code"]
         city_name_kr = city["city_name_kr"]
+        city_name_en = city.get("city_name_en", city_name_kr)
         country_kr = city["country_kr"]
+        country_en = city.get("country_en", country_kr)
 
         for r in city["routes"]:
             airport = r["airport"].upper()
@@ -146,7 +162,9 @@ def build_routes(mapping: List[Dict]) -> List[Dict]:
                     "route_key": f"{city_code}_{airport}_out",
                     "city_code": city_code,
                     "city_name_kr": city_name_kr,
+                    "city_name_en": city_name_en,
                     "country_kr": country_kr,
+                    "country_en": country_en,
                     "label": f"서울 -> {city_name_kr} ({airport})",
                     "dcity": "sel",
                     "dairport": "icn",
@@ -162,7 +180,9 @@ def build_routes(mapping: List[Dict]) -> List[Dict]:
                     "route_key": f"{city_code}_{airport}_in",
                     "city_code": city_code,
                     "city_name_kr": city_name_kr,
+                    "city_name_en": city_name_en,
                     "country_kr": country_kr,
+                    "country_en": country_en,
                     "label": f"{city_name_kr} ({airport}) -> 서울",
                     "dcity": trip_city,
                     "dairport": trip_airport,
@@ -774,9 +794,14 @@ def make_jsonl_record(date_str: str, price: int, route: Dict, ingest_time: str) 
         "event_time": date_str,
         "entity": {
             "city_code": route["city_code"],
+            "city_name": route.get("city_name_en", route["city_name_kr"]),
             "city_name_kr": route["city_name_kr"],
+            "city_name_en": route.get("city_name_en", route["city_name_kr"]),
+            "country": route.get("country_en", route["country_kr"]),
+            "country_kr": route["country_kr"],
+            "country_en": route.get("country_en", route["country_kr"]),
             "origin": route["dairport"].upper(),
-            "dest_airport": route["dest_airport"],
+            "dest_airport": route["aairport"].upper(),
             "direction": route["direction"],
         },
         "payload": {
@@ -944,15 +969,7 @@ async def main() -> None:
     route_filter = (os.getenv("ROUTE_FILTER") or "").strip()
     filtered_routes = all_routes
     if route_filter:
-        needle = route_filter.lower()
-        filtered_routes = [
-            r
-            for r in all_routes
-            if needle in r["route_key"].lower()
-            or needle in r["label"].lower()
-            or needle in r["city_code"].lower()
-            or needle in r["city_name_kr"].lower()
-        ]
+        filtered_routes = [r for r in all_routes if matches_route_filter(r, route_filter)]
         print(f"  [Info] ROUTE_FILTER='{route_filter}' -> {len(filtered_routes)} routes")
 
     pending = [route for route in filtered_routes if route["route_key"] not in done_keys]
@@ -1000,7 +1017,9 @@ async def main() -> None:
     retry_rounds = ZERO_RESULT_RETRY_ROUNDS
 
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=False, slow_mo=50, args=["--incognito"])
+        headless = os.getenv("TRIP_HEADLESS", "0") == "1"
+        slow_mo = 0 if headless else 50
+        browser = await p.chromium.launch(headless=headless, slow_mo=slow_mo, args=["--incognito"])
         session_lock = asyncio.Lock()
         session_state: Dict = {"session": None, "used": 0}
 
