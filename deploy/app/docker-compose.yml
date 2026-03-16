@@ -3,21 +3,17 @@ services:
     build:
       context: ../../backend/dahaeng
       dockerfile: Dockerfile
+    container_name: dahaeng-backend
     env_file:
       - .env
-    # DB host must match database-compose service names.
-    # Example:
-    #   DB_URL=jdbc:mysql://mysql:3306/dahaeng
-    #   MONGODB_URI=mongodb://mongodb:27017/dahaeng
     environment:
       TZ: ${TZ:-Asia/Seoul}
     restart: unless-stopped
     networks:
       - app-internal
       - db-external
-    # Initial health-check option only (disable in normal production operation):
-    # ports:
-    #   - "8080:8080"
+    expose:
+      - "8080"
 
   frontend:
     build:
@@ -27,6 +23,7 @@ services:
         VITE_API_BASE_URL: ${VITE_API_BASE_URL}
         VITE_GOOGLE_CLIENT_ID: ${VITE_GOOGLE_CLIENT_ID}
         VITE_ENABLE_MSW: ${VITE_ENABLE_MSW:-false}
+    container_name: dahaeng-frontend
     depends_on:
       - backend
     restart: unless-stopped
@@ -38,6 +35,7 @@ services:
 networks:
   app-internal:
     driver: bridge
+
   db-external:
     external: true
     name: ${DB_EXTERNAL_NETWORK:-dahaeng-db-net}
