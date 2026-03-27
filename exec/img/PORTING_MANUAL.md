@@ -364,18 +364,127 @@ python auto_travel_scraper_byID_season.py
 - 비밀키(`JWT_SECRET`, API 키, 클라우드 키)는 코드 저장소에 저장하지 않음
 - 분리 Compose 사용 시 DB/앱 서비스가 같은 `dahaeng-db-net`에 연결되어 있는지 항상 확인
 
-## 9. 검증 절차
-### 9.1 백엔드 기동 확인
+## 9. 배포 파일 관리 기준 (Nginx / Docker)
+운영 포팅 시 아래 배포 파일이 필요하며, 본 저장소에 없으면 서버 운영 경로(예: `~/app`)에서 별도 관리한다.
+
+### 9.1 필수 파일
+- App Compose: `~/app/app-compose/docker-compose.yml`
+- DB/Infra Compose: `~/app/database/docker-compose.yml`
+- Backend Dockerfile: `backend/Dockerfile` (또는 운영 레포 내 동등 경로)
+- Frontend Dockerfile: `frontend/Dockerfile` (또는 운영 레포 내 동등 경로)
+- Nginx 설정: `/etc/nginx/sites-available/<service>.conf`
+
+### 9.2 Nginx 라우팅 기준
+- `/` -> frontend 컨테이너
+- `/api/` -> backend 컨테이너
+- `/oauth2/` -> backend 컨테이너 (OAuth2 로그인 플로우)
+- `/login/oauth2/` -> backend 컨테이너 (OAuth2 콜백 처리)
+
+### 9.3 HTTPS 설정(적용 권장)
+- 인증서: Let's Encrypt(Certbot) 사용
+- 80 포트는 443으로 리다이렉트
+- 443 서버블록에서 SSL 인증서/키 경로 지정
+- `X-Forwarded-Proto`, `X-Forwarded-For` 헤더 전달
+
+예시 명령:
+```bash
+sudo certbot --nginx -d <도메인> -d www.<도메인>
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+### 9.3.1 현재 운영 nginx.conf 예시
+아래는 현재 운영 기준 설정 예시이다.
+
+```nginx
+server {
+    listen 80;
+    server_name dahaeng.site j14d206.p.ssafy.io;
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+server {
+    listen 443 ssl http2;
+    server_name dahaeng.site j14d206.p.ssafy.io;
+
+    ssl_certificate /etc/letsencrypt/live/dahaeng.site/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/dahaeng.site/privkey.pem;
+
+    root /usr/share/nginx/html;
+    index index.html;
+
+    location /assets/ {
+        expires 7d;
+        add_header Cache-Control "public, max-age=604800, immutable";
+        try_files $uri =404;
+    }
+
+    location /api/ {
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_pass http://backend:8080/api/;
+    }
+
+    location /oauth2/ {
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_pass http://backend:8080/oauth2/;
+    }
+
+    location /login/oauth2/ {
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_pass http://backend:8080/login/oauth2/;
+    }
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}
+```
+
+### 9.4 OAuth와 HTTPS 연계 주의사항
+- Google Cloud Console의 Authorized redirect URI를 반드시 `https://` 기준으로 등록
+- `GOOGLE_REDIRECT_URI`, `FRONT_CALLBACK_URL` 모두 HTTPS 도메인으로 설정
+- HTTP/HTTPS 혼용 시 OAuth redirect mismatch 오류가 발생할 수 있음
+
+## 10. 검증 절차
+### 10.1 백엔드 기동 확인
 - 백엔드 로그에 DB 연결 오류가 없는지 확인
 
-### 9.2 프론트 연동 확인
+### 10.2 프론트 연동 확인
 - 프론트 접속 후 API 요청이 `VITE_API_BASE_URL`로 정상 전송되는지 확인
 
-### 9.3 OAuth/YouTube 확인
+### 10.3 OAuth/YouTube 확인
 - Google 로그인 성공 후 `/api/auth/exchange` 응답 확인
 - 인증 후 `/api/youtube/sync` 호출 시 정상 완료 메시지 확인
 
-## 10. 트러블슈팅
+## 11. 트러블슈팅
 - Google 로그인 실패
   - Redirect URI 불일치 여부 확인
   - `GOOGLE_CLIENT_ID/SECRET` 적용 여부 확인
