@@ -65,12 +65,57 @@ const TRAVEL_COURSES_JSON_SCHEMA = {
 
 // ── API 호출 ──────────────────────────────────────────────────────────────────
 
+/**
+ * 서버/실 API 키 연동 완료 시 false 로 변경하면 실제 Gemini API가 호출됩니다.
+ * mock 모드에서는 입력된 관광지 목록만으로 결정적인 코스를 구성해 네트워크/비용 없이 동작합니다.
+ */
+const USE_MOCK_GEMINI_API = true;
+
+function buildMockTravelCourses(
+  features: NearbyAttractionFeature[],
+  touristSpots: NonNullable<CityDetail['touristSpot']> | undefined,
+  cityNameKo: string,
+): TravelCourses {
+  const spots = [
+    ...(touristSpots ?? [])
+      .filter((s) => s.lat != null && s.lon != null)
+      .map((s) => ({ name: s.koName ?? s.name, lat: s.lat as number, lon: s.lon as number })),
+    ...features.map((f) => ({
+      name: f.properties.nameKo ?? f.properties.nameEn ?? f.properties.name,
+      lat: f.properties.lat,
+      lon: f.properties.lon,
+    })),
+  ];
+
+  if (spots.length === 0) return { courses: [] };
+
+  const themes = ['핵심 명소 코스', '여유로운 힐링 코스', '현지 분위기 코스'];
+  const chunkSize = Math.max(1, Math.min(6, Math.ceil(spots.length / themes.length)));
+  const courses = themes
+    .map((courseTitle, i) => spots.slice(i * chunkSize, i * chunkSize + chunkSize).map((spot, order) => ({
+      name: spot.name,
+      order: order + 1,
+      description: `${cityNameKo}의 인기 명소 ${spot.name}을 둘러보세요.`,
+      tip: '현지 분위기를 천천히 즐겨보세요.',
+      stayMinutes: 60,
+      visitTime: `${(9 + order * 2).toString().padStart(2, '0')}:00 ~ ${(10 + order * 2).toString().padStart(2, '0')}:30`,
+      lat: spot.lat,
+      lon: spot.lon,
+    })))
+    .filter((attractions) => attractions.length > 0)
+    .map((attractions, i) => ({ courseTitle: themes[i], attractions }));
+
+  return { courses };
+}
+
 export async function generateTravelCourses(
   features: NearbyAttractionFeature[],
   cityNameKo: string,
   touristSpots?: NonNullable<CityDetail['touristSpot']>,
   cityTags?: NonNullable<CityDetail['tags']>,
 ): Promise<TravelCourses> {
+  if (USE_MOCK_GEMINI_API) return buildMockTravelCourses(features, touristSpots, cityNameKo);
+
   const apiKey = 'AIzaSyCsVfoWZyTQzt_WOmZrkCfcx2MBxNS2ceI';
   const ai = new GoogleGenAI({ apiKey });
 

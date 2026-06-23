@@ -10,10 +10,17 @@ import type {
   PreferenceTagRequest,
 } from "@/schemas/auth.schema";
 
+/**
+ * 서버 구현 완료 시 false 로 변경하면 실제 API가 호출됩니다.
+ * mock 모드에서는 Google OAuth 백엔드 교환이 불가능하므로 게스트 모드 사용을 권장합니다.
+ */
+const USE_MOCK_AUTH_API = true;
+
 export const authApi = {
   // GET /api/auth/google/login-url
   // 백엔드: bare { loginUrl: "/oauth2/authorization/google" }
   getGoogleLoginUrl: async () => {
+    if (USE_MOCK_AUTH_API) return GoogleLoginUrlResponseSchema.parse({ loginUrl: "/oauth2/authorization/google" });
     const { data } = await axiosInstance.get("/api/auth/google/login-url");
     return GoogleLoginUrlResponseSchema.parse(data);
   },
@@ -46,12 +53,14 @@ export const authApi = {
   // POST /api/member/tag (선호도 태그 등록 — 신규/수정 모두 POST, 백엔드가 upsert 처리)
   submitPreference: async (body: PreferenceTagRequest) => {
     PreferenceTagRequestSchema.parse(body);
+    if (USE_MOCK_AUTH_API) return;
     await axiosInstance.post("/api/member/tag", body); // { tagIds: number[] }
   },
 
   // POST /api/member/tag (선호도 태그 수정 — 백엔드에 PATCH 없음, POST upsert 재사용)
   updatePreference: async (body: PreferenceTagRequest) => {
     PreferenceTagRequestSchema.parse(body);
+    if (USE_MOCK_AUTH_API) return;
     await axiosInstance.post("/api/member/tag", body); // { tagIds: number[] }
   },
 
@@ -59,23 +68,27 @@ export const authApi = {
   getMemberTags: async (): Promise<
     { id: number; tagId: number; isFromYoutube: boolean }[]
   > => {
+    if (USE_MOCK_AUTH_API) return [];
     const { data } = await axiosInstance.get("/api/member/tag");
     return data;
   },
 
   // DELETE /api/member/tag/{id} — memberTag 레코드 id로 태그 삭제
   deleteTag: async (memberTagId: number): Promise<void> => {
+    if (USE_MOCK_AUTH_API) return;
     await axiosInstance.delete(`/api/member/tag/${memberTagId}`);
   },
 
   // GET /api/members/youtube/status
   getYoutubeStatus: async () => {
+    if (USE_MOCK_AUTH_API) return YoutubeStatusSchema.parse({ connected: false });
     const { data } = await axiosInstance.get("/api/members/youtube/status");
     return YoutubeStatusSchema.parse(data);
   },
 
   // GET /api/member/youtube/tag
   getYoutubeConsentUrl: async () => {
+    if (USE_MOCK_AUTH_API) return GoogleLoginUrlResponseSchema.parse({ loginUrl: "/oauth2/authorization/google" });
     const { data } = await axiosInstance.get("/api/member/tag");
     return GoogleLoginUrlResponseSchema.parse(data);
   },

@@ -49,14 +49,22 @@ const InterestAnalyzeResponseSchema = z.object({
 
 export type InterestAnalyzeResponse = z.infer<typeof InterestAnalyzeResponseSchema>;
 
+/**
+ * 서버 구현 완료 시 false 로 변경하면 실제 API가 호출됩니다.
+ * YouTube 연동은 백엔드 OAuth가 필요해 mock 모드에서는 항상 미연동 상태로 동작합니다.
+ */
+const USE_MOCK_YOUTUBE_API = true;
+
 export const youtubeApi = {
   // POST /api/youtube/sync — YouTube 데이터 동기화 + 키워드 추출
   sync: async () => {
+    if (USE_MOCK_YOUTUBE_API) return;
     await axiosInstance.post("/api/youtube/sync", null, { timeout: 120_000 });
   },
 
   // POST /api/interest/analyze — AI 태그 추론 + DB 저장
   analyze: async () => {
+    if (USE_MOCK_YOUTUBE_API) return;
     await axiosInstance.post("/api/interest/analyze", null, {
       timeout: 120_000,
     });
@@ -64,12 +72,16 @@ export const youtubeApi = {
 
   // GET /api/youtube/sync-status — YouTube 연동 및 동기화 상태 조회
   getSyncStatus: async (): Promise<YoutubeSyncStatus> => {
+    if (USE_MOCK_YOUTUBE_API) {
+      return { connected: false, syncEnabled: null, syncStatus: null, lastSyncedAt: null };
+    }
     const { data } = await axiosInstance.get("/api/youtube/sync-status");
     return data as YoutubeSyncStatus;
   },
 
   // PATCH /api/youtube/sync-preference — syncEnabled 변경
   updateSyncPreference: async (syncEnabled: boolean): Promise<void> => {
+    if (USE_MOCK_YOUTUBE_API) return;
     await axiosInstance.patch("/api/youtube/sync-preference", { syncEnabled });
   },
 
@@ -78,6 +90,7 @@ export const youtubeApi = {
     tagIds: number[];
     tagNames: string[];
   }> => {
+    if (USE_MOCK_YOUTUBE_API) return { tagIds: [], tagNames: [] };
     const { data } = await axiosInstance.get("/api/interest/analyze");
     const parsed = InterestAnalyzeResponseSchema.safeParse(data);
     const tags = parsed.success ? parsed.data.tags : z.array(InterestTagSchema).parse(data);
@@ -90,6 +103,7 @@ export const youtubeApi = {
 
   // GET /api/interest/analyze — 풀 분석 데이터 (추천 이유 탭용)
   getInterestAnalysis: async (): Promise<InterestAnalyzeResponse> => {
+    if (USE_MOCK_YOUTUBE_API) return { tags: [], topKeywords: [] };
     const { data } = await axiosInstance.get("/api/interest/analyze");
     const parsed = InterestAnalyzeResponseSchema.safeParse(data);
     if (parsed.success) return parsed.data;

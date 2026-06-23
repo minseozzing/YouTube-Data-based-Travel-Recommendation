@@ -6,6 +6,9 @@
  */
 import dayjs from '@/utils/dayjs';
 import type { CitySummary, FlightCalendar, FlightTrend } from '@/schemas/flight.schema';
+import { findCity, resolveImage } from './sharedData';
+import { COUNTRY_NAME_KO } from '@/data/countryNameKo';
+import { CITY_NAME_KO } from '@/data/cityNameKo';
 
 const now = dayjs();
 
@@ -15,14 +18,16 @@ function randomPrice(base: number, variance: number) {
 
 // 도시 요약 (GET /api/cities/{cityId}/summary)
 export function getMockCitySummary(_cityId: number, _yearMonth: string): CitySummary {
+  const city = findCity(_cityId);
+  const baseFlight = city ? Math.round((city.accommodation * 1.4) / 1000) * 1000 : 240000;
   return {
     city_id: _cityId,
-    city_name_kr: '도쿄',
-    city_name_en: 'Tokyo',
-    country_name_kr: '일본',
-    city_image_url: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800',
-    avg_flight_price: 240000,
-    avg_hotel_price: 180000,
+    city_name_kr: city ? (CITY_NAME_KO[city.nameEn] ?? city.nameEn) : '도쿄',
+    city_name_en: city?.nameEn ?? 'Tokyo',
+    country_name_kr: city ? (COUNTRY_NAME_KO[city.countryNameEn] ?? city.countryNameEn) : '일본',
+    city_image_url: city ? resolveImage(city.imageKey) : 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800',
+    avg_flight_price: baseFlight,
+    avg_hotel_price: city?.accommodation ?? 180000,
     typical_stops_text: '직항',
     min_duration_text: '2시간 30분',
     peak_season_months: [3, 11, 12],

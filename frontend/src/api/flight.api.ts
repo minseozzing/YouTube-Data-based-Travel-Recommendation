@@ -13,7 +13,7 @@ import {
   getMockFlightTrend,
 } from '@/mocks/flightMocks';
 
-const USE_MOCK_FLIGHT_API = false;
+const USE_MOCK_FLIGHT_API = true;
 
 // 수집 날짜 → "오늘" / "어제" / "그제" / "N일 전" 레이블 계산
 function computeLabel(collectedDate: string): string {

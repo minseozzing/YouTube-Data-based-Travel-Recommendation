@@ -16,6 +16,19 @@ import {
 } from '@/schemas/cost.schema';
 
 import { z } from 'zod';
+import {
+  getMockCostDetailRaw,
+  getMockCostCompareRaw,
+  getMockCostCardRaw,
+  getMockCostSearchRaw,
+  getMockExchangeRateNewRaw,
+  getMockExchangeRateHistoryRaw,
+} from '@/mocks/costMocks';
+
+/**
+ * 서버 구현 완료 시 false 로 변경하면 실제 API가 호출됩니다.
+ */
+const USE_MOCK_COST_API = true;
 
 export const SEOUL_CITY_ID = 162;
 export const SEOUL_COUNTRY_ID = 58; // South Korea
@@ -67,7 +80,9 @@ export const costApi = {
   // GET /api/exchange-rate?currency=XXX
   getExchangeRateNew: async (currency: string): Promise<ExchangeRateNew | null> => {
     try {
-      const { data } = await axiosInstance.get('/api/exchange-rate', { params: { currency } });
+      const data = USE_MOCK_COST_API
+        ? getMockExchangeRateNewRaw(currency)
+        : (await axiosInstance.get('/api/exchange-rate', { params: { currency } })).data;
       return ExchangeRateNewSchema.parse({
         target: String(data.target),
         event_date: data.eventDate,
@@ -89,9 +104,11 @@ export const costApi = {
     type: 'D' | 'W' | 'M',
   ): Promise<ExchangeRateHistory | null> => {
     try {
-      const { data } = await axiosInstance.get('/api/exchange-rate/history', {
-        params: { targetCurrency, type },
-      });
+      const data = USE_MOCK_COST_API
+        ? getMockExchangeRateHistoryRaw(targetCurrency, type)
+        : (await axiosInstance.get('/api/exchange-rate/history', {
+            params: { targetCurrency, type },
+          })).data;
       return ExchangeRateHistorySchema.parse(data);
     } catch {
       return null;
@@ -104,9 +121,11 @@ export const costApi = {
     targetId: number,
   ): Promise<CostDetail> => {
     try {
-      const { data } = await axiosInstance.get('/api/cost/detail', {
-        params: { targetType: targetType.toUpperCase(), targetId },
-      });
+      const data = USE_MOCK_COST_API
+        ? getMockCostDetailRaw(targetType.toUpperCase() as 'CITY' | 'COUNTRY', targetId)
+        : (await axiosInstance.get('/api/cost/detail', {
+            params: { targetType: targetType.toUpperCase(), targetId },
+          })).data;
       const lc = data.livingCost;
       return CostDetailSchema.parse({
         target_type: data.targetType,
@@ -181,9 +200,11 @@ export const costApi = {
   // GET /api/cost/card?mode=TOP
   getCostCard: async (): Promise<CostCardItem[]> => {
     try {
-      const { data } = await axiosInstance.get('/api/cost/card', {
-        params: { mode: 'TOP' },
-      });
+      const data = USE_MOCK_COST_API
+        ? getMockCostCardRaw()
+        : (await axiosInstance.get('/api/cost/card', {
+            params: { mode: 'TOP' },
+          })).data;
       return (data.cards as any[]).map((c) => ({
         rank: c.rank ?? 0,
         id: c.id,
@@ -204,9 +225,11 @@ export const costApi = {
     sort: 'ASC' | 'DESC' = 'ASC',
   ): Promise<CostCardItem[]> => {
     try {
-      const { data } = await axiosInstance.get('/api/cost/card', {
-        params: { mode: 'SEARCH', type, keyword, sort },
-      });
+      const data = USE_MOCK_COST_API
+        ? getMockCostSearchRaw(type, keyword, sort)
+        : (await axiosInstance.get('/api/cost/card', {
+            params: { mode: 'SEARCH', type, keyword, sort },
+          })).data;
       return (data.cards as any[]).map((c, i) => ({
         rank: i + 1,
         id: c.id,
@@ -225,14 +248,14 @@ export const costApi = {
     const continents = ['asia', 'europe', 'north america', 'south america', 'africa', 'oceania'];
     const results = await Promise.all(
       continents.map((c) =>
-        axiosInstance
-          .get('/api/cost/card', { params: { mode: 'SEARCH', type: 'CONTINENT', keyword: c, sort: 'ASC' } })
-          .then(({ data }) =>
-            (data.cards as CostCardItem[]).map((item, i) => ({
+        costApi
+          .getCostSearch('CONTINENT', c, 'ASC')
+          .then((items) =>
+            items.map((item, i) => ({
               rank: i + 1,
               id: item.id,
               name: item.name,
-              imgUrl: (item as any).imgUrl ?? null,
+              imgUrl: item.imgUrl ?? null,
               dailyBudget: item.dailyBudget,
             })),
           )
@@ -257,9 +280,11 @@ export const costApi = {
     targetId: number,
   ): Promise<CostCompare> => {
     try {
-      const { data } = await axiosInstance.get('/api/cost/compare', {
-        params: { targetType, baseId, targetId },
-      });
+      const data = USE_MOCK_COST_API
+        ? getMockCostCompareRaw(targetType === 'CITY' ? 'CITY' : 'COUNTRY', baseId, targetId)
+        : (await axiosInstance.get('/api/cost/compare', {
+            params: { targetType, baseId, targetId },
+          })).data;
       return CostCompareSchema.parse({
         base: { ...data.base, img_url: data.base.imgUrl ?? null },
         target: { ...data.target, img_url: data.target.imgUrl ?? null },

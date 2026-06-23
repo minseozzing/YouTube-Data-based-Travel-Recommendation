@@ -1,6 +1,17 @@
 import { axiosInstance } from "./axiosInstance";
 import type { CityDetail } from "@/schemas/city.schema";
 import { z } from "zod";
+import {
+  getMockCityListRaw,
+  getMockCityDetailRaw,
+  getMockRecommendRaw,
+  getMockViewHistoryRaw,
+} from "@/mocks/cityMocks";
+
+/**
+ * 서버 구현 완료 시 false 로 변경하면 실제 API가 호출됩니다.
+ */
+const USE_MOCK_CITY_API = true;
 
 // ── 최근 본 도시 ────────────────────────────────────────────────────────────
 export const ViewHistoryItemSchema = z.object({
@@ -193,7 +204,9 @@ const BackendNotRecommendDetailSchema = z.object({
 export const cityApi = {
   // GET /api/city
   getList: async (params?: { lat?: number; lng?: number; query?: string }) => {
-    const { data } = await axiosInstance.get("/api/city", { params });
+    const data = USE_MOCK_CITY_API
+      ? getMockCityListRaw()
+      : (await axiosInstance.get("/api/city", { params })).data;
     return z
       .array(BackendCitySchema)
       .parse(data)
@@ -223,12 +236,14 @@ export const cityApi = {
     },
   ): Promise<CityDetail> => {
     try {
-    const { data } = await axiosInstance.get(`/api/city/${cityId}`, {
-      params: recommend && recommendParams
-        ? { recommend, selectedTags: recommendParams.selectedTags, userTotalBudget: recommendParams.userTotalBudget, travelDays: recommendParams.travelDays, month: recommendParams.month, recommendId: recommendParams.recommendId }
-        : { recommend },
-      timeout: recommend ? 60_000 : 10_000,
-    });
+    const data = USE_MOCK_CITY_API
+      ? getMockCityDetailRaw(cityId, recommend, recommendParams)
+      : (await axiosInstance.get(`/api/city/${cityId}`, {
+          params: recommend && recommendParams
+            ? { recommend, selectedTags: recommendParams.selectedTags, userTotalBudget: recommendParams.userTotalBudget, travelDays: recommendParams.travelDays, month: recommendParams.month, recommendId: recommendParams.recommendId }
+            : { recommend },
+          timeout: recommend ? 60_000 : 10_000,
+        })).data;
 
     if (recommend) {
       const city = BackendRecommendDetailSchema.parse(data);
@@ -324,7 +339,9 @@ export const cityApi = {
         }),
       ),
     });
-    const { data } = await axiosInstance.post("/api/recommend", body);
+    const data = USE_MOCK_CITY_API
+      ? getMockRecommendRaw(body)
+      : (await axiosInstance.post("/api/recommend", body)).data;
     const parsed = BackendRecommendResponseSchema.parse(data);
     return {
       recommendId: parsed.recommendId ?? undefined,
@@ -341,7 +358,9 @@ export const cityApi = {
 
   // GET /api/city/view-history
   getViewHistory: async (): Promise<ViewHistoryItem[]> => {
-    const { data } = await axiosInstance.get("/api/city/view-history");
+    const data = USE_MOCK_CITY_API
+      ? getMockViewHistoryRaw()
+      : (await axiosInstance.get("/api/city/view-history")).data;
     return z.array(ViewHistoryItemSchema).parse(data);
   },
 };
