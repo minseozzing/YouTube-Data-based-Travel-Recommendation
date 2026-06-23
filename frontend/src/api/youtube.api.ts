@@ -1,5 +1,6 @@
 import { axiosInstance } from "./axiosInstance";
 import { z } from "zod";
+import { getMockInterestAnalysisRaw, getMockInterestTagsRaw } from "@/mocks/youtubeMocks";
 
 export interface YoutubeSyncStatus {
   connected: boolean;
@@ -73,7 +74,7 @@ export const youtubeApi = {
   // GET /api/youtube/sync-status — YouTube 연동 및 동기화 상태 조회
   getSyncStatus: async (): Promise<YoutubeSyncStatus> => {
     if (USE_MOCK_YOUTUBE_API) {
-      return { connected: false, syncEnabled: null, syncStatus: null, lastSyncedAt: null };
+      return { connected: true, syncEnabled: true, syncStatus: "SYNCED", lastSyncedAt: new Date().toISOString() };
     }
     const { data } = await axiosInstance.get("/api/youtube/sync-status");
     return data as YoutubeSyncStatus;
@@ -90,7 +91,7 @@ export const youtubeApi = {
     tagIds: number[];
     tagNames: string[];
   }> => {
-    if (USE_MOCK_YOUTUBE_API) return { tagIds: [], tagNames: [] };
+    if (USE_MOCK_YOUTUBE_API) return getMockInterestTagsRaw();
     const { data } = await axiosInstance.get("/api/interest/analyze");
     const parsed = InterestAnalyzeResponseSchema.safeParse(data);
     const tags = parsed.success ? parsed.data.tags : z.array(InterestTagSchema).parse(data);
@@ -103,7 +104,7 @@ export const youtubeApi = {
 
   // GET /api/interest/analyze — 풀 분석 데이터 (추천 이유 탭용)
   getInterestAnalysis: async (): Promise<InterestAnalyzeResponse> => {
-    if (USE_MOCK_YOUTUBE_API) return { tags: [], topKeywords: [] };
+    if (USE_MOCK_YOUTUBE_API) return InterestAnalyzeResponseSchema.parse(getMockInterestAnalysisRaw());
     const { data } = await axiosInstance.get("/api/interest/analyze");
     const parsed = InterestAnalyzeResponseSchema.safeParse(data);
     if (parsed.success) return parsed.data;

@@ -3,7 +3,6 @@ import { AnimatePresence, motion, type Variants } from "framer-motion";
 import { Loader2, AlertCircle, X, RefreshCw } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useUiStore } from "@/stores/uiStore";
-import { useAuthStore } from "@/stores/authStore";
 import { useCityDetail } from "@/hooks/city/useCityDetail";
 import { useCityList } from "@/hooks/city/useCityList";
 import { DestinationHeroCard } from "@/components/city/DestinationHeroCard";
@@ -74,7 +73,6 @@ export function CityDetailModal() {
     setActiveCityTab,
   } = useUiStore();
 
-  const { isGuest } = useAuthStore();
   const { data: cities } = useCityList();
   const selectedCity = cities?.find((c) => c.cityId === selectedCityId);
   const selectedCityName = selectedCity?.cityName;
@@ -82,8 +80,9 @@ export function CityDetailModal() {
     isRecommendActive &&
     recommendResults.some((r) => r.city === selectedCityName);
 
-  // 게스트 모드에서는 recommend=false, 추천 이유/유튜브 탭 숨김
-  const showRecommendTabs = isRecommendedCity && !isGuest;
+  // mock 브랜치에서는 백엔드가 없어 게스트 모드만 사용 가능하므로,
+  // 추천 이유/유튜브 탭도 게스트에게 동일하게 보여준다.
+  const showRecommendTabs = isRecommendedCity;
 
   const {
     data: basicCity,
