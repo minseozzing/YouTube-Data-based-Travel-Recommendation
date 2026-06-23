@@ -10,7 +10,7 @@
 
 - 프로젝트 기간: 2026.02 ~ 2026.04 (6주) — SSAFY 14기 빅데이터 분산 트랙 특화 프로젝트
 - 개발 인원: 6명 (FE 2, BE 4)
-- 배포: `dahaeng.site`
+- 배포: [youtube-data-based-travel-recommendation.pages.dev](https://youtube-data-based-travel-recommendation.pages.dev)
 
 ![main](./docs/images/main-globe.png)
 
