@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="./docs/images/logo.png" width="240" alt="다행 로고"/>
+</div>
+
 # 다행 (Dahaeng)
 
 > 다음 여행을 행복하게
